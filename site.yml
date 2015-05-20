@@ -172,6 +172,7 @@
   roles:
     - role: cinder-control
       tags: ['openstack', 'cinder', 'control']
+      when: cinder.enabled|bool
 
 - name: cinder data plane
   gather_facts: force
