@@ -24,13 +24,8 @@
 - name: ensure tgt service is running
   service: name=tgt state=started
 
-# TODO: allow for device-backed VGs in addition to file-backed VGs
-- name: cinder volume group
-  cinder_volume_group: file={{ cinder.volume_file }}
-                       size={{ cinder.volume_file_size }}
-  when: cinder.fixed_key is not defined or (cinder.fixed_key is defined and "compute" not in group_names)
-  # a fixed_key cannot be used with a local cinder volume group on a compute
-  # node. This would be a security risk, DO NOT CHANGE.
+- include: volume_group.yml
+  when: cinder.create_vg|bool and ( cinder.fixed_key is not defined or (cinder.fixed_key is defined and "compute" not in group_names) )
 
 - name: iscsi start
   service: name=open-iscsi state=started
