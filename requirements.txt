@@ -3,6 +3,7 @@ python-neutronclient
 python-keystoneclient
 python-glanceclient
 python-cinderclient
+python-heatclient
 oslo.utils
 tox
 pep8
