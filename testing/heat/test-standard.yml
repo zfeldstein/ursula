@@ -1,0 +1,73 @@
+heat_template_version: 2013-05-23
+
+description: HOT template to test a three node Ursula cluster
+
+parameters:
+  key_name:
+    type: string
+    description: Name of keypair to assign to servers
+  image:
+    type: string
+    description: Name of image to use for servers
+  flavor:
+    type: string
+    description: Flavor to use for servers
+  net_id:
+    type: string
+    description: ID of Neutron network into which servers get deployed
+
+resources:
+  controller1:
+    type: OS::Nova::Server
+    properties:
+      name: controller1
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key_name }
+      networks:
+        - network: { get_param: net_id }
+
+  controller2:
+    type: OS::Nova::Server
+    properties:
+      name: controller2
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key_name }
+      networks:
+        - network: { get_param: net_id }
+
+  compute1:
+    type: OS::Nova::Server
+    properties:
+      name: compute1
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key_name }
+      networks:
+        - network: { get_param: net_id }
+
+  server_security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: Security group for Ursula testing.
+      name: test-security-group
+      rules: [
+        {remote_ip_prefix: 0.0.0.0/0,
+        protocol: tcp,
+        port_range_min: 22,
+        port_range_max: 22},
+        {remote_ip_prefix: 0.0.0.0/0,
+        protocol: icmp}]
+
+outputs:
+  contorller1_provider_ip:
+    description: IP address of controller1 in provider network
+    value: { get_attr: [ controller1, first_address ] }
+  controller2_provider_ip:
+    description: IP address of controller2 in provider network
+    value: { get_attr: [ controller2, first_address ] }
+  compute1_provider_ip:
+    description: IP address of compute1 in provider network
+    value: { get_attr: [ compute1, first_address ] }
+
