@@ -21,7 +21,7 @@ export NET_ID=${NET_ID:=ba0fdd03-72b5-41eb-bb67-fef437fd6cb4}
 if [[ $(git rev-parse --abbrev-ref HEAD) == 'HEAD' ]]; then
   export testenv_instance_prefix=$(git rev-parse --short HEAD)
 else
-  export testenv_instance_prefix=$(git rev-parse --abbrev-ref HEAD)
+  export testenv_instance_prefix=$(git rev-parse --abbrev-ref HEAD | sed 's/\./_/g' | cut -c 1-20)
 fi
 
 VMS="${testenv_instance_prefix}-controller-0 ${testenv_instance_prefix}-controller-1 ${testenv_instance_prefix}-compute-0"
