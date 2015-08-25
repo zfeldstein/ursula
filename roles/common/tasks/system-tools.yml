@@ -4,31 +4,11 @@
 
 - name: install system tools
   apt: pkg={{ item }}
-  with_items:
-    - ack-grep
-    - build-essential
-    - curl
-    - dstat
-    - ethtool
-    - git
-    - htop
-    - iotop
-    - iperf
-    - ltrace
-    - mcelog
-    - mtr
-    - netcat
-    - pstack
-    - pv
-    - ruby1.9.1
-    - ruby1.9.1-dev
-    - smem
-    - socat
-    - tree
-    - vim
-    - cdpr
-    - sysstat
-    - logrotate
+  with_items: common.system_tools.packages
+
+- name: install mcelog package when precise
+  apt: pkg=mcelog
+  when: ansible_distribution_version == "12.04"
 
 - name: install lm-sensors package
   apt: name=lm-sensors state=present update_cache=yes

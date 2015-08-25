@@ -1,6 +1,5 @@
 ---
 common:
-  bbg_openstack_repo: 'deb http://apt.openstack.blueboxgrid.com/ubuntu/ precise main'
   hwraid:
     enabled: True
     clients:
@@ -26,4 +25,28 @@ common:
     git_rev: master
     tar_url: https://github.com/blueboxgroup/ursula-monitoring/archive/master.tar.gz
     tar_version: master
-
+  system_tools:
+    packages:
+      - ack-grep
+      - build-essential
+      - curl
+      - dstat
+      - ethtool
+      - git
+      - htop
+      - iotop
+      - iperf
+      - ltrace
+      - mtr
+      - netcat
+      - pstack
+      - pv
+      - ruby1.9.1
+      - ruby1.9.1-dev
+      - smem
+      - socat
+      - tree
+      - vim
+      - cdpr
+      - sysstat
+      - logrotate
