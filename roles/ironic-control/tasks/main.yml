@@ -43,6 +43,7 @@
   with_items:
     - ironic-api
     - ironic-conductor
+  tags: db-migrate
 
 - name: sync ironic database
   command: "{{ ironic.virtualenv }}/bin/ironic-dbsync upgrade"
@@ -51,14 +52,17 @@
   run_once: true
   notify: restart ironic controller services
   # we want this to always be changed so that it can notify the service restart
+  tags: db-migrate
 
 - meta: flush_handlers
+  tags: db-migrate
 
 - name: start ironic controller services
   service: name={{ item }} state=started
   with_items:
     - ironic-api
     - ironic-conductor
+  tags: db-migrate
 
 - name: permit access to ironic
   ufw: rule=allow port={{ ironic.api_url.port }} proto=tcp

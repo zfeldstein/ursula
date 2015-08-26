@@ -34,6 +34,7 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
+  tags: db-migrate
 
 - name: sync heat database
   command: heat-manage db_sync
@@ -43,8 +44,10 @@
   notify:
     - restart heat services
   # we want this to always be changed so that it can notify the service restart
+  tags: db-migrate
 
 - meta: flush_handlers
+  tags: db-migrate
 
 - name: start heat services
   service: name={{ item }} state=started
@@ -52,6 +55,7 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
+  tags: db-migrate
 
 - include: monitoring.yml tags=monitoring,common
   when: monitoring.enabled|default('True')|bool

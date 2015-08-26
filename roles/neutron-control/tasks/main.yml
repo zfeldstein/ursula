@@ -22,6 +22,7 @@
 - name: stop neutron service before db sync
   service: name=neutron-server state=stopped
   when: database_create.changed or force_sync|default('false')|bool
+  tags: db-migrate
 
 - name: sync neutron database
   command: neutron-db-manage --config-file /etc/neutron/neutron.conf \
@@ -31,11 +32,14 @@
   changed_when: true
   notify: restart neutron services
   # we want this to always be changed so that it can notify the service restart
+  tags: db-migrate
 
 - meta: flush_handlers
+  tags: db-migrate
 
 - name: start neutron-server
   service: name=neutron-server state=started
+  tags: db-migrate
 
 - name: Permit access to Neutron
   ufw: rule=allow to_port=9797 proto=tcp
