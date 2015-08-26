@@ -43,7 +43,6 @@
   with_items:
     - ironic-api
     - ironic-conductor
-  tags: db-migrate
 
 - name: sync ironic database
   command: "{{ ironic.virtualenv }}/bin/ironic-dbsync upgrade"
@@ -55,14 +54,12 @@
   tags: db-migrate
 
 - meta: flush_handlers
-  tags: db-migrate
 
 - name: start ironic controller services
   service: name={{ item }} state=started
   with_items:
     - ironic-api
     - ironic-conductor
-  tags: db-migrate
 
 - name: permit access to ironic
   ufw: rule=allow port={{ ironic.api_url.port }} proto=tcp

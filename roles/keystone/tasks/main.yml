@@ -34,7 +34,6 @@
 - name: stop keystone service before db sync
   service: name=keystone state=stopped
   when: database_create.changed or force_sync|default('false')|bool
-  tags: db-migrate
 
 - name: sync keystone database
   command: keystone-manage db_sync
@@ -46,11 +45,9 @@
   tags: db-migrate
 
 - meta: flush_handlers
-  tags: db-migrate
 
 - name: start keystone
   service: name=keystone state=started
-  tags: db-migrate
 
 - name: permit access to keystone
   ufw: rule=allow to_port={{ item }} proto=tcp

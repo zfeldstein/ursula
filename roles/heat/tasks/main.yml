@@ -34,7 +34,6 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
-  tags: db-migrate
 
 - name: sync heat database
   command: heat-manage db_sync
@@ -47,7 +46,6 @@
   tags: db-migrate
 
 - meta: flush_handlers
-  tags: db-migrate
 
 - name: start heat services
   service: name={{ item }} state=started
@@ -55,7 +53,6 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
-  tags: db-migrate
 
 - include: monitoring.yml tags=monitoring,common
   when: monitoring.enabled|default('True')|bool

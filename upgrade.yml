@@ -38,6 +38,7 @@
   hosts: db
   max_fail_percentage: 1
   tags: dbupgrade
+        db-migration
   serial: 1
 
   tasks:
@@ -53,6 +54,7 @@
   hosts: db_arbiter
   max_fail_percentage: 1
   tags: dbupgrade
+        db-migration
 
   pre_tasks:
     - name: purge old garbd and configs
@@ -73,6 +75,7 @@
   hosts: db
   max_fail_percentage: 1
   tags: dbupgrade
+        db-migration
   serial: 1
 
   tasks:

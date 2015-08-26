@@ -52,7 +52,6 @@
     - glance-api
     - glance-registry
   when: database_create.changed or force_sync|default('false')|bool
-  tags: db-migrate
 
 - name: sync glance database
   command: glance-manage db_sync
@@ -65,14 +64,12 @@
   tags: db-migrate
 
 - meta: flush_handlers
-  tabs: db-migrate
 
 - name: start glance services
   service: name={{ item }} state=started
   with_items:
     - glance-api
     - glance-registry
-  tags: db-migrate
 
 - include: image-sync.yml
   when: glance.sync.enabled
