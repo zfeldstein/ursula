@@ -3,9 +3,9 @@ client:
   self_signed_cert: false
   names:
     - python-keystoneclient
-    - python-glanceclient
+    - python-glanceclient<1.0.0
     - python-novaclient
-    - python-neutronclient
+    - python-neutronclient<2.27.0
     - python-cinderclient
     - python-heatclient
     - python-ironicclient
