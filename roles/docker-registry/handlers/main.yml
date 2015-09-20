@@ -1,0 +1,6 @@
+---
+- name: start docker registry
+  service: name=docker-registry state=started
+
+- name: restart docker registry
+  service: name=docker-registry state=restarted
