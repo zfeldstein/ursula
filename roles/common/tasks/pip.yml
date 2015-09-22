@@ -1,4 +1,9 @@
 ---
+- name: update pip
+  pip: name=pip version={{ common.pip_version }}
+       extra_args='-i {{ openstack.pypi_mirror }}/+simple'
+  when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is defined
+
 - name: root user pip config directory
   file: dest=/root/.pip state=directory
 
@@ -8,11 +13,12 @@
 
 - name: easyinstall config file
   template: src=etc/pydistutils.cfg dest=/root/.pydistutils.cfg
-  when: openstack.pypi_mirror is defined
+  when: openstack.easy_install_mirror is defined
 
 - name: update pip
   pip: name=pip version={{ common.pip_version }}
-  when: ansible_distribution_version == "12.04"
+       extra_args='-i {{ openstack.pypi_mirror }}/+simple'
+  when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is not defined
 
 - name: uninstall python-setuptools
   apt: pkg=python-setuptools state=absent
