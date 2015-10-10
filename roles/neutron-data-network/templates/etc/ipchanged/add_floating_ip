@@ -24,6 +24,8 @@ function neutron_and_local_agents_alive () {
 
 logger "ipchanged UP floating interface"
 
+{% if not neutron.l3ha.enabled|bool %}
+
 # restart neutron-server so that it re-connects to rabbit
 restart neutron-server
 
@@ -45,3 +47,5 @@ if [[ neutron_and_local_agents_alive ]]; then
 else
   logger "ipchanged UP timed out waiting for neutron agents"
 fi
+
+{% endif %}

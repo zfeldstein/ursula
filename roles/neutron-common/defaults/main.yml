@@ -12,11 +12,20 @@ neutron:
   service_plugins:
     - neutron.services.l3_router.l3_router_plugin.L3RouterPlugin
   enable_flat_networks: False
+  l3ha:
+    enabled: False
+    max_agents: 2
+    min_agents: 2
+    cidr: 169.254.192.0/18
+    password: password
+    interval: 2
+
   # Tunneling encapsulations enabled e.g. gre, vxlan
   # Including any tunnels will enable tunnling
   tunnel_types: []
   lbaas:
     enable: False
+    default: True
     interface_driver: neutron.agent.linux.interface.BridgeInterfaceDriver
     service_plugin:
       - neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2

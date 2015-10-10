@@ -8,6 +8,12 @@
     - ucarp
     - radvd
 
+- name: install packages for l3ha
+  apt: pkg={{ item }}
+    - keepalived
+    - conntrackd
+  when: neutron.l3ha.enabled|bool
+
 - include: dnsmasq.yml
 
 - name: ensure ovs br-ex bridge present
