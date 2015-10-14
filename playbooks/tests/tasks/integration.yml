@@ -74,7 +74,7 @@
     shell: . /root/stackrc; nova volume-create --display-name=turtle-vol 2
 
   - name: discover volume id
-    shell: . /root/stackrc; nova volume-list |awk '/turtle-vol/ {print $2}'
+    shell: . /root/stackrc; cinder list |awk '/turtle-vol/ {print $2}'
     register: turtle_vol
 
   - name: nova can attach cinder volume
