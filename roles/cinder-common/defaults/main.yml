@@ -19,7 +19,7 @@ cinder:
       - cinder-volume
       - cinder-volume-usage-audit
   source:
-    rev: 'stable/kilo'
+    rev: 'stable/liberty'
     python_dependencies:
       - { name: mysql-python }
       - { name: functools32 }

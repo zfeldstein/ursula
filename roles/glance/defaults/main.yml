@@ -16,7 +16,7 @@ glance:
   store_ceph: False
   show_multiple_locations: True
   source:
-    rev: 'stable/kilo'
+    rev: 'stable/liberty'
     python_dependencies:
       - { name: mysql-python }
       - { name: functools32 }

@@ -5,7 +5,7 @@ swift:
     - sdb
   allow_versions: False
   source:
-    rev: 'stable/kilo'
+    rev: 'stable/liberty'
     python_dependencies:
       - { name: keystonemiddleware }
       - { name: python-swiftclient }

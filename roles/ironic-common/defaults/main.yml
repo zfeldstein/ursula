@@ -17,7 +17,7 @@ ironic:
     - pxe_ssh
     - pxe_ipmitool
   source:
-    rev: 'stable/kilo'
+    rev: 'stable/liberty'
     python_dependencies:
       - { name: mysql-python }
       - { name: functools32 }
