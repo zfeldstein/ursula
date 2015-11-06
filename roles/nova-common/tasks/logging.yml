@@ -7,3 +7,6 @@
       - missingok
       - rotate 7
       - compress
+      - sharedscripts
+    scripts:
+      - postrotate: "/usr/sbin/service nova-novncproxy reload"
