@@ -23,10 +23,10 @@
 if [ -f /etc/redhat-release ]; then
 	. /etc/init.d/functions
 	. /etc/sysconfig/network
-	config=/etc/sysconfig/garb
+	config=/etc/sysconfig/garbd
 else
 	. /lib/lsb/init-functions
-	config=/etc/default/garb
+	config=/etc/default/garbd
 fi
 
 log_failure() {
