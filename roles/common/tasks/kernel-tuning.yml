@@ -48,7 +48,7 @@
 - name: Increase grub-common crashkernel reserved size
   lineinfile: dest=/etc/grub.d/10_linux
               regexp="^    GRUB_CMDLINE_EXTRA=.+crashkernel="
-              line="    GRUB_CMDLINE_EXTRA=\"$GRUB_CMDLINE_EXTRA crashkernel=256M\""
+              line="    GRUB_CMDLINE_EXTRA=\"$GRUB_CMDLINE_EXTRA crashkernel=512M\""
   notify: update grub config
 
 - name: "Disable GRUB OS prober so we don't try to boot instance's cinder volumes"
