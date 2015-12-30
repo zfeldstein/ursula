@@ -150,6 +150,8 @@ neutron:
     - name: internal
       network_name: internal
       cidr: 172.16.255.0/24
+      pool_start: 172.16.255.2
+      pool_end: 172.16.255.254
       enable_dhcp: "true"
       gateway_ip: 172.16.255.1
       ip_version: 4
