@@ -22,9 +22,9 @@ common:
     path: /opt/ursula-monitoring
     method: git # git|tar
     git_repo: https://github.com/blueboxgroup/ursula-monitoring.git
-    git_rev: master
-    tar_url: https://github.com/blueboxgroup/ursula-monitoring/archive/master.tar.gz
-    tar_version: master
+    git_rev: RELEASE-1.2.x
+    tar_url: https://github.com/blueboxgroup/ursula-monitoring/archive/RELEASE-1.2.x.tar.gz
+    tar_version: RELEASE-1.2.x
   system_tools:
     packages:
       - ack-grep
