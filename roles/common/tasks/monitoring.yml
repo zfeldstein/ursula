@@ -156,7 +156,7 @@
   notify: restart sensu-client
 
 - name: network interface traffic metrics check
-  sensu_metrics_check: name=network-interface-traffic-metrics plugin=metrics-netif.rb
+  sensu_metrics_check: name=network-interface-traffic-metrics plugin=metrics-netif.rb state=absent
                        args='--scheme {{ monitoring.graphite.host_prefix }}.network --interface eth0,eth1,bond0,bond1'
   notify: restart sensu-client
 
@@ -217,6 +217,5 @@
   notify: restart sensu-client
 
 - name: kernel-options
-  sensu_check: name=kernel-options plugin=check-kernel-options.rb
+  sensu_check: name=kernel-options plugin=check-kernel-options.rb state=absent
   notify: restart sensu-client
-
