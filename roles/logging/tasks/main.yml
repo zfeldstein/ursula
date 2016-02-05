@@ -12,18 +12,12 @@
 - name: create logstash user
   user: name=logstash comment="Logstash Service User" shell=/sbin/nologin system=yes home=/var/lib/logstash
 
-- name: install logstash-forwarder
-  apt: pkg=logstash-forwarder
-  when: ansible_distribution_version == "12.04"
-
 - name: download logstash
   get_url: url={{ logging.download.url }}
            dest=/tmp/logstash-forwarder_{{ logging.version }}_amd64.deb
-  when: ansible_distribution_version == "14.04"
 
 - name: install logstash
   apt: deb=/tmp/logstash-forwarder_{{ logging.version }}_amd64.deb
-  when: ansible_distribution_version == "14.04"
 
 - name: install logstash-forwarder service
   copy: src=etc/init/logstash-forwarder.conf dest=/etc/init/logstash-forwarder.conf mode=0644

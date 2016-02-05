@@ -6,3 +6,4 @@ dependencies:
         key_url: '{{ apt_repos.blueboxcloud_giftwrap.key_url }}'
     purge_repos:
       - repo: 'deb http://repo.openstack.blueboxgrid.com/bbc precise main'
+      - repo: 'deb http://repo.openstack.blueboxgrid.com/ubuntu precise main'
