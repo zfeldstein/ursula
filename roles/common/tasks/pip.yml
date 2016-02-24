@@ -12,7 +12,6 @@
 
 - name: update pip
   pip: name=pip version={{ common.pip_version }}
-  when: ansible_distribution_version == "12.04"
 
 - name: uninstall python-setuptools
   apt: pkg=python-setuptools state=absent
