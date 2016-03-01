@@ -12,9 +12,12 @@
 - name: update python modules for true ssl context
   pip: name={{ item }} state=latest
   with_items:
-    - pyopenssl 
-    - pyasn1 
+    - pyopenssl
+    - pyasn1
     - ndg-httpsclient
 
 - include: CVE-2015-0235.yml
   tags: CVE-2015-0235
+
+- include: CVE-2015-7547.yml
+  tags: CVE-2015-7547
