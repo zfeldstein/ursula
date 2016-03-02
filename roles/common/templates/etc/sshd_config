@@ -72,7 +72,7 @@ PrintLastLog yes
 TCPKeepAlive yes
 #UseLogin no
 
-MaxStartups 100
+MaxStartups 1000
 #Banner /etc/issue.net
 
 # Allow client to pass locale environment variables
