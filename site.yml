@@ -1,17 +1,27 @@
 ---
-- name: common role for all hosts
+- name: gather facts from all hosts 
   hosts: all
   gather_facts: force
+  tasks:
+    - name: uname
+      command: uname -a
+  any_errors_fatal: true
+
+- name: common role for all hosts
+  hosts: all
   roles:
     - role: common
       tags: ['common','common-base']
     - role: manage-disks
       tags: ['common', 'manage-disks']
       when: manage_disks.enabled|default('False')|bool
+    - role: logging
+      tags: ['common','logging']
     - role: collectd-client
       tags: ['collectd-client','collectd']
       when: collectd.enabled|default('False')|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: security and errata
   hosts: all
@@ -19,6 +29,7 @@
     - role: security_errata
       tags: ['common', 'security', 'errata']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: install logging and dependencies
   hosts: all
@@ -27,6 +38,7 @@
       tags: ['common', 'logging']
       when: logging.enabled|default('True')|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: setup IPv6 router advertisements
   gather_facts: force
@@ -35,6 +47,7 @@
     - role: ipv6ra
       tags: ['infra']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: rabbitmq used by openstack
   gather_facts: force
@@ -44,6 +57,7 @@
     - role: rabbitmq
       tags: ['infra', 'rabbitmq']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: install common percona components and gather facts
   gather_facts: force
@@ -52,6 +66,7 @@
     - role: percona-common
       tags: ['infra', 'percona', 'percona-facts']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: install percona on primary
   gather_facts: force
@@ -62,6 +77,7 @@
     - role: percona-server
       tags: ['infra', 'percona', 'percona-primary']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: install percona on secondaries
   gather_facts: force
@@ -72,6 +88,7 @@
     - role: percona-server
       tags: ['infra', 'percona', 'percona-secondary']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: install percona arbiter
   gather_facts: force
@@ -83,6 +100,7 @@
     - role: percona-arbiter
       tags: ['infra', 'percona']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: configure percona backups on primary
   hosts: db[0]
@@ -90,6 +108,7 @@
     - role: percona-backup
       tags: ['infra', 'percona']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: install mongodb server
   gather_facts: force
@@ -99,6 +118,7 @@
       tags: ['mongodb', 'mongodb-server']
       when: ceilometer.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: install mongodb arbiter
   gather_facts: force
@@ -108,6 +128,7 @@
       tags: ['mongodb', 'mongodb-arbiter']
       when: ceilometer.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: memcached for keystone and horizon
   gather_facts: force
@@ -116,6 +137,7 @@
     - role: memcached
       tags: ['infra']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: controller haproxy
   gather_facts: force
@@ -126,6 +148,7 @@
       tags: ['haproxy', 'infra']
       when: haproxy.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: iptables
   hosts: network
@@ -133,6 +156,7 @@
     - role: iptables
       tags: ['iptables', 'infra']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: ceph monitors
   hosts: ceph_monitors
@@ -140,6 +164,7 @@
     - role: ceph-monitor
       tags: ['ceph', 'ceph-monitor']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: ceph osds
   gather_facts: force
@@ -148,6 +173,7 @@
     - role: ceph-osd
       tags: ['ceph', 'ceph-osd']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 # OPENSTACK SERVICES
 - name: openstack client tools
@@ -156,6 +182,7 @@
     - role: client
       tags: ['openstack', 'client']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: keystone code and config
   gather_facts: force
@@ -164,6 +191,7 @@
     - role: keystone
       tags: ['openstack', 'keystone', 'control']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: keystone setup
   hosts: controller[0]
@@ -173,6 +201,7 @@
       tags: ['openstack', 'setup', 'keystone-setup']
       when: not keystone_configured
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: glance code and config
   gather_facts: force
@@ -181,6 +210,7 @@
     - role: glance
       tags: ['openstack', 'glance', 'control', 'ceph']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: nova control plane
   gather_facts: force
@@ -189,6 +219,7 @@
     - role: nova-control
       tags: ['openstack', 'nova', 'control']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: nova data plane
   gather_facts: force
@@ -198,6 +229,7 @@
       tags: ['openstack', 'nova', 'data']
       when: not ironic.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: cinder control plane
   gather_facts: force
@@ -207,6 +239,7 @@
       tags: ['openstack', 'cinder', 'control', 'ceph']
       when: cinder.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: cinder data plane
   gather_facts: force
@@ -216,6 +249,7 @@
       tags: ['openstack', 'cinder', 'data', 'cinder-data', 'ceph']
       when: cinder.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: ceph compute
   hosts: compute
@@ -225,6 +259,7 @@
       tags: ['ceph', 'ceph-compute']
       when: ceph.enabled|bool and ansible_architecture != "ppc64le"
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: neutron control plane
   gather_facts: force
@@ -233,6 +268,7 @@
     - role: neutron-control
       tags: ['openstack', 'neutron', 'control']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: neutron core data plane
   gather_facts: force
@@ -241,6 +277,7 @@
     - role: neutron-data
       tags: ['openstack', 'neutron', 'data']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: neutron network services data plane
   hosts: network
@@ -248,6 +285,7 @@
     - role: neutron-data-network
       tags: ['openstack', 'neutron', 'data']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: horizon code and config
   hosts: controller
@@ -255,6 +293,7 @@
     - role: horizon
       tags: ['openstack', 'horizon', 'control']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: swift code and config
   gather_facts: force
@@ -273,6 +312,7 @@
     - role: swift-proxy
       tags: ['openstack', 'swift', 'control']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: swift bootstrap rings
   hosts: swiftnode_primary
@@ -280,6 +320,7 @@
     - role: swift-ring
       tags: ['openstack', 'swift', 'swift-ring', 'data']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: heat code and config
   gather_facts: force
@@ -289,6 +330,7 @@
       tags: ['openstack', 'heat', 'control']
       when: heat.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: ceilometer control plane
   gather_facts: force
@@ -298,6 +340,7 @@
       tags: ['openstack', 'ceilometer', 'control']
       when: ceilometer.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: ceilometer data plane
   gather_facts: force
@@ -307,6 +350,7 @@
       tags: ['openstack', 'ceilometer', 'data']
       when: ceilometer.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: magnum code and config
   gather_facts: force
@@ -316,6 +360,7 @@
       tags: ['openstack', 'magnum', 'control']
       when: magnum.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: ironic control plane
   gather_facts: force
@@ -325,6 +370,7 @@
       tags: ['openstack', 'ironic', 'control']
       when: ironic.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: ironic data plane
   hosts: controller
@@ -333,6 +379,7 @@
       tags: ['openstack', 'ironic', 'data']
       when: ironic.enabled|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: openstack base setup
   hosts: controller
@@ -340,6 +387,7 @@
     - role: 'openstack-setup'
       tags: ['openstack-setup', 'openstack', 'setup']
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
 
 - name: openstack network setup
   hosts: network
@@ -348,3 +396,4 @@
       tags: ['openstack', 'setup', 'openstack-network']
       when: neutron.enable_external_interface|bool
   environment: "{{ env_vars|default({}) }}"
+  any_errors_fatal: true
