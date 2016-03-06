@@ -97,3 +97,6 @@
 
 - name: restart keystone api
   service: name=keystone state=restarted
+
+- include: federation.yml
+  tags: [ 'keystone-federation']
