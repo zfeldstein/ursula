@@ -66,6 +66,9 @@
 - name: enable and start sensu-client
   service: name=sensu-client state=started enabled=yes
 
+- name: override sensu-client startup
+  shell: update-rc.d sensu-client defaults
+
 - name: install sensu plugin pip modules
   pip: name=sensu_plugin version=0.1.0
 
@@ -134,7 +137,7 @@
   notify: restart sensu-client
 
 - name: network interface traffic check
-  sensu_check: name=network_interface_traffic plugin=check-netif.rb state=absent 
+  sensu_check: name=network_interface_traffic plugin=check-netif.rb state=absent
   notify: restart sensu-client
 
 - name: disk check
