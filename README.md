@@ -177,6 +177,11 @@ Note: The default OS for ursula is Ubuntu Trusty. If you want Precise, set
 the env var `URSULA_BOX_NAME` to the name of your precise vagrant
 box before running vagrant.
 
+# Contributing
+
+Contributions in the form of pull requests or issues are very welcome. We
+ask that you review [Code Guidelines](./coding.md).
+
 # More Docs
 
 See the [/doc](https://github.com/blueboxgroup/ursula/tree/master/doc) directory of this repo.
