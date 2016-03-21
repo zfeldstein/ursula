@@ -49,6 +49,7 @@ neutron:
       - neutron-sriov-nic-agent
       - neutron-usage-audit
       - neutron-vpn-agent
+      - neutron
 
   package:
     console_scripts:
@@ -81,6 +82,7 @@ neutron:
       - neutron-sriov-nic-agent
       - neutron-usage-audit
       - neutron-vpn-agent
+      - neutron
 
   logs:
     - paths:
