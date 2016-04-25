@@ -15,12 +15,12 @@
   when: ansible_distribution_version == "12.04"
 
 - name: download logstash
-  get_url: url=http://repo.openstack.blueboxgrid.com/ubuntu/pool/main/l/logstash-forwarder/logstash-forwarder_{{ logging.version }}_amd64.deb
-           dest=/tmp/logstash-forwarder_{{ logging.version }}_amd64.deb
+  get_url: url=https://file-mirror.openstack.blueboxgrid.com/logstash/logstash-forwarder_0.3.1_amd64.deb
+           dest=/tmp/logstash-forwarder_amd64.deb
   when: ansible_distribution_version == "14.04"
 
 - name: install logstash
-  apt: deb=/tmp/logstash-forwarder_{{ logging.version }}_amd64.deb
+  apt: deb=/tmp/logstash-forwarder_amd64.deb
   when: ansible_distribution_version == "14.04"
 
 - name: install logstash-forwarder service

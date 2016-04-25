@@ -1,5 +1,6 @@
 ---
 - name: common role for all hosts
+  gather_facts: force
   hosts: all
   roles:
     - role: common
@@ -109,6 +110,11 @@
   roles:
     - role: client
       tags: ['openstack', 'client']
+
+- name: openstack sustainability
+  hosts: compute
+  roles:
+    - role: openstack
 
 - name: keystone code and config
   gather_facts: force

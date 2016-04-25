@@ -30,9 +30,9 @@
   with_items:
     - libvirt-bin
     - python-libvirt
-    - qemu-kvm=2.0.0+dfsg-2ubuntu1.11
+    - qemu-kvm
     - open-iscsi
-    - librbd1=0.80.9-0ubuntu0.14.04.2
+    - librbd1
   tags: security
   when: ansible_distribution_version == "14.04"
 
