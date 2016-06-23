@@ -20,6 +20,7 @@ swift:
   enabled: True
   disks:
     - disk: vda
+      make_label: True
 
 haproxy:
   stats_group: haproxy

@@ -41,6 +41,7 @@ def main():
             dev  = dict(required=False, default=None),
             partition_path = dict(required=False, default=None),
             mount_point = dict(required=False, default=None),
+            make_label = dict(required=False, default=False),
         ),
         required_one_of = [['dev', 'partition_path']],
         mutually_exclusive = [['dev', 'partition_path']]
@@ -70,9 +71,9 @@ def main():
         module.exit_json(changed=False)
 
     if dev_path is not None:
-        # create label
-        cmd = ['parted', '--script', dev_path, 'mklabel', 'msdos']
-        rc, out, err = module.run_command(cmd, check_rc=True)    
+        if module.params.get('make_label'):
+            cmd = ['parted', '--script', dev_path, 'mklabel', 'gpt']
+            rc, out, err = module.run_command(cmd, check_rc=True)    
 
         # create partitions
         cmd = ['parted', '--script', dev_path, 'mkpart', 'primary', '1', '100%']
