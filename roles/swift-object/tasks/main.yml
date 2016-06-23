@@ -6,14 +6,16 @@
   retries: 5
 
 - name: swift-object service scripts
-  template: src=roles/swift-common/templates/etc/init/swift-service.conf
-            dest=/etc/init/swift-{{ item.service_name }}.conf mode=0644
+  upstart_service: name=swift-{{ item.name }}
+                   cmd=/usr/local/bin/swift-{{ item.cmd|default(item.name) }}
+                   args=/etc/swift/{{ item.conf|default('object-server.conf') }}
+                   user=swift
   with_items:
-    - { service_name: object-auditor, conf: object-server }
-    - { service_name: object, conf: object-server }
-    - { service_name: object-replicator, conf: object-server }
-    - { service_name: object-updater, conf: object-server }
-    - { service_name: object-expirer, conf: object-expirer }
+    - { name: object, cmd: object-server }
+    - { name: object-expirer, conf: object-expirer.conf }
+    - { name: object-auditor }
+    - { name: object-replicator }
+    - { name: object-updater }
 
 - stat: path=/etc/swift/object.ring.gz
   register: object_ring
@@ -65,4 +67,5 @@
     - swift-object
     - swift-object-expirer
     - swift-object-updater
+    - swift-object-auditor
   when: start_object|bool

@@ -69,8 +69,12 @@ def main():
     if os.path.exists(part_path) and os.path.ismount(mount_point):
         module.exit_json(changed=False)
 
-    # create partitions
     if dev_path is not None:
+        # create label
+        cmd = ['parted', '--script', dev_path, 'mklabel', 'msdos']
+        rc, out, err = module.run_command(cmd, check_rc=True)    
+
+        # create partitions
         cmd = ['parted', '--script', dev_path, 'mkpart', 'primary', '1', '100%']
         rc, out, err = module.run_command(cmd, check_rc=True)
 
