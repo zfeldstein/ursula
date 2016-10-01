@@ -8,11 +8,11 @@
     poll: 0
     failed_when: false
 
-  - name: Wait for SSH to come back
-    wait_for: host={{ ansible_default_ipv4.address }}
-              port={{ ansible_ssh_port|default(22) }}
-              delay=15
-    delegate_to: "{{ groups['controller']|first }}"
+  - name: waiting for server to come back
+    wait_for: host={{ inventory_hostname }}
+              state=started
+    delegate_to: localhost
+    become: false
 
   - name: cluster health check
     command: /etc/sensu/plugins/percona-cluster-size.rb -d /root/.my.cnf --expected 3 --criticality critical
@@ -30,10 +30,11 @@
     poll: 0
     failed_when: false
 
-  - name: Wait for SSH to come back
-    wait_for: host={{ ansible_default_ipv4.address }}
-              port={{ ansible_ssh_port|default(22) }}
-              delay=15
+  - name: waiting for server to come back
+    wait_for: host={{ inventory_hostname }}
+              state=started
+    delegate_to: localhost
+    become: false
 
   - name: check nova services
     command: /etc/sensu/plugins/check-nova-services.sh
@@ -64,10 +65,11 @@
     poll: 0
     failed_when: false
 
-  - name: Wait for SSH to come back
-    wait_for: host={{ ansible_default_ipv4.address }}
-              port={{ ansible_ssh_port|default(22) }}
-              delay=15
+  - name: waiting for server to come back
+    wait_for: host={{ inventory_hostname }}
+              state=started
+    delegate_to: localhost
+    become: false
 
   - name: swift health check
     command: /etc/sensu/plugins/check-swift-dispersion.py
@@ -89,10 +91,11 @@
     poll: 0
     failed_when: false
 
-  - name: Wait for SSH to come back
-    wait_for: host={{ ansible_default_ipv4.address }}
-              port={{ ansible_ssh_port|default(22) }}
-              delay=15
+  - name: waiting for server to come back
+    wait_for: host={{ inventory_hostname }}
+              state=started
+    delegate_to: localhost
+    become: false
 
   - name: ceph health check
     command: /etc/sensu/plugins/check-ceph.rb
@@ -108,6 +111,12 @@
     async: 0
     poll: 0
     failed_when: false
+
+  - name: waiting for server to come back
+    wait_for: host={{ inventory_hostname }}
+              state=started
+    delegate_to: localhost
+    become: false
 
   - name: ceph health check
     command: /etc/sensu/plugins/check-ceph.rb
