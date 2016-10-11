@@ -1,0 +1,60 @@
+---
+# Removes all controller specific services, sensu checks, cronjobs, and packages
+# intended for converged controller to compute migration
+- name: warn user of danger
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: warn user
+      run_once: true
+      pause:
+        prompt: "Warning: This action is destructive. Type 'dangerous' to continue"
+      register: warning
+    - name: fail if user does not accept warning.
+      run_once: true
+      fail:
+        msg: Play cancelled
+      when: warning.user_input != "dangerous"
+
+- hosts: controller
+  tasks:
+    - name: remove all sensu checks
+      shell: /bin/rm -rf /etc/sensu/conf.d/checks/*
+    - name: stop sensu client service
+      service: name=sensu-client state=stopped enabled=yes
+    - name: remove glance image sync cronjob
+      file: path=/etc/cron.d/glance-image-sync state=absent
+    - name: remove neutron agents
+      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname }}' | grep -v neutron-linuxbridge-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
+      failed_when: false
+    - name: remove nova agents
+      shell: . /root/stackrc && nova service-list | grep '{{ inventory_hostname }}' | grep -v nova-compute | awk '{print $2}' | xargs -L1 nova service-delete
+      failed_when: false
+    - name: disable cinder service entries
+      shell: . /root/stackrc && cinder service-list | grep '{{ inventory_hostname }}' | awk '{print $2}' | xargs -L1 cinder service-disable '{{ inventory_hostname }}'
+      failed_when: false
+    - name: delete cinder service entries
+      shell: mysql -e "delete from cinder.services where host = '{{ inventory_hostname }}';"
+      failed_when: false
+    - name: delete heat service entries
+      shell: mysql -e "delete from heat.service where hostname = '{{ inventory_hostname }}';"
+      failed_when: false
+    - include_vars: services.yml
+    - name: stop and remove controller services
+      service: name={{ item }} state=stopped enabled=false must_exist=false
+      with_items: "{{ service_list }}"
+      failed_when: false
+    - name: kill epmd after rabbitmq stopped
+      shell: epmd -kill
+    - name: remove controller packages
+      apt: pkg="openstack-{{ item }}-*" purge=yes state=absent
+      with_items:
+        - cinder
+        - glance
+        - heat
+        - horizon
+        - ironic
+        - keystone
+      failed_when: false
+    - name: remove serverspec tests
+      shell: /bin/rm -rf /etc/serverspec/spec/localhost
