@@ -42,3 +42,4 @@ service_list:
   - rabbitmq-server
   - rsync
   - tftpd-hpa
+  - ursula-agent

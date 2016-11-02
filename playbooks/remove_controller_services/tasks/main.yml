@@ -62,3 +62,10 @@
     - name: remove percona packages
       apt: pkg="percona-*" purge=yes state=absent
       failed_when: false
+    - name: remove ucarp package
+      apt: pkg="ucarp" purge=yes state=absent
+      failed_when: false
+    - name: remove ursula-agent init script
+      file: path=/etc/init/ursula-agent.conf state=absent
+    - name: remove ursula-agent
+      pip: name=ursula-agent state=absent
