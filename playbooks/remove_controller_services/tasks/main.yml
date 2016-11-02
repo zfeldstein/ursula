@@ -59,3 +59,6 @@
       failed_when: false
     - name: remove serverspec tests
       shell: /bin/rm -rf /etc/serverspec/spec/localhost
+    - name: remove percona packages
+      apt: pkg="percona-*" purge=yes state=absent
+      failed_when: false
