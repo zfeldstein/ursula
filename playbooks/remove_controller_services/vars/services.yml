@@ -9,6 +9,7 @@ service_list:
   - ceilometer-api
   - ceilometer-collector
   - cinder-api
+  - cinder-backup
   - cinder-scheduler
   - cinder-volume
   - dnsmasq
