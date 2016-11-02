@@ -67,3 +67,5 @@
       failed_when: false
     - name: remove ursula-agent init script
       file: path=/etc/init/ursula-agent.conf state=absent
+    - name: remove ursula-agent
+      pip: name=ursula-agent state=absent
