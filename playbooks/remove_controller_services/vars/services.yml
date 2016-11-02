@@ -1,5 +1,6 @@
 ---
 service_list:
+  - aodh-api
   - aodh-evaluator
   - aodh-expirer
   - aodh-listener
@@ -8,6 +9,7 @@ service_list:
   - ceilometer-agent-notification
   - ceilometer-api
   - ceilometer-collector
+  - ceilometer-polling
   - cinder-api
   - cinder-backup
   - cinder-scheduler
@@ -36,6 +38,7 @@ service_list:
   - nova-consoleauth
   - nova-novncproxy
   - nova-scheduler
+  - mysql
   - rabbitmq-server
   - rsync
   - tftpd-hpa
