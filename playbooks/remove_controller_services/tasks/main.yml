@@ -25,8 +25,17 @@
       service: name=sensu-client state=stopped enabled=yes
     - name: remove glance image sync cronjob
       file: path=/etc/cron.d/glance-image-sync state=absent
-    - name: remove neutron agents
-      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v neutron-linuxbridge-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
+    - name: remove neutron-lbaasv2-agent
+      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v neutron-lbaasv2-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
+      failed_when: false
+    - name: remove neutron-metadata-agent
+      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v neutron-metadata-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
+      failed_when: false
+    - name: remove neutron-l3-agent
+      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v neutron-l3-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
+      failed_when: false
+    - name: remove neutron-dhcp-agent
+      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v neutron-dhcp-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
       failed_when: false
     - name: remove nova agents
       shell: . /root/stackrc && nova service-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v nova-compute | awk '{print $2}' | xargs -L1 nova service-delete
