@@ -26,19 +26,19 @@
     - name: remove glance image sync cronjob
       file: path=/etc/cron.d/glance-image-sync state=absent
     - name: remove neutron agents
-      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname }}' | grep -v neutron-linuxbridge-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
+      shell: . /root/stackrc && neutron agent-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v neutron-linuxbridge-agent | awk '{print $2}' | xargs -L1 neutron agent-delete
       failed_when: false
     - name: remove nova agents
-      shell: . /root/stackrc && nova service-list | grep '{{ inventory_hostname }}' | grep -v nova-compute | awk '{print $2}' | xargs -L1 nova service-delete
+      shell: . /root/stackrc && nova service-list | grep '{{ inventory_hostname.split('.')[0] }}' | grep -v nova-compute | awk '{print $2}' | xargs -L1 nova service-delete
       failed_when: false
     - name: disable cinder service entries
-      shell: . /root/stackrc && cinder service-list | grep '{{ inventory_hostname }}' | awk '{print $2}' | xargs -L1 cinder service-disable '{{ inventory_hostname }}'
+      shell: . /root/stackrc && cinder service-list | grep '{{ inventory_hostname.split('.')[0] }}' | awk '{print $2}' | xargs -L1 cinder service-disable '{{ inventory_hostname }}'
       failed_when: false
     - name: delete cinder service entries
-      shell: mysql -e "delete from cinder.services where host = '{{ inventory_hostname }}';"
+      shell: mysql -e "delete from cinder.services where host = '{{ inventory_hostname.split('.')[0] }}';"
       failed_when: false
     - name: delete heat service entries
-      shell: mysql -e "delete from heat.service where hostname = '{{ inventory_hostname }}';"
+      shell: mysql -e "delete from heat.service where hostname = '{{ inventory_hostname.split('.')[0] }}';"
       failed_when: false
     - include_vars: services.yml
     - name: stop and remove controller services
