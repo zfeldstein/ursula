@@ -54,6 +54,20 @@
       service: name={{ item }} state=stopped enabled=false must_exist=false
       with_items: "{{ service_list }}"
       failed_when: false
+    - name: remove neutron agent conf files
+      file: path="/etc/init/{{ item }}.conf" state=absent
+      with_items:
+        - neutron-lbaasv2-agent
+        - neutron-metadata-agent
+        - neutron-l3-agent
+        - neutron-dhcp-agent
+    - name: remove neutron agent service symlinks
+      file: path="/etc/init.d/{{ item }}" state=absent
+      with_items:
+        - neutron-lbaasv2-agent
+        - neutron-metadata-agent
+        - neutron-l3-agent
+        - neutron-dhcp-agent
     - name: kill epmd after rabbitmq stopped
       shell: epmd -kill
     - name: remove controller packages
