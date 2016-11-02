@@ -2,6 +2,7 @@
 # Removes all controller specific services, sensu checks, cronjobs, and packages
 # intended for converged controller to compute migration
 - name: warn user of danger
+  hosts: all:!vyatta-*
   connection: local
   gather_facts: false
   tasks:
