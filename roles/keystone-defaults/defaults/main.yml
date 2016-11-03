@@ -4,14 +4,16 @@ keystone:
   token_expiration_in_seconds: 86400
   admin_workers: 5
   public_workers: 5
+  admin_project_name: admin
+  admin_project_domain_name: Default
   source:
-    rev: 'stable/mitaka'
+    rev: 'stable/newton'
     constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/mitaka/upper-constraints.txt'
+    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
       - { name: uwsgi }
-      - { name: python-ldap }
+      - { name: pyldap }
       - { name: ldappool }
     system_dependencies:
       - openssl

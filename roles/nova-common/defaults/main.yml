@@ -5,7 +5,7 @@ nova:
   patches:
   compute_driver: libvirt.LibvirtDriver
   firewall_driver: nova.virt.firewall.NoopFirewallDriver
-  scheduler_host_manager: nova.scheduler.host_manager.HostManager
+  scheduler_host_manager: host_manager
   compute_manager: nova.compute.manager.ComputeManager
   api_workers: 5
   conductor_workers: 5
@@ -43,13 +43,13 @@ nova:
     - virt-top
   driver:
     docker:
-      rev: 'stable/mitaka'
+      rev: 'stable/newton'
       git_mirror: https://github.com/stackforge/nova-docker.git
       dest: /opt/stack/novadocker
   source:
-    rev: 'stable/mitaka'
+    rev: 'stable/newton'
     constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/mitaka/upper-constraints.txt'
+    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }
@@ -63,7 +63,6 @@ nova:
     - nova-api-metadata
     - nova-api-os-compute
     - nova-cells
-    - nova-cert
     - nova-compute
     - nova-conductor
     - nova-console
@@ -84,11 +83,6 @@ nova:
       fields:
         type: openstack
         tags: nova,nova-api
-    - paths:
-        - /var/log/nova/nova-cert.log
-      fields:
-        type: openstack
-        tags: nova,nova-cert
     - paths:
         - /var/log/nova/nova-compute.log
       fields:

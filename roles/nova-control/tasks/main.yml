@@ -2,13 +2,22 @@
 - include: novnc.yml
   tags: novnc
 
+- name: remove retired nova controller services
+  upstart_service:
+    name: "{{ item }}"
+    user: nova
+    cmd: /usr/local/bin/{{ item }}
+    config_dirs: /etc/nova
+    state: absent
+  with_items:
+    - nova-cert
+
 - name: install nova controller services
   upstart_service: name={{ item }} user=nova
                    cmd=/usr/local/bin/{{ item }}
                    config_dirs=/etc/nova
   with_items:
     - nova-api
-    - nova-cert
     - nova-conductor
     - nova-consoleauth
     - nova-scheduler
@@ -19,18 +28,6 @@
         dest=/usr/local/sbin/nova-quota-sync
         mode=0755
         owner=root
-
-- name: stop nova services before db sync
-  service: name={{ item }} state=stopped
-  with_items:
-    - nova-api
-    - nova-cert
-    - nova-conductor
-    - nova-consoleauth
-    - nova-scheduler
-    - nova-novncproxy
-  when: database_create.changed or force_sync|default('false')|bool
-  tags: db-migrate
 
 - name: sync nova database
   command: nova-manage db sync
@@ -64,7 +61,6 @@
   service: name={{ item }} state=started
   with_items:
     - nova-api
-    - nova-cert
     - nova-conductor
     - nova-consoleauth
     - nova-scheduler
