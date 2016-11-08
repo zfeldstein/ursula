@@ -10,3 +10,13 @@
     name: "check-neutron-agents-duplicate"
     check: "{{ sensu_checks.neutron.check_neutron_agents_duplicate }}"
   notify: restart sensu-client missing ok
+
+- name: template neutron l3 router script for ucarp
+  template: src=check-neutron-l3-routers.sh mode=0755 owner=root group=root
+            dest=/etc/sensu/plugins/check-neutron-l3-routers.sh
+
+- name: neutron router check multiple l3 agents active or all standby status
+  sensu_check_dict:
+    name: "check-neutron-l3-routers"
+    check: "{{ sensu_checks.neutron.check_neutron_l3_routers }}"
+  notify: restart sensu-client missing ok
