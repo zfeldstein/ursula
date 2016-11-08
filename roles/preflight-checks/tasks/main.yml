@@ -1,5 +1,24 @@
 ---
 - block:
+  - name: check whether neutron-client is installed
+    command: neutron --version
+    register: result_neutron_installed
+    failed_when: false
+
+  - name: check whether neutron endpoint exists
+    shell: . /root/stackrc; openstack endpoint list | grep neutron
+    failed_when: false
+    register: result_neutron_endpoint
+
+  - include: neutron.yml
+    when:
+      - result_neutron_installed.rc == 0
+      - result_neutron_endpoint.rc == 0
+
+  delegate_to: "{{ groups['controller'][0] }}"
+  run_once: true
+
+- block:
   - name: check ceph installed
     command: ceph --version
     register: result_ceph_installed
