@@ -384,3 +384,34 @@
       sla:
         failure_rate:
           max: 1
+
+  NovaServers.boot_and_live_migrate_server:
+  - args:
+      flavor:
+        name: "m1.tiny"
+      image:
+        name: {{image_name}}
+      block_migration: false
+    runner:
+      type: "constant"
+      times: 6
+      concurrency: 2
+    context:
+      users:
+        tenants: 3
+        users_per_tenant: 2
+
+  NovaServers.boot_and_migrate_server:
+  - args:
+      flavor:
+        name: "m1.tiny"
+      image:
+        name: {{image_name}}
+    runner:
+      type: "constant"
+      times: 6
+      concurrency: 2
+    context:
+      users:
+        tenants: 3
+        users_per_tenant: 2
