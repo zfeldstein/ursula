@@ -80,6 +80,16 @@ sensu_checks:
       command: check-neutron-agents-duplicate.py --criticality critical
       service_owner: openstack
       dependencies: []
+    check_neutron_l3_routers:
+      handler: default
+      notification: "neutron router check multiple l3 agents active or all standby status"
+      occurrences: 1
+      interval: 600
+      max_routers: 100
+      standalone: true
+      command: check-neutron-l3-routers.sh
+      service_owner: openstack
+      dependencies: []
 
   nova:
     check_nova_services:
