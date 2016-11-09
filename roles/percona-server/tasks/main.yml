@@ -85,9 +85,11 @@
     apt:
       pkg: "{{ item }}"
       state: latest
+      update_cache: yes
     with_items:
       - percona-xtrabackup
       - percona-xtradb-cluster-server-{{ xtradb.server_version }}
+      - percona-xtradb-cluster-galera-{{ xtradb.galera_version }}
 
   # Make sure the cluster is healthy before moving on
   # NOTE this will fail if we switch to apt packages for sensu plugins!!
