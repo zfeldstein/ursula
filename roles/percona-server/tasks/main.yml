@@ -72,6 +72,18 @@
   when: (dbupgrade | default('False') | bool) or
         (upgrade | default('False') | bool)
 
+  - name: restart garbd if arbiter is out of cluster
+    service: name=garbd state=restarted
+    when: cstat is undefined
+
+  - name: check cluster health again
+    command: /etc/sensu/plugins/percona-cluster-size.rb -d /root/.my.cnf --expected 3 --criticality critical
+    register: cstat
+    until: cstat | succeeded
+    retries: 5
+  when: (dbupgrade | default('False') | bool) or
+        (upgrade | default('False') | bool
+
 - name: mysql log dir
   file: dest=/var/log/mysql state=directory mode=2750 owner=mysql group=adm
 
