@@ -8,4 +8,4 @@
     - file: dest=/root/db-backups state=directory owner=root mode=0644
 
     - name: run the backup
-      shell: mysqldump --all-databases > /root/db-backups/{{ time_str.stdout }}.sql
+      mysql_db: state=dump name=all target=/root/db-backups/{{ time_str.stdout }}.sql
