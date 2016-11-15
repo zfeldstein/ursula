@@ -13,6 +13,10 @@
   file: dest=/var/cache/aodh state=directory mode=0700
         owner=aodh group=aodh
         
+- name: permit access to aodh
+  ufw: rule=allow to_port={{ endpoints.aodh.port.haproxy_api }} proto=tcp
+  tags: ufw
+
 - name: install aodh services
   upstart_service: name={{ item }}
                    user=aodh
