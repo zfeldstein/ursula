@@ -11,6 +11,8 @@
   - name: waiting for server to come back
     wait_for: host={{ inventory_hostname }}
               state=started
+              connect_timeout=60
+              timeout=900
     delegate_to: localhost
     become: false
 
@@ -19,6 +21,7 @@
     register: cstat
     until: cstat | succeeded
     retries: 5
+    wait_for: delay=10
     run_once: true
 
 - hosts: compute:!controller
@@ -33,6 +36,8 @@
   - name: waiting for server to come back
     wait_for: host={{ inventory_hostname }}
               state=started
+              connect_timeout=60
+              timeout=900
     delegate_to: localhost
     become: false
 
@@ -40,20 +45,23 @@
     command: /etc/sensu/plugins/check-nova-services.sh
     register: result
     until: result | succeeded
-    retries: 10
+    retries: 5
+    wait_for: delay=10
     delegate_to: "{{ groups['controller']|first }}"
 
   - name: check neutron agents
     command: /etc/sensu/plugins/check-neutron-agents.sh
     register: result
     until: result | succeeded
-    retries: 10
+    retries: 5
+    wait_for: delay=10
 
   - name: cluster health check on db_arbiter
     command: /etc/sensu/plugins/percona-cluster-size.rb -d /root/.my.cnf --expected 3 --criticality critical
     register: cstat
     until: cstat | succeeded
     retries: 5
+    wait_for: delay=10
     delegate_to: "{{ groups['controller']|first }}"
     when: inventory_hostname in groups['db_arbiter']
 
@@ -69,6 +77,8 @@
   - name: waiting for server to come back
     wait_for: host={{ inventory_hostname }}
               state=started
+              connect_timeout=60
+              timeout=900
     delegate_to: localhost
     become: false
 
@@ -76,7 +86,8 @@
     command: /etc/sensu/plugins/check-swift-dispersion.py
     register: result
     until: result | succeeded
-    retries: 10 
+    retries: 5
+    wait_for: delay=10
 
 - hosts: ceph_osds[0]
   tasks:
@@ -84,7 +95,8 @@
     command: /etc/sensu/plugins/check-ceph.rb
     register: result
     until: result | succeeded
-    retries: 10
+    retries: 5
+    wait_for: delay=10
 
 - hosts: ceph_osds
   serial: 1
@@ -101,6 +113,8 @@
   - name: waiting for server to come back
     wait_for: host={{ inventory_hostname }}
               state=started
+              connect_timeout=60
+              timeout=900
     delegate_to: localhost
     become: false
 
@@ -114,7 +128,8 @@
     command: /etc/sensu/plugins/check-ceph.rb
     register: result
     until: result | succeeded
-    retries: 10
+    retries: 5
+    wait_for: delay=10
 
 - hosts: ceph_monitors
   serial: 1
@@ -128,6 +143,8 @@
   - name: waiting for server to come back
     wait_for: host={{ inventory_hostname }}
               state=started
+              connect_timeout=60
+              timeout=900
     delegate_to: localhost
     become: false
 
@@ -135,4 +152,5 @@
     command: /etc/sensu/plugins/check-ceph.rb
     register: result
     until: result | succeeded
-    retries: 10
+    retries: 5
+    wait_for: delay=10
