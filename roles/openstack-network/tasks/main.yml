@@ -24,3 +24,7 @@
             owner=root group=root mode=0644
   when: not neutron_external_ifcfg.stat.exists and result.id is defined
   notify: ifup neutron external interface
+
+- name: enable ip forwarding
+  sysctl: name="net.ipv4.ip_forward" value=1 sysctl_set=yes state=present reload=yes
+  when: result.id is defined
