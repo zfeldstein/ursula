@@ -1,10 +1,12 @@
 ---
 - name: determine Neutron external interface name
-  neutron_network: name=external
-                   auth_url={{ endpoints.keystone.url.internal }}/{{ endpoints.keystone.version }}/
-                   login_tenant_name=admin
-                   login_username=admin
-                   login_password={{ secrets.admin_password }}
+  os_network: 
+    name: external
+    auth:
+      auth_url: "{{ endpoints.keystone.url.internal }}/{{ endpoints.keystone.version }}/"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
   register: result
   run_once: true
   failed_when: False
