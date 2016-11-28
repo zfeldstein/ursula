@@ -31,7 +31,6 @@
 
 
 
-
 - block:
   - name: check whether neutron-client is installed
     command: neutron --version
