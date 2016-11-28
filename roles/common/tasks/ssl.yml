@@ -48,38 +48,46 @@
   tags:
     - cert
 
-# ugly hack: some python http libs don't honor the system ca-certs, and ship with
-# their own list, instead.
-# pre-install these client libs, and force them to use the system cert list.
 - block:
-  - name: pip install httplib2 - precise
+  - name: pip install httplib2
     pip: name=httplib2 version=0.8
     register: result
     until: result|succeeded
     retries: 5
 
-  - name: pip install requests - precise
-    pip: name=requests state=latest
+  - name: pip install requests
+    pip: name=requests version=2.11.1
     register: result
     until: result|succeeded
     retries: 5
+  when: os == 'rhel' or
+        (os == 'ubuntu' and ansible_distribution_version == "12.04")
 
-  - name: force our ssl cert for python libs on precise
-    file: src=/etc/ssl/certs/ca-certificates.crt dest={{ item }} owner=root
-          mode=0644 state=link force=yes
-    with_items:
-      - /usr/share/pyshared/httplib2/cacerts.txt
-      - /usr/local/lib/python2.7/dist-packages/httplib2/cacerts.txt
-      - /usr/local/lib/python2.7/dist-packages/requests/cacert.pem
+# ugly hack: some python http libs don't honor the system ca-certs, and ship with
+# their own list, instead.
+# pre-install these client libs, and force them to use the system cert list.
+- name: force our ssl cert for python libs on precise
+  file: src=/etc/ssl/certs/ca-certificates.crt dest={{ item }} owner=root
+        mode=0644 state=link force=yes
+  with_items:
+    - /usr/share/pyshared/httplib2/cacerts.txt
+    - /usr/local/lib/python2.7/dist-packages/httplib2/cacerts.txt
+    - /usr/local/lib/python2.7/dist-packages/requests/cacert.pem
   when: os == 'ubuntu' and ansible_distribution_version == "12.04"
+- name: force our ssl cert for python libs on precise
+  file: src=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt dest={{ item }} owner=root
+        mode=0644 state=link force=yes
+  with_items:
+    - /usr/lib/python2.7/site-packages/httplib2/cacerts.txt
+    - /usr/lib/python2.7/site-packages/requests/cacert.pem
+  when: os == 'rhel'
 
 - name: httplib2 and request Python modules that already use system CA certs
   package: name={{ item }}
   with_items:
     - python-httplib2
     - python-requests
-  when: os == 'rhel' or
-        (os == 'ubuntu' and ansible_distribution_version == "14.04")
+  when: os == 'ubuntu' and ansible_distribution_version == "14.04"
   register: result
   until: result|succeeded
   retries: 5

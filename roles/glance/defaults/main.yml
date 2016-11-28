@@ -64,7 +64,7 @@ glance:
   logging:
     debug: False
     verbose: True
-  cafile: "{{ ssl.cafile|default('/etc/ssl/certs/ca-certificates.crt') }}"
+  cafile: "{{ ssl.cafile|default(ca_bundle) }}"
   monitoring:
     sensu_checks:
       check_glance_api:
