@@ -11,7 +11,7 @@ vms:
       - 172.16.255.100
       - 192.168.255.100
     cpus: 2
-    memory: 4096
+    memory: 5000
     custom:
        - '["modifyvm", :id, "--nicpromisc3", "allow-all"]'
        - '["modifyvm", :id, "--nicpromisc4", "allow-all"]'
