@@ -7,6 +7,7 @@
     external: "{{ item.external }}"
     provider_segmentation_id: "{{ item.segmentation_id }}"
     provider_physical_network: "{{ item.provider_physical_network }}"
+    validate_certs: "{{ validate_certs }}"
     state: present
     auth:
       auth_url: "{{ endpoints.auth_uri }}"
@@ -26,9 +27,10 @@
     ip_version: "{{ item.ip_version }}"
     ipv6_ra_mode: "{{ item.ipv6_ra_mode | default(omit) }}"
     ipv6_address_mode: "{{ item.ipv6_ra_mode | default(omit) }}"
-    dns_nameservers: "{{ item.dns_nameservers | default(omit) }}"
-    allocation_pool_start: "{{ item.pool_start | default(omit) }}"
-    allocation_pool_end: "{{ item.pool_end | default(omit) }}"
+    dns_nameservers: "{{ item.dns_nameservers|default(omit) }}"
+    allocation_pool_start: "{{ item.pool_start|default(omit) }}"
+    allocation_pool_end: "{{ item.pool_end|default(omit) }}"
+    validate_certs: "{{ validate_certs }}"
     state: present
     auth:
       auth_url: "{{ endpoints.auth_uri }}"

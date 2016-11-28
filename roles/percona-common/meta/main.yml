@@ -4,3 +4,9 @@ dependencies:
     repos:
       - repo: 'deb {{ apt_repos.percona.repo }} {{ ansible_distribution_release }} main'
         key_url: '{{ apt_repos.percona.key_url }}'
+    when: ansible_distribution in ['Ubuntu']
+  - role: repos
+    repos:
+      - repo: '{{ yum_repos.percona.repo }}'
+        key_url: '{{ yum_repos.percona.key_url }}'
+        when: ansible_distribution in ['CentOS','RedHat']

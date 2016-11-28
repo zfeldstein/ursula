@@ -6,6 +6,7 @@ dependencies:
       - name: 'haproxy package repo'
         repo: 'deb {{ apt_repos.haproxy.repo }} {{ ansible_lsb.codename }} main'
         key_url: '{{ apt_repos.haproxy.key_url }}'
+    when: ansible_distribution in ['Ubuntu']
   - role: monitoring-common
     when: monitoring.enabled|default(True)|bool
   - role: collectd-plugin

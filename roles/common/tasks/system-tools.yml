@@ -1,50 +1,33 @@
 ---
 - name: remove older libruby
-  apt: pkg=libruby1.8 purge=yes state=absent
+  package:
+    name: libruby1.8
+    state: absent
   register: result
   until: result|succeeded
   retries: 5
 
 - name: install system tools
-  apt: pkg={{ item }}
-  with_items:
-    - acl
-    - auditd
-    - build-essential
-    - curl
-    - dstat
-    - ethtool
-    - git
-    - htop
-    - iftop
-    - iotop
-    - iperf
-    - ltrace
-    - mtr
-    - netcat
-    - pv
-    - ruby1.9.1
-    - ruby1.9.1-dev
-    - smem
-    - socat
-    - tree
-    - vim
-    - cdpr
-    - sysstat
-    - logrotate
-    - ntp
-    - vlan
-    - lvm2
-    - libpam-cracklib
+  package:
+    name: "{{ item }}"
+  with_items: "{{ common.system_tools.packages }}"
   register: result
   until: result|succeeded
   retries: 5
 
 - name: install tools for x86
-  apt: pkg={{ item }}
+  package: name={{ item }}
   with_items:
     - ack-grep
-  when: ansible_architecture != "ppc64le"
+  when: ansible_architecture != "ppc64le" and os == "ubuntu"
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install selinux tooling
+  package:
+    name: policycoreutils-python
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -52,25 +35,31 @@
 - name: load vlan module
   lineinfile: dest=/etc/modules
               line="8021q"
-  when: ansible_distribution_version == "14.04"
+  when: os == 'ubuntu' and ansible_distribution_version == "14.04"
 
 - name: install mcelog package
-  apt: pkg=mcelog
-  when: common.system_tools.mcelog|bool and ansible_architecture != "ppc64le"
+  package: name=mcelog
+  when: common.system_tools.mcelog|bool and
+        ansible_architecture != "ppc64le"
   register: result
   until: result|succeeded
   retries: 5
 
 # http://www.supermicro.com/support/faqs/faq.cfm?faq=14537
 - name: blacklist mei
-  lineinfile: dest=/etc/modprobe.d/blacklist.conf
-              line="blacklist {{ item }}"
+  lineinfile:
+    dest: /etc/modprobe.d/blacklist.conf
+    line: "blacklist {{ item }}"
+    create: yes
   with_items:
     - mei
     - mei_me
 
 - name: install lm-sensors package
-  apt: name=lm-sensors state=present update_cache=yes
+  package:
+    name: "{{ common.system_tools.lm_sensors_package }}"
+    state: present
+    update_cache: yes
   notify:
     - load sensors
   register: result

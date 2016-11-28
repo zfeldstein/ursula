@@ -12,10 +12,12 @@
     - headers
   notify:
     - reload apache
+  when: os == 'ubuntu'
 
 - name: remove custom headers config
   file: path=/etc/apache2/mods-enabled/headers.conf
         state=absent
+  when: os == 'ubuntu'
   notify:
     - reload apache
 
@@ -28,20 +30,38 @@
 
 - name: openstack dashboard config (12.04)
   template: src=etc/apache2/sites-available/openstack_dashboard.conf
+            dest=/etc/httpd/conf.d/openstack_dashboard.conf
+  when: os == 'rhel'
+  notify:
+    - reload apache
+
+- name: openstack dashboard config (12.04)
+  template: src=etc/apache2/sites-available/openstack_dashboard.conf
             dest=/etc/apache2/sites-available/openstack_dashboard
-  when: ansible_distribution_version == "12.04"
+  when: os == 'ubuntu' and
+        ansible_distribution_version == "12.04"
   notify:
     - reload apache
 
 - name: openstack dashboard config
   template: src=etc/apache2/sites-available/openstack_dashboard.conf
             dest=/etc/apache2/sites-available/openstack_dashboard.conf
-  when: ansible_distribution_version != "12.04"
+  when: os == 'ubuntu' and
+        ansible_distribution_version != "12.04"
+  notify:
+    - reload apache
+
+- name: openstack dashboard config
+  template: src=etc/apache2/sites-available/openstack_dashboard.conf
+            dest=/etc/apache2/sites-available/openstack_dashboard.conf
+  when: os == 'ubuntu' and
+        ansible_distribution_version != "12.04"
   notify:
     - reload apache
 
 - name: enable horizon apache site
   apache2_site: name=openstack_dashboard state=present
+  when: os == 'ubuntu'
   notify:
     - reload apache
 
@@ -55,14 +75,14 @@
     src: "roles/keystone/templates/etc/keystone/policy.json"
     dest: "/etc/openstack-dashboard/keystone_policy.json"
     mode: 0640
-    owner: "www-data"
-    group: "www-data"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
   when: horizon.customize|default('False')|bool
   notify:
     - reload apache
 
-- name: horizon local settings 
-  template: 
+- name: horizon local settings
+  template:
     src: "etc/openstack-dashboard/__init__.py"
     dest: "/etc/openstack-dashboard/__init__.py"
     mode: 0644
@@ -71,20 +91,20 @@
   notify:
     - reload apache
 
-- name: horizon local settings 
+- name: horizon local settings
   template:
     src: "etc/openstack-dashboard/local_settings.py"
     dest: "/etc/openstack-dashboard/local_settings.py"
     mode: 0644
     owner: "root"
-    group: "www-data"
+    group: "{{ apache_group }}"
   notify:
     - reload apache
 
 #Use current Symlink for both package/source install
 - name: create static assets directory
   file: dest="{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/{{ item }}"
-        owner=www-data group=www-data state=directory
+        owner="{{ apache_user }}" group="{{ apache_group }}" state=directory
   with_items:
     - static
     - static/dashboard
@@ -98,7 +118,7 @@
   file: src=/etc/openstack-dashboard/local_settings.py
         dest=/opt/openstack/current/horizon/lib/python2.7/site-packages/openstack_dashboard/local/local_settings.py
         owner=root
-        group=www-data
+        group="{{ apache_user }}"
         mode=0644
         state=link
 
@@ -139,7 +159,7 @@
 - meta: flush_handlers
 
 - name: ensure apache started
-  service: name=apache2 state=started
+  service: name="{{ apache.service_name[os] }}" state=started
 
 - name: Permit HTTP and HTTPS
   ufw: rule=allow to_port={{ item }} proto=tcp
@@ -147,11 +167,17 @@
   with_items:
   - 80
   - 443
+  when: os == 'ubuntu'
+
+- name: set selinux policy for haproxy
+  seport: ports=8080 proto=tcp setype=http_port_t state=present
+  when: os == 'rhel'
+  tags: selinux
 
 - meta: flush_handlers
 
 - name: ensure apache is enabled
-  service: name=apache2 state=started enabled=true
+  service: name="{{ apache.service_name[os] }}" state=started enabled=true
 
 - include: monitoring.yml
   tags:

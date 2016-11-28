@@ -2,6 +2,7 @@
 - name: restart neutron services
   service: name={{ item }} state=restarted_if_running must_exist=false
   when: restart|default('True')
+  failed_when: false
   with_items:
     - neutron-server
     - neutron-dhcp-agent

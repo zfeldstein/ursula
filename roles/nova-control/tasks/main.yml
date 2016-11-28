@@ -2,26 +2,51 @@
 - include: novnc.yml
   tags: novnc
 
-- name: remove retired nova controller services
-  upstart_service:
-    name: "{{ item }}"
-    user: nova
-    cmd: /usr/local/bin/{{ item }}
-    config_dirs: /etc/nova
-    state: absent
-  with_items:
-    - nova-cert
+- block:
+  - name: remove retired nova controller services
+    upstart_service:
+      name: "{{ item }}"
+      user: nova
+      cmd: /usr/local/bin/{{ item }}
+      config_dirs: /etc/nova
+      state: absent
+    with_items:
+      - nova-cert
 
-- name: install nova controller services
-  upstart_service: name={{ item }} user=nova
-                   cmd=/usr/local/bin/{{ item }}
-                   config_dirs=/etc/nova
-  with_items:
-    - nova-api
-    - nova-conductor
-    - nova-consoleauth
-    - nova-scheduler
-    - nova-novncproxy
+  - name: install nova controller services
+    upstart_service: name={{ item }} user=nova
+                     cmd=/usr/local/bin/{{ item }}
+                     config_dirs=/etc/nova
+    with_items:
+      - nova-api
+      - nova-conductor
+      - nova-consoleauth
+      - nova-scheduler
+      - nova-novncproxy
+  when: os == 'ubuntu'
+
+- block:
+  - name: remove retired nova controller services
+    systemd_service:
+      name: "{{ item }}"
+      user: nova
+      cmd: /usr/local/bin/{{ item }}
+      config_dirs: /etc/nova
+      state: absent
+    with_items:
+      - nova-cert
+
+  - name: install nova controller services
+    systemd_service: name={{ item }} user=nova
+                     cmd=/usr/local/bin/{{ item }}
+                     config_dirs=/etc/nova
+    with_items:
+      - nova-api
+      - nova-conductor
+      - nova-consoleauth
+      - nova-scheduler
+      - nova-novncproxy
+  when: os == 'rhel'
 
 - name: install nova-quota-sync script
   copy: src=nova-quota-sync
@@ -30,7 +55,7 @@
         owner=root
 
 - name: sync nova database
-  command: nova-manage db sync
+  command: /usr/local/bin/nova-manage db sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -39,7 +64,7 @@
   tags: db-migrate
 
 - name: sync nova api database
-  command: nova-manage api_db sync
+  command: /usr/local/bin/nova-manage api_db sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -68,7 +93,16 @@
 
 - name: permit access to nova api
   ufw: rule=allow to_port={{ endpoints.nova.port.haproxy_api }} proto=tcp
+  when: os == 'ubuntu'
   tags: ufw
+
+- name: set selinux policy for haproxy
+  seport: ports={{ item }} proto=tcp setype=http_port_t state=present
+  with_items:
+    - "{{ endpoints.nova.port.backend_api }}"
+    - "{{ endpoints.novnc.port.backend_api }}"
+  when: os == 'rhel'
+  tags: selinux
 
 - include: monitoring.yml
   tags:

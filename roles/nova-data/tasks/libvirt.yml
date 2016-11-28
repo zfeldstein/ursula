@@ -6,7 +6,7 @@
             mode=0644
 
 - name: install nova-compute packages
-  apt: pkg={{ item }}
+  package: name={{ item }}
   with_items:
     - cpu-checker
     - libvirt-bin={{ nova.libvirt_bin_version }}
@@ -21,6 +21,27 @@
     - genisoimage
     - util-linux
   notify: restart nova services
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install nova-compute packages
+  package: name={{ item }}
+  with_items:
+    - libvirt-python
+    - qemu-kvm
+    - "{{ nova.qemu_system_package }}"
+    - librbd1
+    - libiscsi
+    - iscsi-initiator-utils
+    - libvirt-devel
+    - libvirt-daemon
+    - libvirt-daemon-driver-qemu
+    - genisoimage
+    - util-linux
+  notify: restart nova services
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -45,9 +66,22 @@
   notify: restart nova services
   when: openstack_install_method == 'source'
 
+- set_fact:
+    libvirt_conf: libvirt.conf
+  when: os == 'rhel'
+- set_fact:
+    libvirt_conf: libvirtd.conf
+  when: os == 'ubuntu'
+- set_fact:
+    libvirt_defaults: /etc/sysconfig/libvirtd
+  when: os == 'rhel'
+- set_fact:
+    libvirt_defaults: /etc/default/libvirt
+  when: os == 'ubuntu'
+
 - name: delete lines in libvirtd.conf
   lineinfile:
-    dest: /etc/libvirt/libvirtd.conf
+    dest: "/etc/libvirt/{{ libvirt_conf }}"
     regexp: "{{ item.value.regexp }}"
     line: "{{ item.value.line }}"
     state: absent
@@ -62,7 +96,7 @@
 
 - name: add/update various lines in libvirtd.conf
   lineinfile:
-    dest: /etc/libvirt/libvirtd.conf
+    dest: "/etc/libvirt/{{ libvirt_conf }}"
     regexp: "{{ item.value.regexp }}"
     line: "{{ item.value.line }}"
   with_dict:
@@ -73,7 +107,7 @@
 
 - name: remove libvirtd defaults
   lineinfile:
-    dest: /etc/default/libvirt-bin
+    dest: "{{ libvirt_defaults }}"
     regexp: '^libvirtd_opts\s*='
     line: 'libvirtd_opts=\"-d -l\"'
     state: absent
@@ -127,3 +161,8 @@
 
 - name: add nova to the libvirtd group
   user: name=nova groups=libvirtd append=true system=yes createhome=no
+  when: os == 'ubuntu'
+
+- name: add nova to the libvirt group
+  user: name=nova groups=libvirt append=true system=yes createhome=no
+  when: os == 'rhel'

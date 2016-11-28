@@ -5,6 +5,7 @@ dependencies:
     repos:
       - repo: 'deb {{ apt_repos.cloud_archive.repo }} {{ ansible_distribution_release }}-updates/mitaka main'
         key_package: ubuntu-cloud-keyring
+    when: os == 'ubuntu'
   - role: sensu-check
   - role: monitoring-common
     when: monitoring.enabled|default(True)|bool
