@@ -6,10 +6,10 @@ export OS_PROJECT_NAME=admin
 export OS_TENANT_NAME=admin
 export OS_USER_DOMAIN_NAME=Default
 export OS_PROJECT_DOMAIN_NAME=Default
-{% if client.self_signed_cert -%}
+{% if client.self_signed_cert and os == 'ubuntu' -%}
 export OS_CACERT=/opt/stack/ssl/openstack.crt
 {% else %}
-export OS_CACERT=/etc/ssl/certs/ca-certificates.crt
+export OS_CACERT={{ ca_bundle }}
 {% endif -%}
 export OS_NO_CACHE=True
 export OS_VOLUME_API_VERSION=2
