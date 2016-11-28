@@ -578,7 +578,8 @@ ssl:
     U8i/S4ozAUKrGKLlEUVL1MgZeJkPMxd1IZ1Xxjq3PcEJxfVldJXWn/ROERE=
     -----END RSA PRIVATE KEY-----
   # remove this line out if using a real CA supplied cert
-  cafile: /usr/local/share/ca-certificates/{{ endpoints.main }}.crt
+  # cafile: /usr/local/share/ca-certificates/{{ endpoints.main }}.crt
+  cafile: /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
 
 openstack_setup:
   add_users: True

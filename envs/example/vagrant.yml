@@ -4,6 +4,7 @@ undercloud_cidr:
   - cidr: 172.16.0.0/24
 
 fqdn: openstack.example.org
+#fqdn: vagrant.openstack.blueboxgrid.com
 
 nova:
   scheduler_default_filters: RetryFilter,AvailabilityZoneFilter,ComputeFilter,CoreFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter
@@ -39,9 +40,6 @@ neutron:
     - 8.8.8.8
   lbaas:
     enabled: false
-
-validate_certs: no
-insecure: yes
 
 ssl:
   crt: |
@@ -111,7 +109,6 @@ ssl:
     QoiXxPXfemRLClYpa1oM50FJogDwKMI3COiLPHhmAZfulh9zhTyf8wSsEQrOi5hN
     Ue61yJbnH0d52l5uW4O8qomsByGndh5zOZFjvg9Yw7R6WUDk3am/AWJVrg==
     -----END CERTIFICATE-----
-
 
 common:
   ipmi:

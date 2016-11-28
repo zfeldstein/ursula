@@ -1,6 +1,8 @@
 ---
 - name: restart libvirt-bin
-  service: name=libvirt-bin state=restarted
+  service:
+    name: "{{ libvirt_service }}"
+    state: restarted
 
 - name: novadocker rootwrap
   command: rsync -avh {{ nova.driver.docker.dest }}/etc/nova/rootwrap.d/ /etc/nova/rootwrap.d/

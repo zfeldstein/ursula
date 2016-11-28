@@ -116,3 +116,6 @@ keystone:
 
 heat:
   enabled: False
+
+ironic:
+  enabled: False

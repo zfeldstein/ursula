@@ -11,7 +11,7 @@
                     tenant_name=admin
                     login_user=admin
                     login_password={{ secrets.admin_password }}
-                    insecure={{ insecure }}
+                    insecure={{ insecure|default(omit) }}
   with_items: "{{ keystone.services }}"
   when: "{{item.name}}.enabled is undefined or {{item.name}}.enabled|bool"
   run_once: true

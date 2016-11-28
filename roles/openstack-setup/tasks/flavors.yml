@@ -10,7 +10,7 @@
     ephemeral: '{{ item.ephemeral | default(omit) }}'
     is_public: '{{ item.is_public | default(omit) }}'
     swap: '{{ item.swap | default(omit) }}'
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
     state: present
     auth:
       auth_url: "{{ endpoints.auth_uri  }}"
@@ -33,7 +33,7 @@
     is_public: '{{ item.is_public | default(omit) }}'
     swap: '{{ item.swap | default(omit) }}'
     state: present
-    validate_certs: "{{ validate_certs }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
       auth_url: "{{ endpoints.auth_uri  }}"
       project_name: admin

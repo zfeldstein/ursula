@@ -9,13 +9,27 @@
     os: ubuntu
   when: ansible_distribution in ['Ubuntu']
 
-- set_fact:
+- name: set ssh_service fact for ubuntu
+  set_fact:
     ssh_service: ssh
   when: os == 'ubuntu'
 
-- set_fact:
+- name: set ssh_service fact for rhel
+  set_fact:
     ssh_service: sshd
   when: os == 'rhel'
+
+- name: set ca_bundle fact for ubuntu
+  set_fact:
+    ca_bundle: /etc/ssl/certs/ca-certificates.crt
+  when: os == 'ubuntu'
+
+- name: set ca_bundle fact for rhel
+  set_fact:
+    ca_bundle: /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
+  when: os == 'rhel'
+
+
 
 
 - block:

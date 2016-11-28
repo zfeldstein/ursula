@@ -1,4 +1,12 @@
 ---
+- set_fact:
+    libvirt_service: libvirt-bin
+  when: os == 'ubuntu'
+
+- set_fact:
+    libvirt_service: libvirtd
+  when: os == 'rhel'
+
 - name: nova user
   user:
     name: nova
