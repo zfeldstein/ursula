@@ -4,16 +4,30 @@
   notify: reload haproxy
 
 - name: install haproxy
-  apt:
-    pkg: haproxy
-  notify: restart rsyslog 
+  package:
+    name: haproxy
+  notify: restart rsyslog
   register: result
   until: result|succeeded
   retries: 5
 
+- name: ensure haproxy stats dir exists
+  file:
+    dest: /var/run/haproxy
+    state: directory
+
 # WORKAROUND: `service haproxy stop` fails due to incorrect `start-stop-daemon --pid`
 - name: fix haproxy init script
   template: src=etc/init.d/haproxy dest=/etc/init.d/haproxy mode=0755
+  when: os == "ubuntu"
+
+- name: install haproxy rsyslog config
+  template: src=etc/rsyslog.d/haproxy.conf
+            dest=/etc/rsyslog.d/49-haproxy.conf
+  when: os == 'rhel'
+  notify: restart rsyslog
+  tags:
+    - ssl
 
 - name: install ssl cert+key
   template: src=etc/haproxy/openstack.pem dest=/etc/haproxy/openstack.pem
@@ -28,6 +42,12 @@
   notify: reload haproxy
 
 - meta: flush_handlers
+
+- name: set selinux policy for mysql proxy
+  seport: ports=3306 proto=tcp setype=http_port_t state=present
+  when: os == 'rhel'
+  tags: selinux
+
 
 - name: start and enable haproxy
   service: name=haproxy state=started enabled=yes

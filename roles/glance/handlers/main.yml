@@ -10,7 +10,7 @@
 #     bind () failed: Address already in use (address-family 2)
 # Adding retry logic to workaround
 - name: restart rsync
-  service: name=rsync state=restarted
+  service: name={{ rsync_service }} state=restarted
   register: result
   until: result|success
   retries: 3

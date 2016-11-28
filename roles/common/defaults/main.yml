@@ -35,6 +35,54 @@ common:
     tar_version: master
   system_tools:
     mcelog: True
+    lm_sensors_package: lm-sensors
+    packages:
+      - acl
+      - auditd
+      - build-essential
+      - curl
+      - dstat
+      - ethtool
+      - git
+      - htop
+      - iftop
+      - iotop
+      - iperf
+      - ltrace
+      - mtr
+      - netcat
+      - pv
+      - ruby1.9.1
+      - ruby1.9.1-dev
+      - smem
+      - socat
+      - tree
+      - vim
+      - cdpr
+      - sysstat
+      - logrotate
+      - ntp
+      - vlan
+      - lvm2
+      - libpam-cracklib
+  python:
+    system_packages:
+      - python-pip
+      - python-libxml2
+      - python-lxml
+      - python-greenlet
+      - python-openssl
+      - python2.7-dev
+      - python-httplib2
+      - python-software-properties
+      - python-virtualenv
+      - python-mysqldb
+      - python-jinja2
+      - cryptsetup
+      - libffi-dev
+      - libssl-dev
+      - libxml2-dev
+      - libxslt1-dev
   packages_to_remove:
     - language-selector-common
   logs:
@@ -51,7 +99,7 @@ common:
       check_lro:
         warning: False
         enabled: True
-        devices: "{{ hostvars[inventory_hostname][hostvars[inventory_hostname].primary_interface|remove_vlan_tag]|net_physical_devices|join(',') }}"
+        devices: "eth0"
       check_static_route:
         criticality: 'critical'
       check_raid:

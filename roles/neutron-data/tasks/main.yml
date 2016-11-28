@@ -1,6 +1,6 @@
 ---
 - name: install required packages and diagnostic tools
-  apt:
+  package:
     name: "{{ item }}"
   with_items:
     - bwm-ng
@@ -11,7 +11,8 @@
   retries: 5
 
 - name: update iproute2 to latest ppa
-  apt: name=iproute2 state=latest
+  package: name=iproute2 state=latest
+  when: os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
@@ -19,7 +20,8 @@
 - name: permit VXLAN traffic
   ufw: rule=allow to_port=4789 proto=udp
   tags: ufw
-  when: neutron.plugin == 'ml2' and 'vxlan' in neutron.tunnel_types
+  when:  os == 'ubuntu' and
+         neutron.plugin == 'ml2' and 'vxlan' in neutron.tunnel_types
 
 - name: ml2 dataplane config
   template: src=etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
@@ -35,7 +37,15 @@
                    cmd=/usr/local/bin/neutron-linuxbridge-agent
                    config_dirs=/etc/neutron
                    config_files=/etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
-  when: neutron.plugin == 'ml2'
+  when: os == 'ubuntu' and neutron.plugin == 'ml2'
+
+- name: install neutron-linuxbridge-agent service
+  systemd_service: name=neutron-linuxbridge-agent
+                   user=neutron
+                   cmd=/usr/local/bin/neutron-linuxbridge-agent
+                   config_dirs=/etc/neutron
+                   config_files=/etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
+  when: os == 'rhel' and neutron.plugin == 'ml2'
 
 - name: trigger restart on upgrades
   debug:

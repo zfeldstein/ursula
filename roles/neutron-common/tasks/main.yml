@@ -1,12 +1,17 @@
 ---
 - name: install common neutron packages
-  apt: pkg={{ item }}
-  with_items:
-    - vlan
-    - bridge-utils
+  package: name=bridge-utils
   register: result
   until: result|succeeded
   retries: 5
+
+- name: install common neutron packages
+  package: name=vlan
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
 
 - name: unload openvswitch if present
   modprobe: name=openvswitch state=absent
@@ -135,4 +140,4 @@
   tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
- 
+

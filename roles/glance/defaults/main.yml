@@ -30,7 +30,10 @@ glance:
       - { name: python-swiftclient }
       - { name: "git+https://github.com/blueboxgroup/bbc-openstack-plugins.git#egg=bbc_openstack_plugins" }
     system_dependencies:
-      - libxml2-dev
+        ubuntu:
+        - libxml2-dev
+        rhel:
+        - libxml2-devel
   alternatives:
     - glance-api
     - glance-cache-cleaner

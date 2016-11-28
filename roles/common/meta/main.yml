@@ -5,23 +5,23 @@ dependencies:
     repos:
       - repo: 'deb {{ apt_repos.bbg_ubuntu.repo }} {{ ansible_lsb.codename }} main'
         key_url: '{{ apt_repos.bbg_ubuntu.key_url }}'
-    when: ansible_architecture != "ppc64le"
+    when: ansible_architecture != "ppc64le" and ansible_distribution == 'Ubuntu'
   - role: apt-repos
     repos:
-      - repo: 'deb {{ apt_repos.hwraid.repo }} precise main'
+      - repo: 'deb {{ apt_repos.hwraid.repo }} {{ ansible_lsb.codename }} main'
         key_url: '{{ apt_repos.hwraid.key_url }}'
-    when: common.hwraid.enabled|bool and ansible_distribution_version == "12.04"
-  - role: apt-repos
-    repos:
-      - repo: 'deb {{ apt_repos.hwraid.repo }} trusty main'
-        key_url: '{{ apt_repos.hwraid.key_url }}'
-    when: common.hwraid.enabled|bool and ansible_distribution_version == "14.04"
+    when: common.hwraid.enabled|bool and ansible_distribution == 'Ubuntu'
   - role: apt-repos
     repos:
       - repo: 'deb {{ apt_repos.sensu.repo }} {{ apt_repos.sensu.distribution }} {{ apt_repos.sensu.components }}'
         key_url: '{{ apt_repos.sensu.key_url }}'
         validate_certs: no
-    when: monitoring.enabled|default(True)|bool
+    when: monitoring.enabled|default(True)|bool and ansible_distribution == 'Ubuntu'
+  - role: repos
+    repos:
+      - repo: '{{ yum_repos.epel.repo }}'
+        key_url: '{{ yum_repos.epel.key_url }}'
+        when: ansible_distribution in ['CentOS','RedHat']
   - role: docker
     when: docker.enabled is defined and docker.enabled|bool
   - role: monitoring-common

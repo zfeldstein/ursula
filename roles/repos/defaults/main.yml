@@ -45,3 +45,17 @@ apt_repos:
   logstash_forwarder:
     repo: ''
     key_url: ''
+
+yum_repos:
+  epel:
+    repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+    key_url: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+  percona:
+    repo: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
+    key_url: /etc/pki/rpm-gpg/RPM-GPG-KEY-Percona
+#  erlang:
+#    repo: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
+#    key_url: https://www.percona.com/downloads/RPM-GPG-KEY-percona
+#  rabbitmq:
+#    repo: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
+#    key_url: https://www.percona.com/downloads/RPM-GPG-KEY-percona

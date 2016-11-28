@@ -66,3 +66,4 @@
   command: "{{ nova.state_path }}/bin/verify-ssh"
   become: yes
   become_user: nova
+  when: os == 'ubuntu'
