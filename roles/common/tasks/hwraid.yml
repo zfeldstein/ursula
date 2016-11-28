@@ -1,6 +1,6 @@
 ---
 - name: install raid utilities
-  apt: pkg={{ item }}
+  package: name={{ item }}
   register: result
   until: result|succeeded
   retries: 5

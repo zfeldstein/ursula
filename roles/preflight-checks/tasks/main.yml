@@ -1,4 +1,23 @@
 ---
+- name: set os fact for rhel operating system
+  set_fact:
+    os: rhel
+  when: ansible_distribution in ['CentOS', 'RedHat']
+
+- name: set os fact for rhel operating system
+  set_fact:
+    os: ubuntu
+  when: ansible_distribution in ['Ubuntu']
+
+- set_fact:
+    ssh_service: ssh
+  when: os == 'ubuntu'
+
+- set_fact:
+    ssh_service: sshd
+  when: os == 'rhel'
+
+
 - block:
   - name: check ceph installed
     command: ceph --version

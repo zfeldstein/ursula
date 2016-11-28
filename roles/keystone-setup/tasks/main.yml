@@ -1,6 +1,6 @@
 ---
 - name: keystone bootstrap user
-  command: keystone-manage bootstrap
+  command: /usr/local/bin/keystone-manage bootstrap
   environment:
     OS_BOOTSTRAP_USERNAME: "{{ keystone.bootstrap.user }}"
     OS_BOOTSTRAP_PASSWORD: "{{ keystone.bootstrap.password }}"
@@ -19,8 +19,9 @@
     name: "{{ item }}"
     description: "{{ item }} tenant"
     domain: default
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -37,8 +38,9 @@
     OS_USERNAME: admin
     OS_PROJECT_NAME: admin
   os_user_facts:
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       password: "{{ secrets.admin_password }}"
       project_domain_name: default
       user_domain_name: default
@@ -51,8 +53,9 @@
     password: "{{ item.password }}"
     default_project: "{{ item.tenant }}"
     domain: default
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -69,8 +72,9 @@
     OS_IDENTITY_API_VERSION: 3
   os_keystone_role:
     name: "{{ item }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -85,8 +89,9 @@
     role: "{{ item.role }}"
     user: "{{ item.user }}"
     project: "{{ item.tenant }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -105,8 +110,9 @@
     role: admin
     user: admin
     domain: default
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -121,8 +127,9 @@
     password: "{{ secrets.service_password }}"
     default_project: admin
     domain: default
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       username: admin
       password: "{{ secrets.admin_password }}"
@@ -133,8 +140,9 @@
     OS_IDENTITY_API_VERSION: 3
   os_keystone_role:
     name: heat_stack_user
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -149,8 +157,9 @@
     role: heat_stack_user
     user: heat_stack_user
     project: admin
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       project_domain_name: default
       user_domain_name: default

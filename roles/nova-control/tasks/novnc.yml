@@ -24,7 +24,7 @@
   register: sym
 
 - name: rm novnc if not a symlink
-  file: path=/usr/share/novnc state=absent 
+  file: path=/usr/share/novnc state=absent
   when: nova.novnc_method == 'file' and sym.stat.islnk is defined and sym.stat.islnk == False
 
 - name: ensure novnc dir exists
@@ -33,4 +33,5 @@
 
 - name: Permit access to NoVNC
   ufw: rule=allow to_port={{ endpoints.novnc.port.haproxy_api }} proto=tcp
+  when: os == 'ubuntu'
   tags: ufw

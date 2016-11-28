@@ -3,7 +3,7 @@
   group: name=monitor state=present
 
 - name: install sensu
-  apt: pkg={{ item }}
+  package: name={{ item }}
   with_items:
   - sensu
   - libfile-which-perl
@@ -243,8 +243,8 @@
 
 - block:
     - name: install snmp package on controllers
-      apt:
-        pkg: snmp
+      package:
+        name: snmp
       register: result
       until: result|succeeded
       retries: 5

@@ -1,6 +1,15 @@
 ---
+- name: create mysql user
+  user:
+    name: mysql
+    comment: mysql service user
+    shell: /bin/false
+    system: yes
+    home: /var/lib/mysql
+
 - name: install python-pycurl
-  apt: pkg=python-pycurl
+  package:
+    name: python-pycurl
   register: result
   until: result|succeeded
   retries: 5

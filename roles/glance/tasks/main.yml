@@ -49,14 +49,32 @@
   with_items:
     - "{{ endpoints.glance.port.haproxy_api }}"
     - "{{ endpoints.glance.port.backend_api }}"
+  when: os == 'ubuntu'
+
+- name: set selinux policy for haproxy
+  seport: ports={{ item }} proto=tcp setype=http_port_t state=present
+  with_items:
+    - "{{ endpoints.glance.port.backend_api }}"
+  when: os == 'rhel'
+  tags: selinux
 
 - name: install glance services
-  upstart_service: name={{ item }}
+  systemd_service: name={{ item }}
                    user=glance
                    cmd=/usr/local/bin/{{ item }}
   with_items:
     - glance-api
     - glance-registry
+  when: os == 'ubuntu'
+
+- name: install glance services
+  systemd_service: name={{ item }}
+                   user=glance
+                   cmd=/usr/local/bin/{{ item }}
+  with_items:
+    - glance-api
+    - glance-registry
+  when: os == 'rhel'
 
 - name: glance config
   template: src={{ item }} dest=/etc/glance mode={{ 0644 if 'policy.json' in item else 0640 }}
@@ -74,7 +92,7 @@
   tags: db-migrate
 
 - name: sync glance database
-  command: glance-manage db_sync
+  command: /usr/local/bin/glance-manage db_sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -118,6 +136,6 @@
   when: logging.enabled|default('True')|bool
 
 - include: serverspec.yml
-  tags: 
+  tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool

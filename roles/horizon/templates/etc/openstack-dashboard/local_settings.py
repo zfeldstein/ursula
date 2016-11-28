@@ -241,7 +241,7 @@ K2K_CHOICES = (
 {% endif %}
 
 # Disable SSL certificate checks (useful for self-signed certificates):
-OPENSTACK_SSL_NO_VERIFY = {{ client.self_signed_cert | bool }}
+OPENSTACK_SSL_NO_VERIFY = {{ insecure | default('false') | bool }}
 
 # The CA certificate to use to verify SSL connections
 #OPENSTACK_SSL_CACERT = '/path/to/cacert.pem'

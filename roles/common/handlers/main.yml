@@ -4,6 +4,11 @@
 
 - name: refresh CAs
   command: update-ca-certificates
+  when: os == 'ubuntu'
+
+- name: refresh rhel CAs
+  command: /bin/update-ca-trust extract
+  when: os == 'rhel'
 
 - name: apply-sysctl
   shell: "cat /etc/sysctl.d/*.conf /etc/sysctl.conf | sysctl -e -p -"
@@ -11,7 +16,10 @@
 - name: update grub config
   command: /usr/sbin/update-grub
 
-- include: ssh.yml
+- name: reload-sshd
+  service:
+    name: "{{ ssh_service }}"
+    state: restarted
 
 - name: restart-ntp
   service: name=ntp state=restarted
@@ -24,3 +32,4 @@
   register: result
   until: result|succeeded
   retries: 5
+  when: os == 'ubuntu'

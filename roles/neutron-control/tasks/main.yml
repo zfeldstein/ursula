@@ -10,6 +10,17 @@
     config_dirs: /etc/neutron
     config_files: /etc/neutron/plugins/ml2/ml2_plugin.ini
     envs: "{{ neutron.service.envs }}"
+  when: os == 'ubuntu'
+
+- name: install neutron-server service
+  systemd_service:
+    name: neutron-server
+    user: neutron
+    cmd: /usr/local/bin/neutron-server
+    config_dirs: /etc/neutron
+    config_files: /etc/neutron/plugins/ml2/ml2_plugin.ini
+    #envs: "{{ neutron.service.envs }}"
+  when: os == 'rhel'
 
 - name: stop neutron service before db sync
   service: name=neutron-server state=stopped
@@ -17,7 +28,7 @@
   tags: db-migrate
 
 - name: sync neutron database
-  command: neutron-db-manage --config-file /etc/neutron/neutron.conf \
+  command: /usr/local/bin/neutron-db-manage --config-file /etc/neutron/neutron.conf \
            --config-file /etc/neutron/plugins/ml2/ml2_plugin.ini upgrade head
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
@@ -42,6 +53,14 @@
 - name: Permit access to Neutron
   ufw: rule=allow to_port={{ endpoints.neutron.port.haproxy_api }} proto=tcp
   tags: ufw
+  when: os == 'ubuntu'
+
+- name: set selinux policy for haproxy
+  seport: ports={{ item }} proto=tcp setype=http_port_t state=present
+  with_items:
+    - "{{ endpoints.neutron.port.backend_api }}"
+  when: os == 'rhel'
+  tags: selinux
 
 - include: monitoring.yml
   tags:

@@ -1,6 +1,6 @@
 ---
 - name: Install XORP to provide IGMP router functionality
-  apt: pkg=xorp
+  package: name=xorp
   register: result
   until: result|succeeded
   retries: 5

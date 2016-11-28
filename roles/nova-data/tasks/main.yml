@@ -14,7 +14,7 @@
   when: nova.compute_driver == "novadocker.virt.docker.DockerDriver"
 
 - name: install nova data plan requirements
-  apt: pkg=sysfsutils
+  package: name=sysfsutils
   register: result
   until: result|succeeded
   retries: 5
@@ -25,11 +25,18 @@
     state: directory
     owner: nova
 
-- name: nbd module
+- name: nbd module - ubuntu
   lineinfile: dest=/etc/modules line="nbd"
+  when: os == 'ubuntu'
 
-- name: probe nbd
+- name: probe nbd - ubuntu
   modprobe: name=nbd state=present
+  when: os == 'ubuntu'
+
+- name: install nbd package - rhel
+  package:
+    name: nbd
+  when: os == 'rhel'
 
 - name: check if SMT is enabled
   command: "ppc64_cpu --smt"
@@ -60,6 +67,12 @@
 - name: install nova-compute service
   upstart_service: name=nova-compute user=nova cmd=/usr/local/bin/nova-compute
                    config_dirs=/etc/nova
+  when: os == 'ubuntu'
+
+- name: install nova-compute service
+  systemd_service: name=nova-compute user=nova cmd=/usr/local/bin/nova-compute
+                   config_dirs=/etc/nova
+  when: os == 'rhel'
 
 - name: trigger restart on upgrades
   debug:
@@ -81,6 +94,6 @@
   when: monitoring.enabled|default('True')|bool
 
 - include: serverspec.yml
-  tags: 
+  tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool

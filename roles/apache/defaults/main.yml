@@ -1,8 +1,18 @@
 ---
 apache:
+  package_name:
+    ubuntu: apache2
+    rhel: httpd
+  service_name:
+    ubuntu: apache2
+    rhel: httpd
   modules:
-    - libapache2-mod-wsgi
-    - libapache2-mod-uwsgi
+    ubuntu:
+      - libapache2-mod-wsgi
+      - libapache2-mod-uwsgi
+    rhel:
+      - mod_wsgi
+      - mod_proxy_uwsgi
   listen: []
   logs:
     - paths:

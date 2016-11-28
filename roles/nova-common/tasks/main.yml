@@ -11,8 +11,8 @@
     ssh_key_bits: 4096
 
 - name: nova packages
-  apt:
-    pkg="{{ item }}"
+  package:
+    name: "{{ item }}"
   with_items: "{{ nova.install_packages }}"
   register: result
   until: result|succeeded
@@ -76,6 +76,6 @@
   when: logging.enabled|default('True')|bool
 
 - include: serverspec.yml
-  tags: 
+  tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool

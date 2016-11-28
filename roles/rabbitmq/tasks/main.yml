@@ -1,7 +1,6 @@
 ---
 # set up some pieces before installing rabbit so that mnesia data
 # doesn't need to be deleted
-
 - name: add rabbitmq config directory
   file: dest=/etc/rabbitmq state=directory owner=root mode=0755
 
@@ -10,20 +9,26 @@
 # lift when rabbitmq-server 3.6.4 is released
 - name: install erlang-solutions erlang
   apt:
-    pkg: "{{ item }}"
+    pkg: esl-erlang=1:18.3
     force: True
-  with_items:
-    - esl-erlang=1:18.3
   register: result
   until: result|succeeded
   retries: 5
+  when: ansible_distribution in ['Ubuntu']
+
+- name: install EPEL erlang
+  package:
+    name: erlang
+  register: result
+  until: result|succeeded
+  retries: 5
+  when: ansible_distribution in ['CentOS','RedHat']
 
 - name: install rabbitmq-server
-  apt:
-    pkg: "{{ item }}"
+  package:
+    name: rabbitmq-server
   with_items:
     - rabbitmq-server
-    #- esl-erlang
   register: result
   until: result|succeeded
   retries: 5
@@ -58,6 +63,12 @@
 # Create the cluster if desired
 - include: cluster.yml
   when: rabbitmq.cluster|bool
+
+- name: ensure rabbit is started
+  service:
+    name: rabbitmq-server
+    state: started
+    enabled: true
 
 # Backward compatibility with existing configurations.
 - name: remove default rabbit user

@@ -55,8 +55,12 @@ nova:
       - { name: python-memcached }
       - { name: python-ironicclient }
     system_dependencies:
-      - libjs-jquery-tablesorter
-      - python-libvirt
+      ubuntu:
+        - libjs-jquery-tablesorter
+        - python-libvirt
+      rhel:
+        - libvirt-python
+        - python-XStatic-JQuery-TableSorter
   alternatives:
     - nova-all
     - nova-api

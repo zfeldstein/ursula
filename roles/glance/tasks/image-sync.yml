@@ -1,10 +1,25 @@
 ---
+# set facts to deal with cross platform
+- set_fact:
+    rsync_defaults: /etc/sysconfig/rsyncd
+  when: os == 'rhel'
+- set_fact:
+    rsync_defaults: /etc/default/rsync
+  when: os == 'ubuntu'
+- set_fact:
+    rsync_service: rsyncd
+  when: os == 'rhel'
+- set_fact:
+    rsync_service: rsync
+  when: os == 'ubuntu'
+
+
 - name: stop btsync
   service: name=btsync state=stopped enabled=false
   failed_when: False
 
 - name: remove btsync
-  apt: pkg=btsync state=absent
+  package: name=btsync state=absent
   register: result
   until: result|succeeded
   retries: 5
@@ -13,14 +28,16 @@
   file: dest=/etc/btsync/glance-cache.conf state=absent
 
 - name: install rsync
-  apt: pkg=rsync
+  package: name=rsync
   register: result
   until: result|succeeded
   retries: 5
 
 - name: rsync defaults
-  lineinfile: dest=/etc/default/rsync regexp={{ item.value.regexp }}
-              line={{ item.value.line }}
+  lineinfile:
+    dest: "{{ rsync_defaults }}"
+    regexp: "{{ item.value.regexp }}"
+    line: "{{ item.value.line }}"
   with_dict:
     enable:
       regexp: ^RSYNC_ENABLE
@@ -42,7 +59,7 @@
 - meta: flush_handlers
 
 - name: start rsync
-  service: name=rsync state=started enabled=yes
+  service: name="{{ rsync_service }}" state=started enabled=yes
 
 - name: glance database credentials
   template: src=etc/glance/.my.cnf

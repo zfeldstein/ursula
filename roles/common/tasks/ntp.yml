@@ -8,6 +8,12 @@
   notify:
     - restart-ntp
 
+- name: symlink ntpd service to ntp on centos/rhel
+  file:
+    src: /usr/lib/systemd/system/ntpd.service
+    dest: /usr/lib/systemd/system/ntp.service
+    state: link
+
 - name: ntp service enabled
   service:
     name: ntp

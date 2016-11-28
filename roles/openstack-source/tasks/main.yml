@@ -1,7 +1,7 @@
 ---
 - name: install project system dependencies
-  apt: pkg={{ item }}
-  with_items: "{{ openstack_source.system_dependencies }}"
+  package: name={{ item }}
+  with_items: "{{ openstack_source.system_dependencies[os] }}"
   register: result
   until: result|succeeded
   retries: 5

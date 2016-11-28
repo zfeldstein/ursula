@@ -4,6 +4,7 @@
     OS_IDENTITY_API_VERSION: 3
   os_keystone_domain:
     name: "{{ keystone.ldap_domain.domain }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
       auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
@@ -20,6 +21,7 @@
   os_project:
     name: "{{ keystone.ldap_domain.project }}"
     domain_id: "{{ ldap_domain.domain.id }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
       auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin

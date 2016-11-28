@@ -1,13 +1,42 @@
 ---
+- set_fact:
+    apache_user: www-data
+    apache_group: www-data
+  when: os == 'ubuntu'
+
+- set_fact:
+    apache_user: apache
+    apache_group: apache
+  when: os == 'rhel'
+
 - name: install apache package
-  apt: pkg=apache2
+  package: name="{{ apache.package_name[os] }}"
   register: result
   until: result|succeeded
   retries: 5
 
+- name: use our apache config
+  template:
+    src: httpd.conf
+    dest: /etc/httpd/conf/httpd.conf
+  when: os == 'rhel'
+  notify:
+    - reload apache
+
+- name: check selinux for httpd_can_network_connect
+  command: /usr/sbin/getsebool httpd_can_network_connect | grep off
+  register: httpd_can_network_connect
+  failed_when: false
+  changed_when: false
+  when: os == 'rhel'
+
+- name: enable httpd_can_network_connect in selinux
+  command: /usr/sbin/setsebool -P httpd_can_network_connect 1
+  when: os == 'rhel' and httpd_can_network_connect.rc != 0
+
 - name: install apache module packages
-  apt: pkg={{ item }}
-  with_items: "{{ apache.modules }}"
+  package: name={{ item }}
+  with_items: "{{ apache.modules[os] }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -20,11 +49,31 @@
     - rewrite
     - uwsgi
   notify: reload apache
-  
+  when: os == 'ubuntu'
+
 - name: disable apache status
   command: a2dismod status
   notify:
     - reload apache
+  when: os == 'ubuntu'
+
+- name: disable apache status
+  lineinfile:
+    dest: /etc/httpd/conf.modules.d/00-base.conf
+    regexp: "^LoadModule status_module$"
+    state: absent
+  notify:
+    - reload apache
+  when: os == 'rhel'
+
+- name: disable apache status
+  lineinfile:
+    dest: /etc/httpd/conf/httpd.conf
+    regexp: "^Listen 80$"
+    state: absent
+  notify:
+    - reload apache
+  when: os == 'rhel'
 
 - name: disable default vhost
   apache2_site: name={{ item }} state=absent
@@ -32,12 +81,23 @@
     - 000-default
     - default-ssl
   notify: restart apache
+  when: os == 'ubuntu'
+
+- name: disable default vhosts
+  file: dest=/etc/httpd/conf.d/{{ item }} state=absent
+  with_items:
+    - autoindex.conf
+    - userdir.conf
+    - welcome.conf
+  notify: restart apache
+  when: os == 'rhel'
 
 - name: do not include ports.conf
   lineinfile: dest=/etc/apache2/apache2.conf
               regexp="^Include ports\.conf$"
               state=absent
+  when: os == 'ubuntu'
 
 - name: remove ports.conf
   file: dest=/etc/apache2/ports.conf state=absent
-
+  when: os == 'ubuntu'

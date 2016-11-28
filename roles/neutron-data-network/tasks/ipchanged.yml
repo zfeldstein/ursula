@@ -1,6 +1,6 @@
 ---
 - name: install ipchanged dependencies
-  apt: pkg=python-daemon
+  package: name=python-daemon
   register: result
   until: result|succeeded
   retries: 5
@@ -11,6 +11,13 @@
 
 - name: install ipchanged configuraion
   template: src=etc/init/ipchanged.conf dest=/etc/init/ipchanged.conf mode=0644
+  when: os == 'ubuntu'
+
+- name: ipchanged systemd service
+  systemd_service:
+    name: ipchanged
+    cmd: /usr/local/sbin/ipchanged
+
 
 - name: ipchanged dirs - undercloud
   file: dest=/etc/ipchanged/{{ item }} state=directory
@@ -42,4 +49,4 @@
   when: ansible_default_ipv4.interface != hostvars[inventory_hostname][primary_interface].device
 
 - name: start ipchanged service
-  service: name=ipchanged state=started
+  service: name=ipchanged state=started enabled=true

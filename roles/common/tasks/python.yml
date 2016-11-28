@@ -1,8 +1,16 @@
 ---
+- name: python dependencies
+  package:
+    name: "{{ item }}"
+  with_items: " {{ common.python.system_packages }}"
+  #register: result
+  #until: result|succeeded
+  #retries: 5
+
 - name: update pip
   pip: name=pip version={{ common.pip_version }}
        extra_args='-i {{ openstack.pypi_mirror }}'
-  when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is defined
+  when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is defined  and ansible_distribution == 'Ubuntu'
   register: result
   until: result|succeeded
   retries: 5
@@ -35,7 +43,7 @@
   retries: 5
 
 - name: uninstall python-setuptools
-  apt: pkg=python-setuptools state=absent
+  package: name=python-setuptools state=absent
   when: common.setuptools_version != "system"
   register: result
   until: result|succeeded

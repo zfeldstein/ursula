@@ -6,6 +6,11 @@ keystone:
   public_workers: 5
   admin_project_name: admin
   admin_project_domain_name: Default
+  uwsgi:
+    method: socket
+    http_port:
+      admin: 9091
+      public: 9092
   source:
     rev: 'stable/newton'
     constrain: True
@@ -16,10 +21,16 @@ keystone:
       - { name: pyldap }
       - { name: ldappool }
     system_dependencies:
-      - openssl
-      - libldap2-dev
-      - libsasl2-dev
-      - libkrb5-dev
+        ubuntu:
+        - openssl
+        - libldap2-dev
+        - libsasl-dev
+        - libkrb5-dev
+        rhel:
+        - openssl
+        - openldap-devel
+        - libgsasl-devel
+        - krb5-devel
   alternatives:
     - keystone-manage
     - keystone-wsgi-admin

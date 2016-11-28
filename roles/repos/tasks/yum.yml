@@ -1,0 +1,23 @@
+---
+- debug:
+    msg: "item - {{ repos }}"
+
+- name: Install EPEL repo.
+  yum:
+    name: "{{ item.repo }}"
+    state: present
+  with_items: "{{ repos }}"
+  register: result
+  until: '"failed" not in result'
+  retries: 5
+  delay: 10
+
+- name: Import EPEL GPG key.
+  rpm_key:
+    key: "{{ item.key_url }}"
+    state: present
+  with_items: "{{ repos }}"
+  register: result
+  until: '"failed" not in result'
+  retries: 5
+  delay: 10

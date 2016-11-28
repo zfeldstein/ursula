@@ -80,7 +80,10 @@ neutron:
       - { name: "git+git://github.com/openstack/neutron-lbaas.git@stable/newton#egg=neutron-lbaas" }
       - { name: PyMySQL }
     system_dependencies:
-      - conntrack
+      ubuntu: []
+        #- conntrack
+      rhel: []
+        #- conntrack
   alternatives:
     - neutron-db-manage
     - neutron-debug

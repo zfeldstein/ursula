@@ -1,6 +1,7 @@
 ---
 - name: refresh cert auths
   command: update-ca-certificates
+  when: ansible_distribution == 'Ubuntu'
 
 - name: restart logstash-forwarder
   service: name=logstash-forwarder state=restarted

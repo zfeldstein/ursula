@@ -1,10 +1,39 @@
 ---
 - name: install memcached packages
-  apt: pkg={{ item }}
-  with_items:
-    - memcached
-    - python-memcache
-    - libsasl2-dev
+  package: name=memcached
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install memcached packages
+  package:
+    name=libsasl2-dev
+  when: ansible_distribution in ['Ubuntu']
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install memcached packages
+  package:
+    name=libgsasl
+  when: ansible_distribution in ['CentOS','RedHat']
+  register: result
+  until: result|succeeded
+  retries: 5
+
+
+- name: install memcached packages
+  package:
+    name=python-memcache
+  when: ansible_distribution in ['Ubuntu']
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install memcached packages
+  package:
+    name=python-memcached
+  when: ansible_distribution in ['CentOS','RedHat']
   register: result
   until: result|succeeded
   retries: 5

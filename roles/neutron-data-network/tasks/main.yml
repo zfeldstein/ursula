@@ -1,26 +1,39 @@
 ---
 - name: install neutron-data-network packages
-  apt: pkg={{ item }}
+  package: name={{ item }}
   with_items:
     - dnsmasq
     - dnsmasq-utils
-    - iputils-arping
     - ucarp
     - radvd
-    - resolvconf
   register: result
   until: result|succeeded
   retries: 5
 
+- name: install arping - ubuntu
+  package:
+    name: iputils-arping
+  when: os == 'ubuntu'
+
+- name: install resolvconf - ubuntu
+  package:
+    name: resolvconf
+  when: os == 'ubuntu'
+
+- name: install arping - rhel
+  package:
+    name: iputils
+  when: os == 'rhel'
+
 - name: install packages for l3ha
-  apt: pkg=keepalived
+  package: name=keepalived
   when: neutron.l3ha.enabled|bool
   register: result
   until: result|succeeded
   retries: 5
 
 - name: remove conntrackd
-  apt: name=conntrackd purge=yes state=absent
+  package: name=conntrackd state=absent
   register: result
   until: result|succeeded
   retries: 5
@@ -28,7 +41,10 @@
 - include: dnsmasq.yml
 
 - include: igmp-router.yml
-  when: neutron.plugin == 'ml2' and 'vxlan' in neutron.tunnel_types and not neutron.l2_population
+  when: os == 'ubuntu' and (
+        neutron.plugin == 'ml2' and
+        'vxlan' in neutron.tunnel_types
+        and not neutron.l2_population )
 
 - name: assert kernel supports vxlan
   command: modinfo -F version vxlan
@@ -53,6 +69,25 @@
     config_dirs: /etc/neutron
     config_files: /etc/neutron/neutron.conf,{{ item.value.config_files }}
     envs: "{{ neutron.service.envs }}"
+  when: os == 'ubuntu'
+  with_dict:
+    neutron-dhcp-agent:
+      config_files: /etc/neutron/dhcp_agent.ini
+    neutron-l3-agent:
+      config_files: /etc/neutron/l3_agent.ini
+      pidfile: /var/run/enutron-l3-agent.pid
+    neutron-metadata-agent:
+      config_files: /etc/neutron/metadata_agent.ini
+
+- name: install neutron-data-network services
+  systemd_service:
+    name: "{{ item.key }}"
+    user: neutron
+    cmd: "/usr/local/bin/{{ item.key }}"
+    config_dirs: /etc/neutron
+    config_files: /etc/neutron/neutron.conf,{{ item.value.config_files }}
+    #envs: "{{ neutron.service.envs }}"
+  when: os == 'rhel'
   with_dict:
     neutron-dhcp-agent:
       config_files: /etc/neutron/dhcp_agent.ini

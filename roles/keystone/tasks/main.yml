@@ -43,12 +43,21 @@
 - name: install keystone uwsgi service
   template: src=etc/init/keystone.conf
             dest=/etc/init/keystone.conf mode=0644
+  when: os == 'ubuntu'
+
+- name: install keystone uwsgi service
+  systemd_service:
+    name: keystone
+    cmd: "{{ uwsgi_path }}"
+    args: "--uid keystone --gid keystone --master --emperor /etc/keystone/uwsgi"
+  when: os == 'rhel'
 
 - name: Creates keystone uwsgi and httpd directories
   file: path={{ item }} state=directory
         owner=keystone group=keystone mode=0775
   with_items:
     - /etc/keystone/uwsgi
+    - /run/uwsgi
 
 - name: configure keystone admin wsgi
   template: src=etc/keystone/uwsgi/keystone-admin.ini
@@ -72,6 +81,15 @@
 - name: keystone apache vhost
   template: src=etc/apache2/sites-available/keystone.conf
             dest=/etc/apache2/sites-available/keystone.conf
+  when: os == 'ubuntu'
+  notify:
+    - reload apache
+  tags: keystone-federation
+
+- name: keystone apache vhost
+  template: src=etc/apache2/sites-available/keystone.conf
+            dest=/etc/httpd/conf.d/keystone.conf
+  when: os == 'rhel'
   notify:
     - reload apache
   tags: keystone-federation
@@ -91,7 +109,7 @@
   when: keystone.federation.enabled|bool and keystone.federation.idp.k2k.enabled|bool
 
 - name: sync keystone database
-  command: keystone-manage db_sync
+  command: /usr/local/bin/keystone-manage db_sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -111,6 +129,7 @@
   apache2_site: name=keystone state=present
   notify:
     - reload apache
+  when: os == 'ubuntu'
 
 - include: ldap.yml
   when: keystone.ldap_domain.enabled|default('False')|bool
@@ -118,10 +137,7 @@
 - meta: flush_handlers
 
 - name: start keystone
-  service: name=keystone state=started
-
-- name: start keystone (apache)
-  service: name=apache2 state=started
+  service: name=keystone state=started enabled=true
 
 - name: start shibboleth service
   service: name=shibd state=started enabled=true
@@ -134,6 +150,15 @@
     - "{{ endpoints.keystone.port.haproxy_api }}"
     - "{{ endpoints.keystone_admin.port.haproxy_api }}"
     - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
+  when: os == 'ubuntu'
+
+- name: set selinux policy for haproxy
+  seport: ports={{ item }} proto=tcp setype=http_port_t state=present
+  with_items:
+    - "{{ endpoints.keystone.port.backend_api }}"
+    - "{{ endpoints.keystone_admin.port.backend_api }}"
+    - "{{ endpoints.keystone_legacy.port.backend_api }}"
+  when: os == 'rhel'
 
 - name: add cron job to clean up expired tokens
   template:
