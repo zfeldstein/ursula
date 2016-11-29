@@ -119,54 +119,6 @@
       username: admin
       password: "{{ secrets.admin_password }}"
 
-- name: heat stack user
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  os_user:
-    name: heat_stack_user
-    password: "{{ secrets.service_password }}"
-    default_project: admin
-    domain: default
-    validate_certs: "{{ validate_certs|default(omit) }}"
-    auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
-      project_name: admin
-      username: admin
-      password: "{{ secrets.admin_password }}"
-  when: heat.enabled|bool
-
-- name: heat stack role
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  os_keystone_role:
-    name: heat_stack_user
-    validate_certs: "{{ validate_certs|default(omit) }}"
-    auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
-      project_name: admin
-      project_domain_name: default
-      user_domain_name: default
-      username: admin
-      password: "{{ secrets.admin_password }}"
-  when: heat.enabled|bool
-
-- name: heat stack user role
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  os_user_role:
-    role: heat_stack_user
-    user: heat_stack_user
-    project: admin
-    validate_certs: "{{ validate_certs|default(omit) }}"
-    auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
-      project_name: admin
-      project_domain_name: default
-      user_domain_name: default
-      username: admin
-      password: "{{ secrets.admin_password }}"
-  when: heat.enabled|bool
-
 - include: federation.yml
   when: keystone.federation.enabled|bool
   tags:

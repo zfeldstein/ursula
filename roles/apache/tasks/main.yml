@@ -24,15 +24,7 @@
     - reload apache
 
 - name: check selinux for httpd_can_network_connect
-  command: /usr/sbin/getsebool httpd_can_network_connect | grep off
-  register: httpd_can_network_connect
-  failed_when: false
-  changed_when: false
-  when: os == 'rhel'
-
-- name: enable httpd_can_network_connect in selinux
-  command: /usr/sbin/setsebool -P httpd_can_network_connect 1
-  when: os == 'rhel' and httpd_can_network_connect.rc != 0
+  seboolean: name=httpd_can_network_connect state=yes persistent=yes
 
 - name: install apache module packages
   package: name={{ item }}
