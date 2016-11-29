@@ -13,7 +13,7 @@ Prerequistites
 Networking
 ==========
 
-We've strived to keep the networking in the Vagrant install simple.  It _may_ not resemble what you would run in production,  but it does allow for an easier introduction to Openstack.
+We've strived to keep the networking in the Vagrant install simple.  It _may_ not resemble what you would run in production,  but it does allow for an easier introduction to OpenStack.
 
 There are four network interfaces provided in the Vagrantfile.
 
@@ -25,7 +25,7 @@ Vagrant guest IP:  This isn't of any interest to us.
 eth1
 ----
 
-Host Networking:  This is the primary network for the openstack hosts and services.
+Host Networking:  This is the primary network for the OpenStack hosts and services.
 
 eth2
 ----
@@ -52,7 +52,7 @@ Use `$ ursula --provisioner=vagrant envs/example/allinone site.yml`
 allinone
 --------
 
-This will stand up a single monolithic Openstack VM.  It's much quicker than standard, but sacrifices HA and multi-node:
+This will stand up a single monolithic OpenStack VM.  It's much quicker than standard, but sacrifices HA and multi-node:
 
 ```
 $ ursula --provisioner=vagrant envs/example/allinone site.yml
