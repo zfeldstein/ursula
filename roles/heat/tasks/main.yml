@@ -19,6 +19,7 @@
   with_items:
     - "{{ endpoints.heat.port.haproxy_api }}"
     - "{{ endpoints.heat_cfn.port.haproxy_api }}"
+  when: os == 'ubuntu'
 
 - name: install heat services
   upstart_service: name={{ item }}
@@ -29,6 +30,18 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
+  when: os == 'ubuntu'
+
+- name: install heat services
+  systemd_service: name={{ item }}
+                   user=heat
+                   cmd=/usr/local/bin/{{ item }}
+                   config_files=/etc/heat/heat.conf
+  with_items:
+    - heat-api
+    - heat-api-cfn
+    - heat-engine
+  when: os == 'rhel'
 
 - name: heat config
   template: src=etc/heat/{{ item }} dest=/etc/heat/{{ item }} mode={{ 0644 if 'policy.json' in item else 0640 }} owner=heat group=heat
@@ -40,9 +53,62 @@
   notify:
     - restart heat services
 
+- name: heat stack user
+  environment:
+    OS_IDENTITY_API_VERSION: 3
+    OS_USER_DOMAIN_NAME: default
+    OS_PROJECT_DOMAIN_NAME: default
+  os_user:
+    name: heat_stack_user
+    password: "{{ secrets.service_password }}"
+    default_project: admin
+    domain: default
+    validate_certs: "{{ validate_certs|default(omit) }}"
+    auth:
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
+
+- name: heat stack role
+  environment:
+    OS_IDENTITY_API_VERSION: 3
+    OS_USER_DOMAIN_NAME: default
+    OS_PROJECT_DOMAIN_NAME: default
+  os_keystone_role:
+    name: heat_stack_user
+    validate_certs: "{{ validate_certs|default(omit) }}"
+    auth:
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      project_name: admin
+      project_domain_name: default
+      user_domain_name: default
+      username: admin
+      password: "{{ secrets.admin_password }}"
+
+- name: heat stack user role
+  environment:
+    OS_IDENTITY_API_VERSION: 3
+    OS_USER_DOMAIN_NAME: default
+    OS_PROJECT_DOMAIN_NAME: default
+  os_user_role:
+    role: heat_stack_user
+    user: heat_stack_user
+    project: admin
+    validate_certs: "{{ validate_certs|default(omit) }}"
+    auth:
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      project_name: admin
+      project_domain_name: default
+      user_domain_name: default
+      username: admin
+      password: "{{ secrets.admin_password }}"
+
 - name: create heat trusts roles
   environment:
     OS_IDENTITY_API_VERSION: 3
+    OS_USER_DOMAIN_NAME: default
+    OS_PROJECT_DOMAIN_NAME: default
   os_keystone_role:
     name: "{{ item }}"
     auth:
@@ -133,7 +199,7 @@
   tags: db-migrate
 
 - name: sync heat database
-  command: heat-manage db_sync
+  command: /usr/local/bin/heat-manage db_sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
