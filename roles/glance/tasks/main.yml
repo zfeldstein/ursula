@@ -51,13 +51,6 @@
     - "{{ endpoints.glance.port.backend_api }}"
   when: os == 'ubuntu'
 
-- name: set selinux policy for haproxy
-  seport: ports={{ item }} proto=tcp setype=http_port_t state=present
-  with_items:
-    - "{{ endpoints.glance.port.backend_api }}"
-  when: os == 'rhel'
-  tags: selinux
-
 - name: install glance services
   systemd_service: name={{ item }}
                    user=glance

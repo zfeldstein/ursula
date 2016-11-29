@@ -43,11 +43,10 @@
 
 - meta: flush_handlers
 
-- name: set selinux policy for mysql proxy
-  seport: ports=3306 proto=tcp setype=http_port_t state=present
+- name: set selinux policy for haproxy
+  seboolean: name=haproxy_connect_any state=yes persistent=yes
   when: os == 'rhel'
   tags: selinux
-
 
 - name: start and enable haproxy
   service: name=haproxy state=started enabled=yes
