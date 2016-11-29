@@ -46,6 +46,13 @@
   notify:
     - restart mysql server
 
+- name: install mysql low memory config
+  template: src=etc/mysql/conf.d/low_memory.cnf dest=/etc/mysql/conf.d/low_memory.cnf
+            mode=0644
+  when: ansible_memtotal_mb < 6000
+  notify:
+    - restart mysql server
+
 - name: install percona xtradb packages
   apt: pkg={{ item }} state=installed
   with_items:
