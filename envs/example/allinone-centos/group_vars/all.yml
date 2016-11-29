@@ -1,16 +1,11 @@
 ---
 stack_env: example_allinone
 floating_ip: 172.16.0.100
-primary_interface: ansible_enp0s8
 xtradb:
   sst_auth_password: asdf
 
 percona:
   replication: False
-
-neutron:
-  enable_external_interface: True
-  bridge_mappings: physnet:enp0s9
 
 cinder:
   enabled: false
@@ -115,7 +110,7 @@ keystone:
     method: port
 
 heat:
-  enabled: False
+  enabled: True
 
 ironic:
   enabled: False

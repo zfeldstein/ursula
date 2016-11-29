@@ -9,7 +9,9 @@ heat:
     upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
-    system_dependencies: []
+    system_dependencies:
+      ubuntu: []
+      rhel: []
   alternatives:
     - heat-api
     - heat-api-cfn
