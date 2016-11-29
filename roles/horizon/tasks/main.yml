@@ -169,11 +169,6 @@
   - 443
   when: os == 'ubuntu'
 
-- name: set selinux policy for haproxy
-  seport: ports=8080 proto=tcp setype=http_port_t state=present
-  when: os == 'rhel'
-  tags: selinux
-
 - meta: flush_handlers
 
 - name: ensure apache is enabled

@@ -152,14 +152,6 @@
     - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
   when: os == 'ubuntu'
 
-- name: set selinux policy for haproxy
-  seport: ports={{ item }} proto=tcp setype=http_port_t state=present
-  with_items:
-    - "{{ endpoints.keystone.port.backend_api }}"
-    - "{{ endpoints.keystone_admin.port.backend_api }}"
-    - "{{ endpoints.keystone_legacy.port.backend_api }}"
-  when: os == 'rhel'
-
 - name: add cron job to clean up expired tokens
   template:
     src: etc/cron.d/drop-expired-keystone-tokens

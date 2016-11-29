@@ -96,14 +96,6 @@
   when: os == 'ubuntu'
   tags: ufw
 
-- name: set selinux policy for haproxy
-  seport: ports={{ item }} proto=tcp setype=http_port_t state=present
-  with_items:
-    - "{{ endpoints.nova.port.backend_api }}"
-    - "{{ endpoints.novnc.port.backend_api }}"
-  when: os == 'rhel'
-  tags: selinux
-
 - include: monitoring.yml
   tags:
     - monitoring
