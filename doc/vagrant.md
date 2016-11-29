@@ -3,12 +3,11 @@ Ursula on Vagrant
 
 Vagrant is an excellent tool for easily testing out new tools or systems without having to install a bunch of crap to your userland.
 
-Prerequistites
+Prerequisites
 ==============
 
 * Virtualbox
 * Vagrant
-* Ansible ( 1.7ish )
 
 Networking
 ==========
