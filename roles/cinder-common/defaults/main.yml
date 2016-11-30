@@ -31,7 +31,9 @@ cinder:
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }
-    system_dependencies: []
+    system_dependencies:
+      ubuntu: []
+      rhel: []
   logs:
   - paths:
       - /var/log/cinder/cinder-api.log

@@ -51,6 +51,17 @@
     - "{{ endpoints.glance.port.backend_api }}"
   when: os == 'ubuntu'
 
+- name: Permit access to glance
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.glance.port.haproxy_api }}"
+    - "{{ endpoints.glance.port.backend_api }}"
+  tags: firewall
+  when: os == 'rhel'
+
 - name: install glance services
   systemd_service: name={{ item }}
                    user=glance
