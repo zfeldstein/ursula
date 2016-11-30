@@ -87,6 +87,20 @@
                    config_dirs=/etc/cinder
   when: os == 'rhel' and swift.enabled|default("false")|bool
 
+- name: install cinder-volume service
+  systemd_service: name=cinder-volume user=cinder
+                   cmd=/usr/local/bin/cinder-volume
+                   config_dirs=/etc/cinder
+  when: os == 'rhel'
+
+- name: install cinder backup service
+  systemd_service: name=cinder-backup
+                   user=cinder
+                   cmd=/usr/local/bin/cinder-backup
+                   config_dirs=/etc/cinder
+  when: os == 'rhel'
+  when: swift.enabled|default("false")|bool
+
 
 - name: trigger restart on upgrades
   debug:

@@ -33,6 +33,7 @@ common:
       - ntp
       - lvm2
       - cracklib
+      - mlocate
   python:
     system_packages:
       - python-pip
