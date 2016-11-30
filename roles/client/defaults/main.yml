@@ -8,7 +8,7 @@ client:
     - python-novaclient
     - python-neutronclient==4.1.1
     - python-cinderclient
-    - python-heatclient
+    - python-heatclient==1.5.0
     - python-ceilometerclient
     - python-ironicclient
     - python-swiftclient
