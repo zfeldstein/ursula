@@ -9,6 +9,7 @@
     state: restarted
     must_exist: false
   run_once: True
+  failed_when: false
   delegate_to: "{{ item[0] }}"
   when: restart|default('True')
   with_nested:
@@ -24,3 +25,6 @@
   delegate_to: "{{ item }}"
   when: restart|default('True') and swift.enabled|default('False')
   with_items: "{{ play_hosts }}"
+
+- name: restart tgt service
+  service: name="{{ tgt_service }}" state=restarted

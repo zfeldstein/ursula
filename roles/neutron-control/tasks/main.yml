@@ -55,6 +55,16 @@
   tags: ufw
   when: os == 'ubuntu'
 
+- name: Permit access to glance
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.neutron.port.haproxy_api }}"
+  tags: firewall
+  when: os == 'rhel'
+
 - include: monitoring.yml
   tags:
     - monitoring

@@ -1,6 +1,6 @@
 ---
 - name: install cinder-data required packages
-  apt: pkg={{ item }}
+  package: name={{ item }}
   with_items:
     - cryptsetup
     - lvm2
@@ -8,6 +8,21 @@
     - nbd-client
     - open-iscsi
     - qemu-utils
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install cinder-data required packages
+  package: name={{ item }}
+  when: os == 'rhel'
+  with_items:
+    - cryptsetup
+    - lvm2
+    - scsi-target-utils
+    - nbd
+    - iscsi-initiator-utils
+    - qemu-kvm-tools
   register: result
   until: result|succeeded
   retries: 5
@@ -24,15 +39,16 @@
     cinder_tgt:
       src: etc/tgt/conf.d/cinder_tgt.conf
       dest: /etc/tgt/conf.d/cinder_tgt.conf
+  notify: restart tgt service
 
 - name: ensure tgt service is running
-  service: name=tgt state=started
+  service: name="{{ tgt_service }}" state=started
 
 - include: volume_group.yml
   when: cinder.create_vg|bool and ( cinder.fixed_key is not defined or (cinder.fixed_key is defined and "compute" not in group_names) )
 
 - name: iscsi start
-  service: name=open-iscsi state=started
+  service: name="{{ iscsi_service }}" state=started
 
 - name: enable cinder encryption
   template: src=etc/cinder/cinder.encryption.conf dest=/etc/cinder/cinder.encryption.conf mode=0640
@@ -49,13 +65,30 @@
   upstart_service: name=cinder-volume user=cinder
                    cmd=/usr/local/bin/cinder-volume
                    config_dirs=/etc/cinder
+  when: os == 'ubuntu'
 
 - name: install cinder backup service
   upstart_service: name=cinder-backup
                    user=cinder
                    cmd=/usr/local/bin/cinder-backup
                    config_dirs=/etc/cinder
+  when: os == 'ubuntu'
   when: swift.enabled|default("false")|bool
+
+- name: install cinder-volume service
+  systemd_service: name=cinder-volume user=cinder
+                   cmd=/usr/local/bin/cinder-volume
+                   config_dirs=/etc/cinder
+  when: os == 'rhel'
+
+- name: install cinder backup service
+  systemd_service: name=cinder-backup
+                   user=cinder
+                   cmd=/usr/local/bin/cinder-backup
+                   config_dirs=/etc/cinder
+  when: os == 'rhel'
+  when: swift.enabled|default("false")|bool
+
 
 - name: trigger restart on upgrades
   debug:

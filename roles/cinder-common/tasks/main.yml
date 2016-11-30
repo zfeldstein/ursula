@@ -1,4 +1,20 @@
 ---
+- set_fact:
+    tgt_service: tgt
+  when: os == 'ubuntu'
+
+- set_fact:
+    tgt_service: tgtd
+  when: os == 'rhel'
+
+- set_fact:
+    iscsi_service: open-iscsi
+  when: os == 'ubuntu'
+
+- set_fact:
+    iscsi_service: iscsid
+  when: os == 'rhel'
+
 - name: check if cinder user exists
   shell: getent passwd cinder
   register: cinder_user
@@ -85,7 +101,7 @@
     - logging
 
 - include: serverspec.yml
-  tags: 
+  tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
 

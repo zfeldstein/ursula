@@ -7,9 +7,6 @@ xtradb:
 percona:
   replication: False
 
-cinder:
-  enabled: false
-
 common:
   hwraid:
     enabled: False
@@ -36,6 +33,7 @@ common:
       - ntp
       - lvm2
       - cracklib
+      - mlocate
   python:
     system_packages:
       - python-pip

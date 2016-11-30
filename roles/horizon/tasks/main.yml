@@ -169,6 +169,17 @@
   - 443
   when: os == 'ubuntu'
 
+- name: Permit access to horizon
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - 80
+    - 443
+  tags: firewall
+  when: os == 'rhel'
+
 - meta: flush_handlers
 
 - name: ensure apache is enabled

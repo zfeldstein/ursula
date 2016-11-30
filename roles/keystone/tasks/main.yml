@@ -152,6 +152,18 @@
     - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
   when: os == 'ubuntu'
 
+- name: Permit access to keystone
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.keystone.port.haproxy_api }}"
+    - "{{ endpoints.keystone_admin.port.haproxy_api }}"
+    - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
+  tags: firewall
+  when: os == 'rhel'
+
 - name: add cron job to clean up expired tokens
   template:
     src: etc/cron.d/drop-expired-keystone-tokens
