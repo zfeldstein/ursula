@@ -28,6 +28,9 @@
       username: admin
       password: "{{ secrets.admin_password }}"
   with_items: "{{ keystone.tenants }}"
+  register: result
+  until: result|succeeded
+  retries: 5
 
 # Putting user and project name in env works around a bug in openstack
 # modules, where the contents of the auth dict are considered no_log, so

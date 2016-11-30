@@ -21,6 +21,17 @@
     - "{{ endpoints.heat_cfn.port.haproxy_api }}"
   when: os == 'ubuntu'
 
+- name: Permit access to heat
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.heat.port.haproxy_api }}"
+    - "{{ endpoints.heat_cfn.port.backend_api }}"
+  tags: firewall
+  when: os == 'rhel'
+
 - name: install heat services
   upstart_service: name={{ item }}
                    user=heat

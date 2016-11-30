@@ -4,12 +4,23 @@
                    user=cinder
                    cmd=/usr/local/bin/{{ item }}
                    config_dirs=/etc/cinder
+  when: os == 'ubuntu'
+  with_items:
+    - cinder-api
+    - cinder-scheduler
+
+- name: install cinder controller services
+  systemd_service: name={{ item }}
+                   user=cinder
+                   cmd=/usr/local/bin/{{ item }}
+                   config_dirs=/etc/cinder
+  when: os == 'rhel'
   with_items:
     - cinder-api
     - cinder-scheduler
 
 - name: sync cinder database
-  command: cinder-manage db sync
+  command: /usr/local/bin/cinder-manage db sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -36,6 +47,15 @@
 - name: Permit access to Cinder
   ufw: rule=allow to_port={{ endpoints.cinder.port.haproxy_api }} proto=tcp
   tags: ufw
+  when: os == 'ubuntu'
+
+- name: Permit access to Cinder
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ endpoints.cinder.port.haproxy_api }}/tcp"
+  tags: firewall
+  when: os == 'rhel'
 
 - include: monitoring.yml
   tags:

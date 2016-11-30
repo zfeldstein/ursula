@@ -96,6 +96,16 @@
   when: os == 'ubuntu'
   tags: ufw
 
+- name: Permit access to nova
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.nova.port.haproxy_api }}"
+  tags: firewall
+  when: os == 'rhel'
+
 - include: monitoring.yml
   tags:
     - monitoring
