@@ -1,4 +1,11 @@
 ---
+- set_fact:
+    ntpd_service_name: ntp
+  when: os == 'ubuntu'
+- set_fact:
+    ntpd_service_name: ntpd
+  when: os == 'rhel'
+
 - name: install ntp.conf
   template:
     dest: /etc/ntp.conf
@@ -8,14 +15,8 @@
   notify:
     - restart-ntp
 
-- name: symlink ntpd service to ntp on centos/rhel
-  file:
-    src: /usr/lib/systemd/system/ntpd.service
-    dest: /usr/lib/systemd/system/ntp.service
-    state: link
-
 - name: ntp service enabled
   service:
-    name: ntp
+    name: "{{ ntpd_service_name }}"
     state: started
     enabled: true
