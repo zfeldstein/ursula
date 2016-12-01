@@ -89,9 +89,6 @@ sensu_checks:
 logging:
   enabled: false
 
-monitoring:
-  enabled: false
-
 serverspec:
   enabled: false
 
