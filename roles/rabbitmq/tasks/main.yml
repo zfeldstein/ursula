@@ -28,6 +28,14 @@
   until: result|succeeded
   retries: 5
 
+- name: upgrade rabbitmq for CVEs on upgrade
+  apt:
+    pkg: "{{ item }}"
+    update_cache: yes
+  with_items:
+    - rabbitmq-server=3.6.6*
+  when: upgrade | default('False') | bool
+
 - name: add rabbitmq environment configuration
   template: src=etc/rabbitmq/rabbitmq-env.conf
             dest=/etc/rabbitmq/rabbitmq-env.conf
