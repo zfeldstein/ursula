@@ -1,5 +1,6 @@
 ---
 repos: []
+repo: ~
 apt_repos:
   # All key_urls should be HTTPS to ensure we are retrieving the key we are expecting too
   docker:
@@ -15,8 +16,8 @@ apt_repos:
     repo: 'http://hwraid.le-vert.net/ubuntu'
     key_url: 'http://hwraid.le-vert.net/debian/hwraid.le-vert.net.gpg.key'
   sensu:
-    repo: 'http://repos.sensuapp.org/apt'
-    key_url: 'https://repos.sensuapp.org/apt/pubkey.gpg'
+    repo: 'https://sensu.global.ssl.fastly.net/apt'
+    key_url: 'https://sensu.global.ssl.fastly.net/apt/pubkey.gpg'
     distribution: 'sensu'
     components: 'main'
   haproxy:
@@ -48,14 +49,10 @@ apt_repos:
 
 yum_repos:
   epel:
-    repo: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
-    key_url: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}
+    package: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
   percona:
-    repo: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
-    key_url: /etc/pki/rpm-gpg/RPM-GPG-KEY-Percona
-#  erlang:
-#    repo: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
-#    key_url: https://www.percona.com/downloads/RPM-GPG-KEY-percona
-#  rabbitmq:
-#    repo: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
-#    key_url: https://www.percona.com/downloads/RPM-GPG-KEY-percona
+    package: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
+  sensu:
+    repo: http://sensu.global.ssl.fastly.net/yum/$basearch/
+    description: sensu monitoring repo
+    gpgcheck: no

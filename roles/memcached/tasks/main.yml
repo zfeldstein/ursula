@@ -8,15 +8,15 @@
 - name: install memcached packages
   package:
     name=libsasl2-dev
-  when: ansible_distribution in ['Ubuntu']
+  when: os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
 
 - name: install memcached packages
   package:
-    name=libgsasl
-  when: ansible_distribution in ['CentOS','RedHat']
+    name=libgsasl-devel
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -25,7 +25,7 @@
 - name: install memcached packages
   package:
     name=python-memcache
-  when: ansible_distribution in ['Ubuntu']
+  when: os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
@@ -33,7 +33,7 @@
 - name: install memcached packages
   package:
     name=python-memcached
-  when: ansible_distribution in ['CentOS','RedHat']
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5

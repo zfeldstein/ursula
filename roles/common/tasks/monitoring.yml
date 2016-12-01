@@ -3,10 +3,21 @@
   group: name=monitor state=present
 
 - name: install sensu
-  package: name={{ item }}
-  with_items:
-  - sensu
-  - libfile-which-perl
+  package: name=sensu
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install perl which module - ubuntu
+  package: name=libfile-which-perl
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install perl which module - ubuntu
+  package: name=perl-File-Which
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -75,6 +86,7 @@
 
 - name: override sensu-client startup
   shell: update-rc.d sensu-client defaults
+  when: os == 'ubuntu'
 
 - name: install sensu plugin pip modules
   pip: name=sensu_plugin version=0.1.0

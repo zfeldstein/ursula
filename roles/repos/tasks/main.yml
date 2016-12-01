@@ -1,5 +1,5 @@
 - include: apt.yml
-  when: ansible_distribution == "Ubuntu"
+  when: os == "ubuntu"
 
 - include: yum.yml
-  when: ansible_distribution == "CentOS"
+  when: os == "rhel"
