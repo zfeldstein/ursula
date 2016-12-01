@@ -1,6 +1,12 @@
 ---
 - name: try to stop old garbd service
-  service: name=garbd state=stopped enabled=false pattern=/usr/bin/garbd
+  service: name="{{ garbd_service }}" state=stopped enabled=false pattern=/usr/bin/garbd
+  when: os == 'ubuntu'
+  failed_when: False
+
+- name: try to stop old garbd service
+  service: name="{{ garbd_service }}" state=stopped enabled=false
+  when: os == 'rhel'
   failed_when: False
 
 - name: make garbd log
@@ -14,15 +20,32 @@
 
 # the arbiter node only needs the garbd daemon
 - name: install percona garbd package
-  apt: pkg={{ item }} state=installed
-  with_items:
-    - percona-xtradb-cluster-garbd-3.x
+  package: pkg=percona-xtradb-cluster-garbd-3.x state=installed
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install percona garbd package
+  package: pkg=Percona-XtraDB-Cluster-garbd-3 state=installed
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
 
 - name: install garbd config
   template: src=etc/default/garbd dest=/etc/default/garbd mode=0644
+  when: os == 'ubuntu'
+
+- name: install garbd config
+  template: src=etc/default/garbd dest=/etc/sysconfig/garb mode=0644
+  when: os == 'rhel'
+
 
 - name: ensure garbd running
-  service: name=garbd state=started enabled=yes pattern=/usr/bin/garbd
+  service: name="{{ garbd_service }}" state=started enabled=yes pattern=/usr/bin/garbd
+  when: os == 'ubuntu'
+
+- name: ensure garbd running
+  service: name="{{ garbd_service }}" state=started enabled=yes
+  when: os == 'rhel'

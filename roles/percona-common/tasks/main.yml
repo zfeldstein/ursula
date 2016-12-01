@@ -1,4 +1,12 @@
 ---
+- set_fact:
+    garbd_service: garbd
+  when: os == 'ubuntu'
+- set_fact:
+    garbd_service: garb
+  when: os == 'rhel'
+
+
 - name: create mysql user
   user:
     name: mysql
