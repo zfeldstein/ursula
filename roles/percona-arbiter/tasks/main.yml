@@ -41,7 +41,6 @@
   template: src=etc/default/garbd dest=/etc/sysconfig/garb mode=0644
   when: os == 'rhel'
 
-
 - name: ensure garbd running
   service: name="{{ garbd_service }}" state=started enabled=yes pattern=/usr/bin/garbd
   when: os == 'ubuntu'
