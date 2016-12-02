@@ -21,7 +21,7 @@
   sensu_check:
     name: check-keystone-expired-tokens
     plugin: check-keystone-expired-tokens.py
-    interval: 10
+    interval: 3600
     use_sudo: true
   notify: restart sensu-client
 
