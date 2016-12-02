@@ -124,6 +124,10 @@
       failed_when: false
       tags: percona    
 
+    - name: remove the percona backup script
+      file: path=/etc/cron.daily/percona-xtrabackup state=absent
+      tags: percona
+
     - name: remove ucarp package
       apt: pkg="ucarp" purge=yes state=absent
       failed_when: false
