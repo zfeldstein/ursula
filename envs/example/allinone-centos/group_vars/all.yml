@@ -87,7 +87,7 @@ sensu_checks:
         service_owner: openstack
 
 logging:
-  enabled: false
+  enabled: true
 
 serverspec:
   enabled: false

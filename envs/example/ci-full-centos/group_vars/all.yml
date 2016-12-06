@@ -15,5 +15,75 @@ keystone:
     enabled: True
     domain: users
 
+common:
+  hwraid:
+    enabled: False
+  system_tools:
+    mcelog: True
+    lm_sensors_package: lm_sensors
+    packages:
+      - acl
+      - curl
+      - dstat
+      - ethtool
+      - git
+      - iotop
+      - ltrace
+      - mtr
+      - nc
+      - ruby-devel
+      - ruby
+      - socat
+      - tree
+      - vim
+      - sysstat
+      - logrotate
+      - ntp
+      - lvm2
+      - cracklib
+      - mlocate
+  python:
+    system_packages:
+      - python-pip
+      - libxml2-python
+      - python-lxml
+      - python-greenlet
+      - pyOpenSSL
+      - python-devel
+      - python-httplib2
+      - python-virtualenv
+      - MySQL-python
+      - python-jinja2
+      - cryptsetup
+      - libffi-devel
+      - openssl-libs
+      - libxml2-devel
+      - libxslt-devel
+      - libxslt-devel
+      - openssl-devel
+      - libstdc++-static
+      - gcc-c++
+
+logging:
+  enabled: true
+
 serverspec:
+  enabled: false
+
+xtradb:
+  galera_version: 3
+  client_version: 56
+  server_version: 56
+
+haproxy:
+  stats_group: root
+
+keystone:
+  uwsgi:
+    method: port
+
+heat:
   enabled: True
+
+ironic:
+  enabled: False
