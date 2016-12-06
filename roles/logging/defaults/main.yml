@@ -2,7 +2,10 @@ logging:
   version: 0.3.1
   install_method: file
   download:
-    url: https://file-mirror.openstack.blueboxgrid.com/logstash/logstash-forwarder_0.3.1_amd64.deb
+    ubuntu:
+      url: https://file-mirror.openstack.blueboxgrid.com/logstash/logstash-forwarder_0.3.1_amd64.deb
+    rhel:
+      url: https://download.elastic.co/logstash-forwarder/binaries/logstash-forwarder-0.4.0-1.x86_64.rpm
   follow:
     enabled: true
     global_fields:
