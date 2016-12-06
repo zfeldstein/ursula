@@ -9,6 +9,12 @@
     os: ubuntu
   when: ansible_distribution in ['Ubuntu']
 
+- name: stub out ansible_lsb for CentOS
+  set_fact:
+    ansible_lsb:
+      codename: ~
+  when: os == 'rhel'
+
 - name: set ssh_service fact for ubuntu
   set_fact:
     ssh_service: ssh
