@@ -98,8 +98,7 @@
                    user=cinder
                    cmd=/usr/local/bin/cinder-backup
                    config_dirs=/etc/cinder
-  when: os == 'rhel'
-  when: swift.enabled|default("false")|bool
+  when: os == 'rhel' and swift.enabled|default("false")|bool
 
 
 - name: trigger restart on upgrades
