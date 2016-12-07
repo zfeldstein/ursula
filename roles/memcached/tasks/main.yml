@@ -15,7 +15,7 @@
 
 - name: install memcached packages
   package:
-    name=libgsasl-devel
+    name=cyrus-sasl-devel
   when: os == 'rhel'
   register: result
   until: result|succeeded
