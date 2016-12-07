@@ -68,6 +68,16 @@ common:
 
 logging:
   enabled: true
+  follow:
+    enabled: true
+    global_fields:
+      customer_id: "unknown"
+      cluster_name: "unknown"
+    logs:
+      - paths:
+          - /var/log/messages
+        fields:
+          type: syslog
 
 serverspec:
   enabled: false
