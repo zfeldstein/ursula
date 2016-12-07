@@ -15,13 +15,33 @@
 #              insertafter="^-A ufw-before-input -p udp --sport 67 --dport 68 -j ACCEPT"
 
 - name: Permit SSH
-  firewalld: state=enabled permanent=true service=ssh source={{ item }}
+  firewalld:
+    state: enabled
+    service: ssh
+    source: "{{ item }}"
+    zone: public
+    permanent: true
+    immediate: true
   with_items: "{{ common.ssh.allow_from }}"
 
 - name: Permit unrestricted access from remainder of cluster
-  firewalld: state=enabled zone=trusted source={{ item.cidr }}
+  firewalld:
+#    state: enabled
+#    source: "{{ item.cidr }}"
+#    zone: public
+#    permanent: true
+#    immediate: true
+#  with_items: "{{ undercloud_cidr }}"
+#  when: undercloud_cidr is defined
+    rich_rule: 'rule family="ipv4" source address="{{ item.cidr }}" accept'
+    permanent: true
+    immediate: true
+    zone: public
+    state: enabled
   with_items: "{{ undercloud_cidr }}"
   when: undercloud_cidr is defined
+
+# firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="192.168.0.0/22" accept'
 
 #- name: Do not enforce forwarding rules with UFW
 #  lineinfile: dest=/etc/default/ufw regexp="^DEFAULT_FORWARD_POLICY"

@@ -139,8 +139,16 @@
 
 - meta: flush_handlers
 
+- name: check on rhel if bootstrap service is running
+  command: systemctl status mysql@bootstrap.service
+  changed_when: false
+  failed_when: false
+  register: result
+
 - name: start mysql server
   service: name=mysql state=started enabled=true
+  when: os == 'ubuntu' or
+        ( os == 'rhel' and result.rc != 0 )
 
 - name: set mysql root password
   mysql_user: name=root password={{ mysql.root_password }}

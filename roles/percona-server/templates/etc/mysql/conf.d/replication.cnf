@@ -1,6 +1,10 @@
 [mysqld]
 
+{% if os == 'ubuntu' %}
 wsrep_provider = /usr/lib/libgalera_smm.so
+{% else %}
+wsrep_provider = /usr/lib64/libgalera_smm.so
+{% endif -%}
 
 # Empty gcomm address is being used when cluster is getting bootstrapped
 {% if percona_replication_nodes is defined -%}
