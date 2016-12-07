@@ -159,7 +159,7 @@
 - name: add mysql user for haproxy health
   mysql_user:
     name: haproxy
-    host: "{{ hostvars[item]['ansible_fqdn'] }}"
+    host: "{{ hostvars[item][primary_interface]['ipv4']['address'] }}"
   with_items: "{{ groups['controller'] }}"
 
 - name: add fqdn mysql for haproxy health (because haproxy is dumb)
