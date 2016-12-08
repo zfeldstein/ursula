@@ -82,7 +82,11 @@ MaxStartups 100
 # Allow client to pass locale environment variables
 AcceptEnv LANG LC_*
 
+{% if os == 'ubuntu' %}
 Subsystem sftp /usr/lib/openssh/sftp-server
+{% else %}
+Subsystem sftp /usr/libexec/openssh/sftp-server
+{% endif %}
 
 Ciphers aes128-ctr,aes192-ctr,aes256-ctr
 MACs hmac-sha2-256,hmac-sha2-512,hmac-sha1,hmac-ripemd160

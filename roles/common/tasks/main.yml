@@ -61,6 +61,7 @@
   tags: [ssl, common-ssl]
 
 - include: ssh.yml
+  tags: ssh
 
 - include: networking.yml
 
