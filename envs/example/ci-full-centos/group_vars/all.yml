@@ -6,6 +6,10 @@ state_path_base: /opt/stack/data
 
 validate_certs: no
 
+etc_hosts:
+  - name: "{{ fqdn }}"
+    ip: "{{ floating_ip }}"
+
 neutron:
   enable_external_interface: True
   lbaas:
