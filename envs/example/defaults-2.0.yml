@@ -490,6 +490,7 @@ keystone:
     enabled: False
 
 ssl:
+  cafile: "{{ (os == 'rhel' ) | ternary('/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt', '/etc/ssl/certs/ca-certificates.crt') }}"
   crt: |
     -----BEGIN CERTIFICATE-----
     MIIDGTCCAgGgAwIBAgIJAMtkDaIzlHvtMA0GCSqGSIb3DQEBCwUAMBIxEDAOBgNV
