@@ -41,6 +41,8 @@ elif [[ $TEST_ENV == "ci-ceph_swift" ]]; then
   ${testenv_instance_prefix}-swift-2"
 
   export testenv_flavor_ceph_swift=${testenv_flavor_ceph_swift:=ci_ceph_swift}
+elif [[ $TEST_ENV == "ci-full-centos" ]]; then
+  export EXTRA_HEAT_PARAMS="--heat-parameters key_name=${testenv_instance_prefix}_key"
 elif [[ $TEST_ENV != "ci-full-centos" ]]; then
   TEST_ENV="ci-full"
 fi
