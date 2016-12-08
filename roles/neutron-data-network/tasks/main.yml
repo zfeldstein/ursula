@@ -168,9 +168,27 @@
     config_dirs: /etc/neutron
     config_files: "{{ item.value.config_files|join(',') }}"
     envs: "{{ neutron.service.envs }}"
-  when: (neutron.lbaas.enabled == "smart" and
+  when: os == 'ubuntu' and ((neutron.lbaas.enabled == "smart" and
          groups['controller'][0] not in groups['compute']) or
-         neutron.lbaas.enabled|bool
+         neutron.lbaas.enabled|bool)
+  with_dict:
+    neutron-lbaasv2-agent:
+      config_files:
+        - /etc/neutron/neutron.conf
+        - /etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini
+        - /etc/neutron/neutron_lbaas.conf
+
+- name: install neutron lbaas service
+  systemd_service:
+    name: "{{ item.key }}"
+    user: neutron
+    cmd: "/usr/local/bin/{{ item.key }}"
+    config_dirs: /etc/neutron
+    config_files: "{{ item.value.config_files|join(',') }}"
+    #envs: "{{ neutron.service.envs }}"
+  when: os == 'rhel' and ((neutron.lbaas.enabled == "smart" and
+         groups['controller'][0] not in groups['compute']) or
+         neutron.lbaas.enabled|bool)
   with_dict:
     neutron-lbaasv2-agent:
       config_files:
