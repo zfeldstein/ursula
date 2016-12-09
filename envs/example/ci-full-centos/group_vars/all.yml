@@ -103,3 +103,6 @@ heat:
 
 ironic:
   enabled: False
+
+cinder:
+  enabled: False
