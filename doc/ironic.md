@@ -122,7 +122,7 @@ In a minute or so your vbox VM should start up and provision cirros.
 Image Building
 ==============
 
-The Openstack Way
+The OpenStack Way
 -----------------
 
 ```
