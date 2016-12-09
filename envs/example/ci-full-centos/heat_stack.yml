@@ -32,15 +32,15 @@ parameters:
   controller-0_name:
     type: string
     description: Name of controller-0 server
-    default: centos-controller-0
+    default: controller-0
   controller-1_name:
     type: string
     description: Name of controller-1 server
-    default: centos-controller-1
+    default: controller-1
   compute-0_name:
     type: string
     description: Name of compute-0 server
-    default: centos-compute-0
+    default: compute-0
 
 resources:
 
