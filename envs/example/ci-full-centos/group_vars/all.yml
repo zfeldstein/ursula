@@ -1,7 +1,7 @@
 ---
 stack_env: ci-full-centos
 undercloud_cidr:
-  - cidr: 192.168.3.0/22
+  - cidr: 192.168.0.0/22
 state_path_base: /opt/stack/data
 
 validate_certs: no
