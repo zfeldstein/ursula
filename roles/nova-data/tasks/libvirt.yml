@@ -38,9 +38,12 @@
     - libvirt-devel
     - libvirt-daemon
     - libvirt-daemon-driver-qemu
+    - libvirt-daemon-kvm
     - genisoimage
     - util-linux
-  notify: restart nova services
+  notify:
+    - restart nova services
+    - restart libvirt-bin
   when: os == 'rhel'
   register: result
   until: result|succeeded
