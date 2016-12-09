@@ -13,7 +13,7 @@ etc_hosts:
 neutron:
   enable_external_interface: True
   lbaas:
-    enabled: True
+    enabled: False
 
 keystone:
   ldap_domain:
