@@ -24,7 +24,7 @@ secrets:
   telemetry_secret: asdf
   cloud_admin_password: asdf
 
-fqdn: openstack.example.com
+fqdn: openstack.example.org
 swift_fqdn: "{{ fqdn }}"
 floating_ip: "{{ hostvars[groups['controller'][0]][primary_interface]['ipv4']['address'] }}"
 undercloud_floating_ip: "{{ hostvars[groups['controller'][0]][primary_interface]['ipv4']['address'] }}"

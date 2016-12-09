@@ -166,29 +166,27 @@ resources:
        floating_ip: { get_resource: controller-0_floating_ip }
        server_id: { get_resource: controller-0 }
 
-  controller-1_floating_ip:
-     type: OS::Nova::FloatingIP
-     properties:
-       pool: { get_param: floating_ip_pool }
+#  controller-1_floating_ip:
+#     type: OS::Nova::FloatingIP
+#     properties:
+#       pool: { get_param: floating_ip_pool }
 
-  controller-1_fip_association:
-     type: OS::Nova::FloatingIPAssociation
-     properties:
-       floating_ip: { get_resource: controller-1_floating_ip }
-       server_id: { get_resource: controller-1 }
+#  controller-1_fip_association:
+#     type: OS::Nova::FloatingIPAssociation
+#     properties:
+#       floating_ip: { get_resource: controller-1_floating_ip }
+#       server_id: { get_resource: controller-1 }
 
-  compute-0_floating_ip:
-     type: OS::Nova::FloatingIP
-     properties:
-       pool: { get_param: floating_ip_pool }
+#  compute-0_floating_ip:
+#     type: OS::Nova::FloatingIP
+#     properties:
+#       pool: { get_param: floating_ip_pool }
 
-  compute-0_fip_association:
-     type: OS::Nova::FloatingIPAssociation
-     properties:
-       floating_ip: { get_resource: compute-0_floating_ip }
-       server_id: { get_resource: compute-0 }
-  # placeholder line
-
+#  compute-0_fip_association:
+#     type: OS::Nova::FloatingIPAssociation
+#     properties:
+#       floating_ip: { get_resource: compute-0_floating_ip }
+#       server_id: { get_resource: compute-0 }
 
 outputs:
   private_key:
@@ -196,14 +194,14 @@ outputs:
     value: { get_attr: [ ssh_keypair, private_key ] }
 
   controller-0:
-    description: Floating IP address of controller-0
-    value: { get_attr: [ controller-0_floating_ip, ip ] }
+    description: IP address of controller-0
+    value: { get_attr: [ controller-0, first_address ] }
   controller-1:
-    description: Floating IP address of controller-1
-    value: { get_attr: [ controller-1_floating_ip, ip ] }
+    description: IP address of controller-1
+    value: { get_attr: [ controller-1, first_address ] }
   compute-0:
-    description: Floating IP address of compute-0
-    value: { get_attr: [ compute-0_floating_ip, ip ] }
+    description: IP address of compute-0
+    value: { get_attr: [ compute-0, first_address ] }
   floating_ip:
     description: Floating IP address of controller-0
     value: { get_attr: [ controller-0_floating_ip, ip ] }

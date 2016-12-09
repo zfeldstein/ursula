@@ -28,6 +28,13 @@
     state: present
   tags: sudoers
 
+- name: disable require tty for sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "^Defaults.*?requiretty"
+    state: absent
+  tags: sudoers
+
 - include: system-tools.yml
 
 - include: python.yml
