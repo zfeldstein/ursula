@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ['*']
 # and don't forget to strip it from the client's request.
 # For more information see:
 # https://docs.djangoproject.com/en/1.8/ref/settings/#secure-proxy-ssl-header
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTOCOL', 'https')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # If Horizon is being served through SSL, then uncomment the following two
 # settings to better secure the cookies from security exploits
