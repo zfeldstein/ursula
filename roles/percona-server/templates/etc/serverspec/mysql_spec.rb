@@ -22,7 +22,7 @@ files.each do |file|
   end
 end
 
-files = Dir['/var/lib/mysql/*.*'].map { |a| File.basename(a) }
+files = Dir['/var/lib/mysql/*.{log,cnf,dat,pid,flag}'].map { |a| File.basename(a) }
 files.each do |file|
   describe file("/var/lib/mysql/#{file}") do
     it { should be_mode '[6][0-6][0-4]' }
@@ -78,12 +78,5 @@ describe file('/etc/logrotate.d/mysql') do
                   ]
   file_contents.each do |file_line|
     it { should contain file_line }
-  end
-end
-
-configs = {'log-error' => '/var/log/mysql/mysql.err', 'log-warnings' => 10}
-configs.each do |config, setting|
-  describe mysql_config(config) do
-    its(:value) { should eq setting }
   end
 end
