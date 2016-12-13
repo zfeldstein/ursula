@@ -155,33 +155,33 @@ resources:
 
 
 ### Floating IP resources and associations for servers
-  controller-0_floating_ip:
-     type: OS::Nova::FloatingIP
-     properties:
-       pool: { get_param: floating_ip_pool }
-
-  controller-0_fip_association:
-     type: OS::Nova::FloatingIPAssociation
-     properties:
-       floating_ip: { get_resource: controller-0_floating_ip }
-       server_id: { get_resource: controller-0 }
-
+#  controller-0_floating_ip:
+#     type: OS::Nova::FloatingIP
+#     properties:
+#       pool: { get_param: floating_ip_pool }
+#
+#  controller-0_fip_association:
+#     type: OS::Nova::FloatingIPAssociation
+#     properties:
+#       floating_ip: { get_resource: controller-0_floating_ip }
+#       server_id: { get_resource: controller-0 }
+#
 #  controller-1_floating_ip:
 #     type: OS::Nova::FloatingIP
 #     properties:
 #       pool: { get_param: floating_ip_pool }
-
+#
 #  controller-1_fip_association:
 #     type: OS::Nova::FloatingIPAssociation
 #     properties:
 #       floating_ip: { get_resource: controller-1_floating_ip }
 #       server_id: { get_resource: controller-1 }
-
+#
 #  compute-0_floating_ip:
 #     type: OS::Nova::FloatingIP
 #     properties:
 #       pool: { get_param: floating_ip_pool }
-
+#
 #  compute-0_fip_association:
 #     type: OS::Nova::FloatingIPAssociation
 #     properties:
@@ -202,7 +202,7 @@ outputs:
   compute-0:
     description: IP address of compute-0
     value: { get_attr: [ compute-0, first_address ] }
-  floating_ip:
-    description: Floating IP address of controller-0
-    value: { get_attr: [ controller-0_floating_ip, ip ] }
+#  floating_ip:
+#    description: Floating IP address of controller-0
+#    value: { get_attr: [ controller-0_floating_ip, ip ] }
   # placeholder line
