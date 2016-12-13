@@ -32,7 +32,7 @@ def main():
             check_dir=dict(default='/etc/sensu/conf.d/checks', required=False),
             state=dict(default='present', required=False, choices=['present','absent']),
             check=dict(type='dict', required=True),
-            ucarp_node_only=dict(default=False, required=False)
+            ucarp_node_only=dict(default=False, required=False, type='bool')
         )
     )
 
