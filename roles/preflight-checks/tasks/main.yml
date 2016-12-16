@@ -1,4 +1,7 @@
 ---
+# We do preflight checks to ensure the cluster is in good state before *re-run*.
+# Otherwise, re-run may bring cluster into a very bad state.
+# But we should know this is a re-run or first-run by some conditions, such as endpoint.
 - block:
   - name: check whether neutron-client is installed
     command: neutron --version
@@ -35,7 +38,6 @@
     when:
       - result_ceph_installed.rc == 0
       - result_cinder_endpoint.rc == 0
-
   when: ceph.enabled | default('False') | bool
   tags: 'precheck_ceph'
   run_once: true

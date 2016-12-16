@@ -1,0 +1,3 @@
+---
+preflight_checks:
+  ceph_version_larger_than: 0.899
