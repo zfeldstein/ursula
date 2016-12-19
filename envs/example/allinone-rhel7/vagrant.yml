@@ -1,0 +1,18 @@
+default:
+  memory: 512
+  cpus: 1
+  box: rhel7
+  box_url: https://ibm.box.com/shared/static/wjhbwct0pxgpg9h5pbxavfdvc1x09cu5.box
+
+vms:
+  allinone:
+    ip_address:
+      - 172.16.0.100
+      - 172.16.255.100
+      - 192.168.255.100
+    cpus: 2
+    memory: 5500
+    custom:
+       - '["modifyvm", :id, "--nicpromisc3", "allow-all"]'
+       - '["modifyvm", :id, "--nicpromisc4", "allow-all"]'
+       - '["modifyvm", :id, "--cableconnected1", "on"]'

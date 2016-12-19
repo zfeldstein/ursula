@@ -20,6 +20,37 @@
     retries: 5
   when: ansible_distribution == "Ubuntu"
 
+- name: Register with RHN
+  redhat_subscription:
+    state: present
+    username: "{{ redhat.user }}"
+    password: "{{ redhat.pass }}"
+  when: ansible_distribution == "RedHat"
+
+- name: Pause for registration
+  pause:
+    seconds: 90
+
+- name: Add OSP pool
+  command: subscription-manager attach --pool={{ item }}
+  when: ansible_distribution == "RedHat"
+  with_items:
+  - 8a85f98158880f8d01588bde0f7c3c43
+
+- name: add OS respositories
+  command: subscription-manager repos --enable={{ item }}
+  when: ansible_distribution == "RedHat"
+  with_items:
+  - rhel-7-server-extras-rpms
+  - rhel-7-server-openstack-10-rpms
+  - rhel-7-server-rh-common-rpms
+  - rhel-7-server-openstack-10-tools-rpms
+  - rhel-7-server-openstack-10-optools-rpms
+  - rhel-7-server-openstack-10-tools-debug-rpms
+  - rhel-7-server-rhceph-2-mon-rpms
+  - rhel-7-server-rhceph-2-tools-rpms
+  - rhel-7-server-optional
+
 - name: secure paths sudoers operations
   lineinfile:
     dest: /etc/sudoers
