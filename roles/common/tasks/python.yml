@@ -73,6 +73,12 @@
   until: result|succeeded
   retries: 5
 
+- name: pip install python-dateutil
+  pip: name=python-dateutil
+  register: result
+  until: result|succeeded
+  retries: 5
+
 - name: install drivers
   command: python setup.py install chdir=/opt/stack/{{ item.name }}
   with_items: "{{ common.python_extra_packages }}"
