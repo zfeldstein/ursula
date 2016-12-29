@@ -66,6 +66,7 @@ common:
       - vlan
       - lvm2
       - libpam-cracklib
+      - pciutils
   python:
     system_packages:
       - python-pip
