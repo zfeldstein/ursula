@@ -32,6 +32,9 @@
     - role: serverspec
       tags: ['common', 'serverspec']
       when: serverspec.enabled|default("False")|bool
+    - role: inspec
+      tags: ['common', 'inspec']
+      when: inspec.enabled|default("False")|bool
     - role: logging
       tags: ['common', 'logging']
       when: logging.enabled|default("True")|bool

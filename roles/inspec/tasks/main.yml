@@ -1,0 +1,27 @@
+---
+- name: install inspec
+  package: name=inspec
+
+- name: ensure inspec directory exists
+  file:
+    dest: "{{ item }}"
+    state: directory
+    owner: root
+    mode: 0755
+  with_items:
+    - /etc/inspec
+    - /etc/inspec/controls
+    - /etc/inspec/libraries
+
+- name: inspec config file
+  template:
+    src: etc/inspec/inspec.yml
+    dest: /etc/inspec/inspec.yml
+    mode: 0644
+
+- name: inspec sensu hook
+  sensu_check: name=inspec-check plugin=check-inspec.rb
+               args='--controls /etc/inspec/controls' use_sudo=true
+               interval={{ inspec.interval }}
+  notify: restart sensu-client
+  when: inspec.enabled|default(True)|bool
