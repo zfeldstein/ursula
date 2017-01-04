@@ -61,3 +61,7 @@ yum_repos:
     description: Filebeat repo
     gpgcheck: yes
     key_url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  chef:
+    repo: https://packages.chef.io/repos/yum/stable/el/7/x86_64/
+    gpgcheck: yes
+    key_url: https://downloads.chef.io/packages-chef-io-public.key
