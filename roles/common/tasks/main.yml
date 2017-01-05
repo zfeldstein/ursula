@@ -27,8 +27,9 @@
     password: "{{ redhat.pass }}"
   when: ansible_distribution == "RedHat"
 
+
 - name: add OS respositories
-  command: subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-openstack-10-rpms  --enable=rhel-7-server-rh-common-rpms  --enable=rhel-7-server-openstack-10-tools-rpms --enable=rhel-7-server-openstack-10-optools-rpms --enable=rhel-7-server-openstack-10-tools-debug-rpms --enable=rhel-7-server-rhceph-2-mon-rpms --enable=rhel-7-server-rhceph-2-tools-rpms --enable rhel-7-server-optional-rpms
+  command: subscription-manager repos --enable=rhel-7-server-extras-rpms  --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-openstack-10-rpms  --enable=rhel-7-server-rh-common-rpms  --enable=rhel-7-server-openstack-10-tools-rpms --enable=rhel-7-server-openstack-10-optools-rpms --enable=rhel-7-server-openstack-10-tools-debug-rpms --enable=rhel-7-server-rhceph-2-mon-rpms --enable=rhel-7-server-rhceph-2-tools-rpms --enable rhel-7-server-optional-rpms
   when: ansible_distribution == "RedHat"
 
 - name: secure paths sudoers operations
@@ -50,6 +51,7 @@
 
 - include: python.yml
   tags: pip, python
+  
 
 - include: ruby.yml
   tags: ruby

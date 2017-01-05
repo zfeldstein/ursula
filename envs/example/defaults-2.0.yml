@@ -1,11 +1,13 @@
 ---
 stack_env: example
 ursula_env_path: "{{ lookup('env','URSULA_ENV') }}"
-
 country_code: US
 
 openstack_install_method: 'source'
 #openstack_install_method: 'package'
+#openstack_install_method: 'distro'
+#openstack_distro_type: 'osp'
+basevenv_lib_dir: "/opt/openstack/base/lib/python2.7/site-packages"
 
 primary_interface: 'ansible_eth0'
 primary_ip: "{{ hostvars[inventory_hostname][primary_interface]['ipv4']['address'] }}"
