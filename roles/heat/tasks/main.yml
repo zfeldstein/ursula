@@ -43,7 +43,7 @@
     - heat-engine
   when: os == 'ubuntu'
 
-- name: install heat services
+- name: install heat services (rhel source)
   systemd_service: name={{ item }}
                    user=heat
                    cmd=/usr/local/bin/{{ item }}
@@ -52,7 +52,7 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
-  when: os == 'rhel'
+  when: os == 'rhel' and openstack_install_method == 'source'
 
 - name: heat config
   template: src=etc/heat/{{ item }} dest=/etc/heat/{{ item }} mode={{ 0644 if 'policy.json' in item else 0640 }} owner=heat group=heat
@@ -70,6 +70,7 @@
       OS_IDENTITY_API_VERSION: 3
       OS_USER_DOMAIN_NAME: default
       OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     os_user:
       name: heat_stack_user
       password: "{{ secrets.service_password }}"
@@ -88,6 +89,7 @@
       OS_IDENTITY_API_VERSION: 3
       OS_USER_DOMAIN_NAME: default
       OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     os_keystone_role:
       name: heat_stack_user
       validate_certs: "{{ validate_certs|default(omit) }}"
@@ -104,6 +106,7 @@
       OS_IDENTITY_API_VERSION: 3
       OS_USER_DOMAIN_NAME: default
       OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     os_user_role:
       role: heat_stack_user
       user: heat_stack_user
@@ -122,8 +125,10 @@
       OS_IDENTITY_API_VERSION: 3
       OS_USER_DOMAIN_NAME: default
       OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     os_keystone_role:
       name: "{{ item }}"
+      validate_certs: "{{ validate_certs|default(omit) }}"
       auth:
         auth_url: "{{ endpoints.keystone.url.internal }}/v3"
         project_name: admin
@@ -138,8 +143,10 @@
   - name: assign admin heat roles
     environment:
       OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     os_user_role:
       role: heat_stack_owner
+      validate_certs: "{{ validate_certs|default(omit) }}"
       user: admin
       project: admin
       auth:
@@ -153,7 +160,9 @@
   - name: create heat domain
     environment:
       OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     os_keystone_domain:
+      validate_certs: "{{ validate_certs|default(omit) }}"
       name: heat
       auth:
         auth_url: "{{ endpoints.keystone.url.internal }}/v3"
@@ -167,6 +176,7 @@
   - name: remove heat domain user from default domain
     environment:
       OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" user delete --domain default heat_domain_admin
     register: remove_heat_admin
     failed_when: remove_heat_admin|failed and
@@ -175,9 +185,11 @@
   - name: create heat domain admin user
     environment:
       OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     os_user:
       name: heat_domain_admin
       password: "{{ secrets.stack_domain_admin_password }}"
+      validate_certs: "{{ validate_certs|default(omit) }}"
       domain: "{{ heat_domain.domain.id }}"
       auth:
         auth_url: "{{ endpoints.keystone.url.internal }}/v3"
@@ -193,21 +205,31 @@
   - name: add admin role to the heat domain admin user
     environment:
       OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
     shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" role add --domain "{{ heat_domain.domain.id }}" --user "{{ heat_admin_user.user.id }}" admin
     when: heat.enabled|bool and heat_admin_user|changed
   run_once: true
 
 - name: stop heat services before db sync
   service: name={{ item }} state=stopped
-  when: database_create.changed or force_sync|default('false')|bool
+  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method != 'distro'
   with_items:
     - heat-api
     - heat-api-cfn
     - heat-engine
   tags: db-migrate
+  
+- name: stop heat services before db sync (rhel osp)
+  service: name={{ item }} state=stopped
+  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method == 'distro'
+  with_items:
+    - openstack-heat-api
+    - openstack-heat-api-cfn
+    - openstack-heat-engine
+  tags: db-migrate
 
 - name: sync heat database
-  command: /usr/local/bin/heat-manage db_sync
+  command: heat-manage db_sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -232,6 +254,15 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
+  when: openstack_install_method != 'distro'
+  
+- name: start heat services (rhel osp)
+  service: name={{ item }} state=started
+  with_items:
+    - openstack-heat-api
+    - openstack-heat-api-cfn
+    - openstack-heat-engine
+  when: openstack_install_method == 'distro'
 
 - include: monitoring.yml
   tags:

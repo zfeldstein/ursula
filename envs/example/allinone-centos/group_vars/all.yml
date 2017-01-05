@@ -3,11 +3,15 @@ stack_env: example_allinone
 floating_ip: 172.16.0.100
 xtradb:
   sst_auth_password: asdf
-
+validate_certs: false
 percona:
   replication: False
 
 common:
+  python_extra_packages: 
+    - pytz
+    - pyopenssl
+    - shade
   hwraid:
     enabled: False
   system_tools:
@@ -51,10 +55,12 @@ common:
       - openssl-libs
       - libxml2-devel
       - libxslt-devel
-      - libxslt-devel
       - openssl-devel
       - libstdc++-static
       - gcc-c++
+      - python-requests
+      - uwsgi-plugin-python
+      
 sensu_checks:
     percona:
       check_cluster_size:
@@ -85,6 +91,7 @@ sensu_checks:
         standalone: true
         command: "check-procs.rb -p garbd -W 1 -C 1"
         service_owner: openstack
+
 
 logging:
   enabled: true

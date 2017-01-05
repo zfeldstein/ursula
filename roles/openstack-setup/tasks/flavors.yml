@@ -1,5 +1,7 @@
 ---
 - name: Add flavors
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_nova_flavor:
     name: '{{ item.name }}'
     ram: '{{ item.ram | int }}'
@@ -22,6 +24,8 @@
   # FIXME flavors are always added, even if it's just an Ironic cloud
 
 - name: Add ironic flavors
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_nova_flavor:
     name: '{{ item.name }}'
     ram: '{{ item.ram | int }}'

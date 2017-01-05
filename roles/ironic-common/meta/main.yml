@@ -19,3 +19,6 @@ dependencies:
     project_name: ironic
     alternatives: "{{ ironic.alternatives }}"
     when: openstack_install_method == 'package'
+  - role: openstack-distro
+    project_name: ironic
+    when: openstack_install_method == 'distro'
