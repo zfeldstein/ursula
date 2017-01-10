@@ -7,7 +7,7 @@
 
 - name: rabbit server process check
   sensu_process_check:
-    service: rabbitmq-server
+    service: "{{ ( os == 'ubuntu' )| ternary('rabbitmq-server', 'beam.smp') }}"
   notify: restart sensu-client
 
 - name: rabbit cluster check
