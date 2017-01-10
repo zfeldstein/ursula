@@ -73,26 +73,15 @@
     until: result|succeeded
     retries: 5
 
-  #- name: Ubuntu 14.04 style /etc/network/interfaces.d/ directory
-  #  file: dest=/etc/network/interfaces.d state=directory owner=root
-  #        group=root mode=0755
+- name: network tasks
+  hosts: network
+  tasks:
+  - name: enable ip_forward sysctl
+    sysctl:
+      name: net.ipv4.conf.eth0.ip_forward
+      value: 1
+      sysctl_set: yes
 
-  #- name: /etc/network/interfaces to support interfaces.d/
-  #  template: src=../templates/etc/network/interfaces
-  #            dest=/etc/network/interfaces
-
-  #- name: default interfaces.d/eth0.cfg
-  #  template: src=../templates/etc/network/interfaces.d/eth0.cfg
-  #            dest=/etc/network/interfaces.d/eth0.cfg
-
-#- name: network tasks
-#  hosts: network
-#  tasks:
-#  - name: interfaces.d/eth0.cfg with NAT for floating IP pool
-#    template: src=../templates/etc/network/interfaces.d/eth0-controllers.cfg
-#              dest=/etc/network/interfaces.d/eth0.cfg
-#    notify: bounce eth0
-#
-#  handlers:
-#  - name: bounce eth0
-#    shell: ifdown eth0; ifup eth0
+  - name: configure netfilter nat
+    # not clear how to do this with firewalld module
+    command: firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o eth0 -s 192.168.255.0/24 ! -d 192.168.255.0/24 -j MASQUERADE
