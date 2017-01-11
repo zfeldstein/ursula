@@ -8,7 +8,7 @@ parameters:
   image:
     type: string
     description: Name of image to use for servers
-    default: centos7
+    default: 11760201-107c-4387-a54f-ec738533d71f
   flavor:
     type: string
     description: Flavor to use for servers
