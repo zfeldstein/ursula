@@ -2,3 +2,9 @@
 - name: ifup neutron external interface
   command: ifup {{ neutron_external_interface }}
   ignore_errors: yes
+
+- name: enable ip forwarding
+  command: sysctl net.ipv4.conf.all.forwarding=1
+
+- name: enable ip masq
+  command: firewall-cmd --direct --add-rule ipv4 nat POSTROUTING 0 -o eth0 -s 192.168.255.0/24 ! -d 192.168.255.0/24 -j MASQUERADE
