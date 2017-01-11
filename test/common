@@ -58,6 +58,15 @@ SSH_ARGS=\
 " -i ${KEY_PATH}"
 export ANSIBLE_SSH_ARGS="${SSH_ARGS}"
 
+export SECURITYGROUP_NAME="${testenv_instance_prefix}_ursula"
+export CONTROLLER_0_NAME="${testenv_instance_prefix}-controller-0"
+export CONTROLLER_1_NAME="${testenv_instance_prefix}-controller-1"
+export COMPUTE_0_NAME="${testenv_instance_prefix}-compute-0"
+if [[ $TEST_ENV == "ci-full-centos" ]]; then
+    EXTRA_HEAT_PARAMS="image=${IMAGE_ID};key_name=${KEY_NAME};security_group=${SECURITYGROUP_NAME};controller-0_name=${CONTROLLER_0_NAME};controller-1_name=${CONTROLLER_1_NAME};compute-0_name=${COMPUTE_0_NAME}"
+else
+    EXTRA_HEAT_PARAMS="image=${IMAGE_ID}"
+fi
 
 die() {
   echo "[ERROR] $*"; exit 1
