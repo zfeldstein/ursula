@@ -19,6 +19,8 @@ keystone:
   ldap_domain:
     enabled: True
     domain: users
+  uwsgi:
+    method: port
 
 common:
   hwraid:
@@ -93,10 +95,6 @@ xtradb:
 
 haproxy:
   stats_group: root
-
-keystone:
-  uwsgi:
-    method: port
 
 heat:
   enabled: True
