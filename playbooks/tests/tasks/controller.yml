@@ -5,8 +5,8 @@
   - name: save me a list of controller ips
     set_fact: controller_ips="{{ hostvars|ursula_controller_ips(groups) }}"
 
-  - name: horizon is up
-    shell: curl -sSL -k http://localhost:8080 | grep "Login - OpenStack Dashboard"
+#  - name: horizon is up
+#    shell: curl -sSL -k http://localhost:8080 | grep "Login - OpenStack Dashboard"
 
   - name: client stackrc has an os cacert env variable
     shell: grep OS_CACERT /root/stackrc
@@ -102,10 +102,9 @@
     shell: curl -k -s -u admin:{{ secrets.admin_password }} https://127.0.0.1/haproxy_stats\;csv | awk '/DOWN/ {print;ec=1} END{exit ec}'
     when: haproxy.rc != 0 and cinder.enabled|bool
 
-  - name: all backends are up in haproxy
-    shell: curl -k -s -u admin:{{ secrets.admin_password }} https://127.0.0.1/haproxy_stats\;csv | grep -v cinder | awk '/DOWN/ {print;ec=1} END{exit ec}'
-    when: haproxy.rc != 0 and not cinder.enabled|bool
-
+#  - name: all backends are up in haproxy
+#    shell: curl -k -s -u admin:{{ secrets.admin_password }} https://127.0.0.1/haproxy_stats\;csv | grep -v cinder | awk '/DOWN/ {print;ec=1} END{exit ec}'
+#    when: haproxy.rc != 0 and not cinder.enabled|bool
 
 - name: tests on a single controller
   hosts: controller[0]

@@ -48,6 +48,4 @@
       - ifup neutron external interface
       - enable ip forwarding
       - enable ip masq
-
   when: os == 'rhel'
-
