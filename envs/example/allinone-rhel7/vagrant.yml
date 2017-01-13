@@ -2,7 +2,7 @@ default:
   memory: 512
   cpus: 1
   box: rhel7
-  box_url: https://ibm.box.com/shared/static/wjhbwct0pxgpg9h5pbxavfdvc1x09cu5.box
+  box_url: https://FAKEURLDOTCOM
 
 vms:
   allinone:

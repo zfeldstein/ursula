@@ -1,0 +1,21 @@
+---
+- name: Register with RHN
+  redhat_subscription:
+    state: present
+    username: "{{ redhat.user }}"
+    password: "{{ redhat.pass }}"
+
+- name: Pause for registration
+  pause:
+    seconds: 90
+
+- name: Add OSP pool
+  command: subscription-manager attach --pool={{ item }}
+  with_items:
+  - {{ redhat.poolids }}
+
+- name: add OS respositories
+  command: subscription-manager repos --enable={{ item }}
+  with_items:
+  - {{ redhat.repos }}
+

@@ -20,6 +20,12 @@
       tags: ['always', 'precheck']
   environment: "{{ env_vars|default({}) }}"
 
+- name: RedHat Network registration for RedHat hosts
+  hosts: all
+  roles:
+    - role: rhn-subscription
+  when: ansible_distribution == "RedHat"
+
 - name: common role for all hosts
   hosts: all:!vyatta-*
   any_errors_fatal: true
