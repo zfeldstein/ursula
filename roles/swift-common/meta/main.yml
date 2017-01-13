@@ -23,3 +23,4 @@ dependencies:
   - role: openstack-distro
     project_name: swift
     when: openstack_install_method == 'distro'
+

@@ -55,6 +55,7 @@
                   login_tenant_name=admin
                   login_username=admin
                   login_password={{ secrets.admin_password }}
+                  verify={{ validate_certs|default(omit) }}
   with_items: "{{ neutron.routers }}"
   run_once: true
 
@@ -69,6 +70,7 @@
                           login_tenant_name=admin
                           login_username=admin
                           login_password={{ secrets.admin_password }}
+                          verify={{ validate_certs|default(omit) }}
   with_items: "{{ neutron.routers }}"
   run_once: true
 
@@ -83,5 +85,6 @@
                             login_tenant_name=admin
                             login_username=admin
                             login_password={{ secrets.admin_password }}
+                            verify={{ validate_certs|default(omit) }}
   with_items: "{{ neutron.router_interfaces }}"
   run_once: true
