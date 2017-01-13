@@ -3,6 +3,12 @@
 - name: cinder-volume process check
   sensu_process_check: service=cinder-volume
   notify: restart sensu-client
+  when: openstack_install_method != 'distro'
+  
+- name: cinder-volume process check
+  sensu_process_check: service=openstack-cinder-volume
+  notify: restart sensu-client
+  when: openstack_install_method == 'distro' and os == 'rhel'
 
 - name: iscsid process check
   sensu_process_check: service=iscsid
@@ -29,4 +35,9 @@
 - name: cinder-backup process check
   sensu_process_check: service=cinder-backup
   notify: restart sensu-client
-  when: swift.enabled|default("False")|bool
+  when: swift.enabled|default("False")|bool and openstack_install_method != 'distro'
+  
+- name: cinder-backup process check
+  sensu_process_check: service=openstack-cinder-backup
+  notify: restart sensu-client
+  when: swift.enabled|default("False")|bool and openstack_install_method == 'distro' and os == 'rhel'
