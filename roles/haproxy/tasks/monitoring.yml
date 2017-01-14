@@ -6,7 +6,7 @@
 
 - name: haproxy check backends
   sensu_check: name=haproxy_servers plugin=check-haproxy.rb
-               args="-p -c 100 -S /var/run/haproxy/stats.sock -A"
+               args="-c 100 -S /var/run/haproxy/stats.sock -A"
   notify: restart sensu-client
 
 - name: haproxy metrics

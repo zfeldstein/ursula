@@ -28,3 +28,7 @@ dependencies:
     rootwrap: True
     alternatives: "{{ nova.alternatives }}"
     when: openstack_install_method == 'package'
+  - role: openstack-distro
+    project_name: nova
+    rootwrap: True
+    when: openstack_install_method == 'distro'
