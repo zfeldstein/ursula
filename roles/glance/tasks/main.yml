@@ -103,7 +103,7 @@
   with_items:
     - openstack-glance-api
     - openstack-glance-registry
-  when: database_create.changed or force_sync|default('false')|bool and openstack_install_method == 'distro'
+  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method == 'distro'
   tags: db-migrate
 
 - name: sync glance database
