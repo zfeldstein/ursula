@@ -30,12 +30,13 @@
 - stat:
     path: /etc/httpd/conf.d/00-nova-placement-api.conf
   register: np
-  when: os == 'rhel' and openstack_install_method == 'distro'
 
 - name: disable nova placement API
-  command: mv /etc/httpd/conf.d/00-nova-placement-api.conf /etc/httpd/conf.d/00-nova-placement-api
-  when: np.stat.exists == True and os == 'rhel' and openstack_install_method == 'distro'
-  
+  command: mv /etc/httpd/conf.d/00-nova-placement-api.conf /etc/httpd/conf.d/00-nova-placement-api.disabled
+  when: 
+    - np.stat.exists == True 
+    - os == 'rhel' 
+    - openstack_install_method == 'distro'
 
 - name: create nova config dir
   file: dest=/etc/nova state=directory
