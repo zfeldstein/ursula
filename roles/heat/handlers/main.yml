@@ -1,8 +1,16 @@
 ---
 - name: restart heat services
   service: name={{ item }} state=restarted must_exist=false
-  when: restart|default('True')
+  when: restart|default('True') and openstack_install_method != 'distro'
   with_items:
     - heat-api
     - heat-api-cfn
     - heat-engine
+
+- name: restart heat services (rhel osp)
+  service: name={{ item }} state=restarted must_exist=false
+  when: restart|default('True') and openstack_install_method == 'distro'
+  with_items:
+    - openstack-heat-api
+    - openstack-heat-api-cfn
+    - openstack-heat-engine

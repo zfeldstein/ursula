@@ -67,6 +67,7 @@ common:
       - libpam-cracklib
       - pciutils
   python:
+    base_venv: "/opt/openstack/base"
     system_packages:
       - python-pip
       - python-libxml2

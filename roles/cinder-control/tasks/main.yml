@@ -9,18 +9,18 @@
     - cinder-api
     - cinder-scheduler
 
-- name: install cinder controller services
+- name: install cinder controller services (rhel source)
   systemd_service: name={{ item }}
                    user=cinder
                    cmd=/usr/local/bin/{{ item }}
                    config_dirs=/etc/cinder
-  when: os == 'rhel'
+  when: os == 'rhel' and openstack_install_method == 'source'
   with_items:
     - cinder-api
     - cinder-scheduler
 
 - name: sync cinder database
-  command: /usr/local/bin/cinder-manage db sync
+  command: cinder-manage db sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -43,6 +43,14 @@
   with_items:
     - cinder-api
     - cinder-scheduler
+  when: openstack_install_method != 'distro'
+
+- name: start cinder controller services (rhel osp)
+  service: name={{ item }} state=started
+  with_items:
+    - openstack-cinder-api
+    - openstack-cinder-scheduler
+  when: openstack_install_method == 'distro'
 
 - name: Permit access to Cinder
   ufw: rule=allow to_port={{ endpoints.cinder.port.haproxy_api }} proto=tcp

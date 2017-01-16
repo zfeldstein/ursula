@@ -46,7 +46,7 @@
       - nova-consoleauth
       - nova-scheduler
       - nova-novncproxy
-  when: os == 'rhel'
+    when: os == 'rhel' and openstack_install_method == 'source'
 
 - name: install nova-quota-sync script
   copy: src=nova-quota-sync
@@ -55,7 +55,7 @@
         owner=root
 
 - name: sync nova database
-  command: /usr/local/bin/nova-manage db sync
+  command: nova-manage db sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -64,7 +64,7 @@
   tags: db-migrate
 
 - name: sync nova api database
-  command: /usr/local/bin/nova-manage api_db sync
+  command: nova-manage api_db sync
   when: database_create.changed or force_sync|default('false')|bool
   run_once: true
   changed_when: true
@@ -84,12 +84,23 @@
 
 - name: start nova controller services
   service: name={{ item }} state=started
+  when: openstack_install_method != 'distro'
   with_items:
     - nova-api
     - nova-conductor
     - nova-consoleauth
     - nova-scheduler
     - nova-novncproxy
+    
+- name: start nova controller services (rhel osp)
+  service: name={{ item }} state=started
+  when: openstack_install_method == 'distro'
+  with_items:
+    - openstack-nova-api
+    - openstack-nova-conductor
+    - openstack-nova-consoleauth
+    - openstack-nova-scheduler
+    - openstack-nova-novncproxy
 
 - name: permit access to nova api
   ufw: rule=allow to_port={{ endpoints.nova.port.haproxy_api }} proto=tcp

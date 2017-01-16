@@ -11,6 +11,10 @@ keystone:
     http_port:
       admin: 9091
       public: 9092
+    home:
+      distro: /usr/lib/python2.7/site-packages/keystone
+      source: /opt/openstack/current/keystone
+      package: /opt/openstack/current/keystone
   source:
     rev: 'stable/newton'
     constrain: True

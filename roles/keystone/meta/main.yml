@@ -20,7 +20,10 @@ dependencies:
   - role: openstack-package
     project_name: keystone
     alternatives: "{{ keystone.alternatives }}"
-    when: openstack_install_method == 'package'
+    when: openstack_install_method == 'package' 
+  - role: openstack-distro
+    project_name: keystone
+    when: openstack_install_method == 'distro'
   - role: collectd-plugin
     when: collectd is defined and collectd.enabled|bool
   - role: openstack-database
