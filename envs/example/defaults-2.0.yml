@@ -15,16 +15,16 @@ primary_ip: "{{ hostvars[inventory_hostname][primary_interface]['ipv4']['address
 secrets:
   db_password:      asdf
   mongodb_password: asdf
-  service_password: asdf
+  service_password: asdfA#8!
   rabbit_password:  asdf
-  admin_password:   asdf
-  stack_domain_admin_password: ydgurtH5erghithge57
+  admin_password:   asdfA#8!
+  stack_domain_admin_password: ydgurtH5erghithge57!
   metadata_proxy_shared_secret: asdf
   horizon_secret_key:           asdf
   glance_sync:      ADQ64XUQLUWH75M634RVBLP55RKPGGOWG
-  monitor_password: asdf
+  monitor_password: asdfA#8!
   telemetry_secret: asdf
-  cloud_admin_password: asdf
+  cloud_admin_password: asdfA#8!
 
 fqdn: openstack.example.com
 swift_fqdn: "{{ fqdn }}"
@@ -316,7 +316,7 @@ keystone:
       password: "{{ secrets.admin_password }}"
       tenant: admin
     - name: demo
-      password: demopass
+      password: demopass$S5
       tenant: demo
     - name: nova
       password: "{{ secrets.service_password }}"

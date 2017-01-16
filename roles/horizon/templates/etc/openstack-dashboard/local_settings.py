@@ -89,11 +89,14 @@ OPENSTACK_API_VERSIONS = {
 # after clicking on backdrop.
 #HORIZON_CONFIG["modal_backdrop"] = "static"
 
+{% if horizon.password_validator.enabled|bool %}
 # Specify a regular expression to validate user passwords.
-#HORIZON_CONFIG["password_validator"] = {
-#    "regex": '.*',
-#    "help_text": _("Your password does not meet the requirements."),
-#}
+HORIZON_CONFIG["password_validator"] = {
+    "regex": "{{ horizon.password_validator.regex }}",
+    "help_text": _("{{ horizon.password_validator.help_text }}""),
+}
+
+{% endif %}
 
 # Disable simplified floating IP address management for deployments with
 # multiple floating IP pools or complex network requirements.
