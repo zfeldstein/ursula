@@ -9,9 +9,9 @@ state_path_base: /opt/stack/data
 
 validate_certs: false
 
-redhat:
-  user: XXXXXXX
-  pass: XXXXXXX
+rhn_subscription:
+  username: XXXXXXX
+  password: XXXXXXX
 
 etc_hosts:
   - name: "{{ fqdn }}"
