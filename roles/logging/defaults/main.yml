@@ -13,6 +13,40 @@ logging:
           - /var/log/syslog
         fields:
           type: syslog
+  syslog_forwarding:
+    enabled: false
+    # selector is a list of facilities and their priorities
+    selector: auth,authpriv.*,local6.*
+    work_directory: /var/spool/rsyslog
+    config_vars:
+      - name: ActionResumeRetryCount
+        value: -1
+      - name: ActionResumeInterval
+        value: 10
+      - name: ActionQueueType
+        value: LinkedList
+      - name: ActionQueueFileName
+        value: auth_authpriv_audit_0
+      - name: ActionQueueMaxDiskSpace
+        value: 1m
+      - name: ActionQueueLowWaterMark
+        value: 500
+      - name: ActionQueueHighWaterMark
+        value: 10000
+      - name: ActionQueueTimeoutEnqueue
+        value: 0
+      - name: ActionQueueSaveOnShutdown
+        value: on
+      - name: ActionQueueSize
+        value: 10000
+      - name: ActionQueueDiscardMark
+        value: 9750
+      - name: ActionQueueDiscardSeverity
+        value: 8
+      - name: ActionQueueCheckpointInterval
+        value: 100
+    host: null
+    port: 514
   forward:
     host: null
     port: 4560
