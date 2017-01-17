@@ -1,0 +1,18 @@
+---
+
+- name: register with RHN
+  redhat_subscription:
+    state: present
+    username: "{{ rhn_subscription.username }}"
+    password: "{{ rhn_subscription.password }}"
+    pool: "{{ rhn_subscription.pool_names_regex }}"
+    autosubscribe: False
+
+- name: disable all redhat repositories
+  command: subscription-manager repos --disable={{ item }}
+  ignore_errors: True
+  with_items: "{{ rhn_subscription.repos.disable }}"
+
+- name: enable desire redhat repositories
+  command: subscription-manager repos --enable={{ item }}
+  with_items: "{{ rhn_subscription.repos.enable }}"
