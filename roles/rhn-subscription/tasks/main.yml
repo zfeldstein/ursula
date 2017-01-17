@@ -1,18 +1,45 @@
 ---
-
-- name: register with RHN
+- name: Register with RHN
   redhat_subscription:
     state: present
-    username: "{{ rhn_subscription.username }}"
-    password: "{{ rhn_subscription.password }}"
-    pool: "{{ rhn_subscription.pool_names_regex }}"
-    autosubscribe: False
+    username: "{{ redhat.user }}"
+    password: "{{ redhat.pass }}"
+  when: ansible_distribution == "RedHat"
+  tags: rhn
+
+- name: update osp subscription
+  shell: subscription-manager attach --pool=8a85f98158880f8d01588bde0f7c3c43
+  register: result
+  failed_when: not result.stdout|search("(Successfully attached)|(already had)")
+  changed_when: result.stdout|search("Successfully attached")
+  when: ansible_distribution == "RedHat"
+  tags: rhn
+
+- name: update ceph osd subscription
+  shell: subscription-manager attach --pool=8a85f981591dc6ee01591e7ba99e1628
+  register: result
+  failed_when: not result.stdout|search("(Successfully attached)|(already had)")
+  changed_when: result.stdout|search("Successfully attached")
+  when:
+    - ansible_distribution == "RedHat"
+    - "'ceph_osds' in group_names"
+  tags: rhn
 
 - name: disable all redhat repositories
   command: subscription-manager repos --disable={{ item }}
   ignore_errors: True
   with_items: "{{ rhn_subscription.repos.disable }}"
 
-- name: enable desire redhat repositories
-  command: subscription-manager repos --enable={{ item }}
+- name: add OS respositories
+  shell: subscription-manager repos --enable={{ item }}
   with_items: "{{ rhn_subscription.repos.enable }}"
+  when: ansible_distribution == "RedHat"
+  tags: rhn
+
+- name: add ceph osd respositories
+  shell: subscription-manager repos --enable=rhel-7-server-rhceph-2-osd-rpms
+  when:
+    - ansible_distribution == "RedHat"
+    - "'ceph_osds' in group_names"
+  tags: rhn
+
