@@ -3,7 +3,7 @@ primary_interface: ansible_eth1
 undercloud_cidr:
   - cidr: 172.16.0.0/24
 
-fqdn: openstack.example.org
+fqdn: openstack.example.com
 #fqdn: vagrant.openstack.blueboxgrid.com
 
 nova:

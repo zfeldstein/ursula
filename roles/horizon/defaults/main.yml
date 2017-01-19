@@ -8,6 +8,8 @@ horizon:
   nextgen_instance_panel: true
   legacy_instance_panel: false
   session_engine: django.contrib.sessions.backends.cache
+  osp_sys_packages:
+    - neutron-lbaas-dashboard
   source:
     rev: 'stable/newton'
     constrain: True
