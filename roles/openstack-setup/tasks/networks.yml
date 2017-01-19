@@ -1,5 +1,7 @@
 ---
 - name: neutron networks
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_network:
     name: "{{ item.name }}"
     provider_network_type: "{{ item.network_type }}"
@@ -18,6 +20,8 @@
   run_once: true
 
 - name: neutron subnets
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_subnet:
     name: "{{ item.name }}"
     network_name: "{{ item.network_name }}"
@@ -41,6 +45,8 @@
   run_once: true
 
 - name: neutron routers
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   neutron_router: state=present
                   name={{ item.name }}
                   tenant_name={{ item.tenant_name }}
@@ -49,10 +55,13 @@
                   login_tenant_name=admin
                   login_username=admin
                   login_password={{ secrets.admin_password }}
+                  verify={{ validate_certs|default(omit) }}
   with_items: "{{ neutron.routers }}"
   run_once: true
 
 - name: neutron routers gateways
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   neutron_router_gateway: state=present
                           router_name={{ item.name }}
                           network_name={{ item.ext_network|default("external") }}
@@ -61,10 +70,13 @@
                           login_tenant_name=admin
                           login_username=admin
                           login_password={{ secrets.admin_password }}
+                          verify={{ validate_certs|default(omit) }}
   with_items: "{{ neutron.routers }}"
   run_once: true
 
 - name: neutron router interfaces
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   neutron_router_interface: router_name={{ item.router_name }}
                             subnet_name={{ item.subnet_name }}
                             tenant_name={{ item.tenant_name }}
@@ -73,5 +85,6 @@
                             login_tenant_name=admin
                             login_username=admin
                             login_password={{ secrets.admin_password }}
+                            verify={{ validate_certs|default(omit) }}
   with_items: "{{ neutron.router_interfaces }}"
   run_once: true

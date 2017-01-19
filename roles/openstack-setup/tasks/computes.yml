@@ -1,5 +1,7 @@
 ---
 - name: create host aggs
+  environment: 
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_nova_host_agg:
     name: "{{ hostvars[item]['compute_ag'] }}"
     az: "{{ hostvars[item]['compute_ag'] }}"
@@ -15,6 +17,8 @@
   with_items: "{{ groups['compute'] }}"
 
 - name: assign hosts to aggs
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_nova_host_agg_host:
     name: "{{ hostvars[item]['compute_ag'] }}"
     host: "{{ hostvars[item]['ansible_nodename'] }}"

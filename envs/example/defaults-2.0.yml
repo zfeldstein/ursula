@@ -1,11 +1,13 @@
 ---
 stack_env: example
 ursula_env_path: "{{ lookup('env','URSULA_ENV') }}"
-
 country_code: US
 
 openstack_install_method: 'source'
-#openstack_install_method: 'package'
+
+
+basevenv: "/opt/openstack/base"
+basevenv_lib_dir: "{{ basevenv }}/lib/python2.7/site-packages"
 
 primary_interface: 'ansible_eth0'
 primary_ip: "{{ hostvars[inventory_hostname][primary_interface]['ipv4']['address'] }}"
@@ -135,6 +137,9 @@ apt_repos:
   collectd:
     repo: http://ppa.launchpad.net/raravena80/collectd5/ubuntu
     key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE97C3D97792BD34E"
+  chef:
+    repo: https://packages.chef.io/stable-apt
+    key_url: https://downloads.chef.io/packages-chef-io-public.key
 
 client:
   self_signed_cert: true
@@ -216,6 +221,9 @@ cinder:
       control_location: front-end
 
 neutron:
+  advertise_mtu: true
+  path_mtu: 1400
+  global_physnet_mtu: 1500
   plugin: ml2
   bridge_mappings: ''
   network_vlan_ranges: ''
@@ -629,4 +637,7 @@ magnum:
   debug: True
 
 serverspec:
+  enabled: False
+
+inspec:
   enabled: False

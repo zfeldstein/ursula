@@ -20,6 +20,14 @@
     retries: 5
   when: ansible_distribution == "Ubuntu"
 
+#FIXME
+- name: set selinux to permissive on redhat
+  selinux:
+    policy: targeted
+    state: permissive
+  when: ansible_distribution == "RedHat"
+  tags: selinux
+
 - name: secure paths sudoers operations
   lineinfile:
     dest: /etc/sudoers
@@ -39,6 +47,7 @@
 
 - include: python.yml
   tags: pip, python
+
 
 - include: ruby.yml
   tags: ruby
@@ -163,3 +172,8 @@
   tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
+
+- include: inspec.yml
+  tags:
+    - inspec
+  when: inspec.enabled|default('False')|bool

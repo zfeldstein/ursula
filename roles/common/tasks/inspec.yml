@@ -1,0 +1,6 @@
+---
+- name: inspec checks for common role
+  template: src={{ item }}
+            dest=/etc/inspec/controls/
+            mode=0755
+  with_fileglob: ../templates/inspec/*

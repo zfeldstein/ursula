@@ -20,6 +20,13 @@
       tags: ['always']
   environment: "{{ env_vars|default({}) }}"
 
+- name: RedHat Network registration for RedHat hosts
+  hosts: all:!vyatta-*
+  roles:
+    - role: rhn-subscription
+      tags: ['rhn']
+      when: ansible_distribution == "RedHat" and openstack_install_method == 'distro'
+
 - name: common role for all hosts
   hosts: all:!vyatta-*
   any_errors_fatal: true
@@ -32,6 +39,9 @@
     - role: serverspec
       tags: ['common', 'serverspec']
       when: serverspec.enabled|default("False")|bool
+    - role: inspec
+      tags: ['common', 'inspec']
+      when: inspec.enabled|default("False")|bool
     - role: logging
       tags: ['common', 'logging']
       when: logging.enabled|default("True")|bool
