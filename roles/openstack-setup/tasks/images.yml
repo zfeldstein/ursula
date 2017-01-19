@@ -22,6 +22,8 @@
     - "{{ images_downloaded.results }}"
 
 - name: default images
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_image:
     api_timeout: 12000
     validate_certs: "{{ validate_certs|default(omit) }}"

@@ -56,3 +56,12 @@ yum_repos:
     repo: http://sensu.global.ssl.fastly.net/yum/$basearch/
     description: sensu monitoring repo
     gpgcheck: no
+  elastic:
+    repo: https://artifacts.elastic.co/packages/5.x/yum
+    description: Filebeat repo
+    gpgcheck: yes
+    key_url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  chef:
+    repo: https://packages.chef.io/repos/yum/stable/el/7/x86_64/
+    gpgcheck: yes
+    key_url: https://downloads.chef.io/packages-chef-io-public.key

@@ -3,11 +3,15 @@ stack_env: example_allinone
 floating_ip: 172.16.0.100
 xtradb:
   sst_auth_password: asdf
-
+validate_certs: false
 percona:
   replication: False
 
 common:
+  python_extra_packages: 
+    - pytz
+    - pyopenssl
+    - shade
   hwraid:
     enabled: False
   system_tools:
@@ -51,10 +55,12 @@ common:
       - openssl-libs
       - libxml2-devel
       - libxslt-devel
-      - libxslt-devel
       - openssl-devel
       - libstdc++-static
       - gcc-c++
+      - python-requests
+      - uwsgi-plugin-python
+      
 sensu_checks:
     percona:
       check_cluster_size:
@@ -86,8 +92,19 @@ sensu_checks:
         command: "check-procs.rb -p garbd -W 1 -C 1"
         service_owner: openstack
 
+
 logging:
   enabled: true
+  follow:
+    enabled: true
+    global_fields:
+      customer_id: "unknown"
+      cluster_name: "unknown"
+    logs:
+      - paths:
+          - /var/log/messages
+        fields:
+          type: syslog
 
 serverspec:
   enabled: false
@@ -109,3 +126,12 @@ heat:
 
 ironic:
   enabled: False
+
+cinder:
+  enabled_backends: lvm,nimble
+  default_backend: nimble
+  backends:
+    - name: lvm
+      volume_driver: cinder.volume.drivers.lvm.LVMISCSIDriver
+      volume_backend_name: lvm
+      volume_group: cinder-volumes

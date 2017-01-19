@@ -25,3 +25,6 @@ dependencies:
     when: collectd is defined and collectd.enabled|bool
   - role: openstack-database
     database_name: magnum
+  - role: openstack-distro
+    project_name: magnum
+    when: openstack_install_method == 'distro'

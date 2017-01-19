@@ -78,14 +78,14 @@
   systemd_service: name=cinder-volume user=cinder
                    cmd=/usr/local/bin/cinder-volume
                    config_dirs=/etc/cinder
-  when: os == 'rhel'
+  when: os == 'rhel' and openstack_install_method == 'package'
 
 - name: install cinder backup service
   systemd_service: name=cinder-backup
                    user=cinder
                    cmd=/usr/local/bin/cinder-backup
                    config_dirs=/etc/cinder
-  when: os == 'rhel' and swift.enabled|default("false")|bool
+  when: os == 'rhel' and swift.enabled|default("false")|bool and openstack_install_method == 'package'
 
 
 - name: trigger restart on upgrades
@@ -107,6 +107,25 @@
   delegate_to: "{{ item }}"
   run_once: True
   with_items: "{{ play_hosts }}"
+  when: openstack_install_method != 'distro'
+  
+- name: start cinder-volume
+  service:
+    name: cinder-volume
+    state: started
+  delegate_to: "{{ item }}"
+  run_once: True
+  with_items: "{{ play_hosts }}"
+  when: openstack_install_method != 'distro'
+  
+- name: start cinder-volume (rhel osp)
+  service:
+    name: openstack-cinder-volume
+    state: started
+  delegate_to: "{{ item }}"
+  run_once: True
+  with_items: "{{ play_hosts }}"
+  when: openstack_install_method == 'distro'
 
 - name: start cinder backup
   service:
@@ -114,7 +133,16 @@
     state: started
   delegate_to: "{{ item }}"
   run_once: True
-  when: swift.enabled|default("false")|bool
+  when: swift.enabled|default("false")|bool and openstack_install_method != 'distro'
+  with_items: "{{ play_hosts }}"
+
+- name: start cinder backup
+  service:
+    name: openstack-cinder-backup
+    state: started
+  delegate_to: "{{ item }}"
+  run_once: True
+  when: swift.enabled|default("false")|bool and openstack_install_method == 'distro'
   with_items: "{{ play_hosts }}"
 
 - include: monitoring.yml

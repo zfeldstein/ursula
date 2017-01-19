@@ -1,0 +1,5 @@
+---
+inspec:
+  version: ~
+  enabled: true
+  interval: 3600
