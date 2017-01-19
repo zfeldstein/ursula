@@ -325,7 +325,11 @@ OPENSTACK_NEUTRON_NETWORK = {
     'enable_ipv6': True,
     'enable_distributed_router': False,
     'enable_ha_router': False,
+{% if neutron.lbaas.enabled|bool %}
     'enable_lb': True,
+{% else %}
+    'enable_lb': False,
+{% endif %}
     'enable_firewall': True,
     'enable_vpn': True,
     'enable_fip_topology_check': True,
@@ -779,5 +783,6 @@ REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
 # http://tinyurl.com/anticlickjack
 #DISALLOW_IFRAME_EMBED = True
 
-
+{% if openstack_install_method != 'distro' %}
 STATIC_ROOT = "{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/static"
+{% endif %}
