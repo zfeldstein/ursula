@@ -2,12 +2,20 @@
 - name: install filebeat apt
   apt:
     pkg: "filebeat={{ logging.forward.version }}"
+  register: result
+  until: result|success
+  retries: 3
+  delay: 10
   notify: restart filebeat
   when: os == "ubuntu"
-  
+
 - name: install filebeat yum
   yum:
     name: "filebeat"
+  register: result
+  until: result|success
+  retries: 3
+  delay: 10
   notify: restart filebeat
   when: os == "rhel"
 
@@ -52,3 +60,7 @@
 
 - name: start and enable filebeat service
   service: name=filebeat state=started enabled=yes
+  register: result
+  until: result|success
+  retries: 3
+  delay: 10
