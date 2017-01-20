@@ -79,6 +79,7 @@
           password: "{{ secrets.admin_password }}"
         display_name: turtle-vol
         size: 2
+      when: cinder.enabled|bool
 
     - name: nova can attach cinder volume
       os_server_volume:
@@ -89,6 +90,7 @@
           password: "{{ secrets.admin_password }}"
         server: turtle-stack
         volume: turtle-vol
+      when: cinder.enabled|bool
 
     - name: wait for instance to boot
       wait_for:

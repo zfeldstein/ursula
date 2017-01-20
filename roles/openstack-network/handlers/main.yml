@@ -2,3 +2,14 @@
 - name: ifup neutron external interface
   command: ifup {{ neutron_external_interface }}
   ignore_errors: yes
+
+- name: enable ip forwarding
+  sysctl: name="net.ipv4.ip_forward" value=1 sysctl_set=yes state=present reload=yes
+
+- name: enable ip masq
+  firewalld:
+    state: enabled
+    immediate: true
+    permanent: true
+    rich_rule: 'rule family="ipv4" source address="192.168.255.0/24" destination address="192.168.255.0/24" invert="True" masquerade'
+    zone: public

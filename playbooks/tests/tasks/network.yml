@@ -52,8 +52,8 @@
 
 # try ping internet for 5 minutes
   - name: neutron router can ping internet
-    shell: ROUTER_NS=$( ip netns show | grep qrouter- ); ip netns
-           exec ${ROUTER_NS} ping -c 5 8.8.8.8
+    shell: ROUTER_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
+           ip netns exec ${ROUTER_NS} ping -c 5 8.8.8.8
     register: result
     until: result|success
     retries: 30
@@ -76,5 +76,5 @@
     shell: egrep "rabbit_hosts = [0-9.]+:5672,[0-9.]+" /etc/neutron/neutron.conf
     when: rabbitmq.cluster == true
 
-  - name: iptables mangle rule in place to correct DHCP checksums
-    shell: iptables -L -n -t mangle | egrep '^CHECKSUM\s+udp\s+--\s+0.0.0.0/0\s+0.0.0.0/0\s+udp dpt:68 CHECKSUM fill'
+#  - name: iptables mangle rule in place to correct DHCP checksums
+#    shell: iptables -L -n -t mangle | egrep '^CHECKSUM\s+udp\s+--\s+0.0.0.0/0\s+0.0.0.0/0\s+udp dpt:68 CHECKSUM fill'
