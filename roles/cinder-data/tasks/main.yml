@@ -61,6 +61,7 @@
   notify: restart cinder services
   when: cinder.fixed_key is not defined
 
+#When OS is Ubuntu
 - name: install cinder-volume service
   upstart_service: name=cinder-volume user=cinder
                    cmd=/usr/local/bin/cinder-volume
@@ -74,18 +75,19 @@
                    config_dirs=/etc/cinder
   when: os == 'ubuntu' and swift.enabled|default("false")|bool
 
+#When OS is Rhel
 - name: install cinder-volume service
   systemd_service: name=cinder-volume user=cinder
                    cmd=/usr/local/bin/cinder-volume
                    config_dirs=/etc/cinder
-  when: os == 'rhel' and openstack_install_method == 'package'
+  when: os == 'rhel' and openstack_install_method != 'distro'
 
 - name: install cinder backup service
   systemd_service: name=cinder-backup
                    user=cinder
                    cmd=/usr/local/bin/cinder-backup
                    config_dirs=/etc/cinder
-  when: os == 'rhel' and swift.enabled|default("false")|bool and openstack_install_method == 'package'
+  when: os == 'rhel' and swift.enabled|default("false")|bool and openstack_install_method !=distro
 
 - name: install cinder-volume service
   systemd_service: name=cinder-volume user=cinder
@@ -140,7 +142,7 @@
   when: swift.enabled|default("false")|bool and openstack_install_method != 'distro'
   with_items: "{{ play_hosts }}"
 
-- name: start cinder backup
+- name: start cinder backup (rhel osp)
   service:
     name: openstack-cinder-backup
     state: started
