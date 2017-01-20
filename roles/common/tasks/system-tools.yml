@@ -10,7 +10,7 @@
 - name: install system tools
   package:
     name: "{{ item }}"
-  with_items: "{{ common.system_tools.packages }}"
+  with_items: "{{ common.system_tools[ansible_os_family | lower].packages }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -57,7 +57,7 @@
 
 - name: install lm-sensors package
   package:
-    name: "{{ common.system_tools.lm_sensors_package }}"
+    name: "{{ common.system_tools[ansible_os_family | lower].lm_sensors_package }}"
     state: present
     update_cache: yes
   notify:
