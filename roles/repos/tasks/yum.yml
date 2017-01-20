@@ -13,7 +13,7 @@
   yum:
     name: "{{ yum_repos[repo].name|default(yum_repos[repo].package) }}"
     state: present
-  when: not yum_repos[repo].repo|default(None)
+  when: not yum_repos[repo].repo|default(None) and repo is defined
   register: result
   until: '"failed" not in result'
   retries: 5
