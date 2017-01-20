@@ -109,15 +109,6 @@
   with_items: "{{ play_hosts }}"
   when: openstack_install_method != 'distro'
   
-- name: start cinder-volume
-  service:
-    name: cinder-volume
-    state: started
-  delegate_to: "{{ item }}"
-  run_once: True
-  with_items: "{{ play_hosts }}"
-  when: openstack_install_method != 'distro'
-  
 - name: start cinder-volume (rhel osp)
   service:
     name: openstack-cinder-volume
