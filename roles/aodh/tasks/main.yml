@@ -79,7 +79,7 @@
 
 - name: stop aodh-expirer service
   service:
-    name: aodhi-expirer
+    name: aodh-expirer
     state: stopped
     must_exist: false
 
