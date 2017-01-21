@@ -256,7 +256,7 @@
 - block:
     - name: install snmp package on controllers
       package:
-        name: snmp
+        name: "{{ common.system_tools[ansible_os_family | lower].snmp_package }}"
       register: result
       until: result|succeeded
       retries: 5

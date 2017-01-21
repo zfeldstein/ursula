@@ -8,59 +8,9 @@ percona:
   replication: False
 
 common:
-  python_extra_packages: 
-    - pytz
-    - pyopenssl
-    - shade
   hwraid:
     enabled: False
-  system_tools:
-    mcelog: True
-    lm_sensors_package: lm_sensors
-    packages:
-      - acl
-      - curl
-      - dstat
-      - ethtool
-      - git
-      - iotop
-      - ltrace
-      - mtr
-      - nc
-      - ruby-devel
-      - ruby
-      - socat
-      - tree
-      - vim
-      - sysstat
-      - logrotate
-      - ntp
-      - lvm2
-      - cracklib
-      - mlocate
-  python:
-    system_packages:
-      - python-pip
-      - libxml2-python
-      - python-lxml
-      - python-greenlet
-      - pyOpenSSL
-      - python-devel
-      - python-httplib2
-      - python-virtualenv
-      - MySQL-python
-      - python-jinja2
-      - cryptsetup
-      - libffi-devel
-      - openssl-libs
-      - libxml2-devel
-      - libxslt-devel
-      - openssl-devel
-      - libstdc++-static
-      - gcc-c++
-      - python-requests
-      - uwsgi-plugin-python
-      
+
 sensu_checks:
     percona:
       check_cluster_size:
@@ -118,6 +68,9 @@ haproxy:
   stats_group: root
 
 keystone:
+  ldap_domain:
+    enabled: True
+    domain: users  
   uwsgi:
     method: port
 
