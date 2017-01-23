@@ -16,9 +16,6 @@ neutron:
     enabled: False
 
 keystone:
-  ldap_domain:
-    enabled: True
-    domain: users
   uwsgi:
     method: port
 
