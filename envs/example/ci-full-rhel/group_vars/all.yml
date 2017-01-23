@@ -51,9 +51,6 @@ haproxy:
   stats_group: root
 
 keystone:
-  ldap_domain:
-    enabled: True
-    domain: users
   uwsgi:
     method: port
 
