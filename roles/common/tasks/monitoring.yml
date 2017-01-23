@@ -61,7 +61,7 @@
 
 - name: ensure PATH contains /usr/local/bin (OpenStack clients)
   lineinfile: dest=/etc/default/sensu regexp=^PATH
-              line="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/etc/sensu/plugins"
+              line="PATH=/opt/sensu/embedded/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/etc/sensu/plugins"
   notify: restart sensu-client
 
 - name: sensu client config
