@@ -1,4 +1,0 @@
----
-ceph:
-  disks:
-    - vdb
