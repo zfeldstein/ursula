@@ -27,6 +27,9 @@ monitoring:
           critical: 80
     gems:
       - sys-filesystem
+  ipmi_checks:
+    enabled: False
+    criticality: 'critical'
   graphite:
     cluster_prefix: "stats.bbc.{{ stack_env }}.openstack"
     host_prefix: "stats.bbc.{{ stack_env }}.{{ ansible_nodename|regex_replace('\\\\.*$', '') }}"

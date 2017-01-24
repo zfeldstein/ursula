@@ -241,6 +241,12 @@
   notify: restart sensu-client missing ok
   when: common.hwraid.enabled|bool
 
+- name: check IPMI sensors
+  sensu_check: name=check-ipmi-sensors plugin=check-ipmi-sensors.py
+               args="--criticality {{ monitoring.ipmi_checks.criticality }}" use_sudo=True
+  when: monitoring.ipmi_checks.enabled|default(False)|bool
+  notify: restart sensu-client
+
 - block:
     - name: install snmp package on controllers
       apt:
