@@ -73,6 +73,7 @@
   pip:
     name: "{{ item }}"
   with_items:
+    - six>=1.10.0
     - shade>=1.9.0
   register: result
   until: result|succeeded
