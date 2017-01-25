@@ -139,7 +139,6 @@ common:
       extra_packages:
         - pytz
         - pyopenssl
-        - shade
   packages_to_remove:
     - language-selector-common
   logs:
