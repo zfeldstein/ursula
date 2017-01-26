@@ -41,3 +41,11 @@
   when: ceph.enabled | default('False') | bool
   tags: 'precheck_ceph'
   run_once: true
+
+#To ensure ceph-common is installed from cloud archive repo and not bbc ceph repo
+- name: remove ceph repo from controllers and computes
+  apt_repository:
+    repo: 'deb {{ apt_repos.ceph.repo }} {{ ansible_lsb.codename }} main'
+    state: absent
+    update_cache: yes
+  when: ('controller' in group_names) or ('compute' in group_names)
