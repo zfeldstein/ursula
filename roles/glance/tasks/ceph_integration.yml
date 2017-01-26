@@ -1,4 +1,13 @@
 ---
+- name: Install ceph-common
+  apt: pkg={{ item }} state=latest
+  with_items:
+    - ceph-common
+  register: result
+  until: result|succeeded
+  retries: 5
+  notify: restart glance services
+
 - name: import rados module into glance
   file:
     src: /usr/lib/python2.7/dist-packages/{{ item }}
@@ -8,8 +17,8 @@
     group: root
     mode: 0644
   with_items:
-    - rados.so
-    - rbd.so
+    - rados.x86_64-linux-gnu.so
+    - rbd.x86_64-linux-gnu.so
 
 - name: remove modules those were used for Hammer
   file:
@@ -20,6 +29,8 @@
     - rados.pyc
     - rbd.py
     - rbd.pyc
+    - rados.so
+    - rbd.so
 
 - name: fetch glance keyring
   slurp: path=/etc/ceph/ceph.client.glance.keyring

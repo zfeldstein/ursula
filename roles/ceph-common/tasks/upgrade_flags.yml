@@ -37,19 +37,21 @@
   when: result_ceph_running_version is defined and result_ceph_running_version.rc == 0 and
         result_ceph_running_version.stdout < '10'
 
-- name: set upgrade_ceph=true
-  set_fact:
-    upgrade_ceph: true
-  when: result_ceph_running_version is defined and result_ceph_running_version.rc == 0 and
-        result_ceph_running_version.stdout < ceph_pure_version
-
-# set upgrade flag for controller and cinder_volume
-- name: set upgrade flag for controller and cinder_volume
-  set_fact:
-    upgrade_ceph: true
-  register: result_upgrade_ceph_controller
-  when: ('controller' in group_names or 'cinder_volume' in group_names) and
-        (result_ceph_installed_version.rc == 0 and result_ceph_installed_version.stdout < ceph_pure_version)
+#FIXME need to enable this check whenever we move up our ceph version from 10.2.3
+#- name: set upgrade_ceph=true
+#  set_fact:
+#    upgrade_ceph: true
+#  when: result_ceph_running_version is defined and result_ceph_running_version.rc == 0 and
+#        result_ceph_running_version.stdout < ceph_pure_version
+#
+## set upgrade flag for controller and cinder_volume
+#- name: set upgrade flag for controller and cinder_volume
+#  set_fact:
+#    upgrade_ceph: true
+#  register: result_upgrade_ceph_controller
+#  when: ('controller' in group_names or 'cinder_volume' in group_names) and
+#        (result_ceph_installed_version.rc == 0 and result_ceph_installed_version.stdout < ceph_pure_version)
+#
 
 - name: set flag so that this yml will not exected on the same host
   set_fact:

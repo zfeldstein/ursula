@@ -10,3 +10,4 @@ dependencies:
     repos:
       - repo: 'deb {{ apt_repos.ceph.repo }} {{ ansible_lsb.codename }} main'
         key_url: '{{ apt_repos.ceph.key_url }}'
+    when: ('ceph_monitors' in group_names) or ('ceph_osds' in group_names)
