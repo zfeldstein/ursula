@@ -1,44 +1,48 @@
 ---
 # run once for each host
 - include: upgrade_flags.yml
-  when: ceph_upgrade_flag_done is undefined
-  tags: ['openstack', 'cinder', 'control', 'data', 'cinder-data', 'glance', 'ceph-update']
+  when: 
+    - ceph_upgrade_flag_done is undefined
+    - ('ceph_monitors' in group_names) or ('ceph_osds' in group_names)
+  tags: ['openstack', 'cinder', 'control', 'data', 'nova-data', 'cinder-data', 'glance', 'ceph-update']
 
 - name: create ceph directory
   file:
     path: /etc/ceph
     state: directory
+- block:
+  - name: create ceph log directory
+    file: dest=/var/log/ceph state=directory mode=2750 owner=root group=adm
 
-- name: create ceph log directory
-  file: dest=/var/log/ceph state=directory mode=2750 owner=root group=adm
+  - name: Change ceph log dir acl
+    acl: name=/var/log/ceph state=present default=yes etype={{ item.etype }} permissions={{ item.permission }}
+    with_items:
+      - etype: user
+        permission: rw
+      - etype: group
+        permission: r
+      - etype: other
+        permission: r
 
-- name: Change ceph log dir acl
-  acl: name=/var/log/ceph state=present default=yes etype={{ item.etype }} permissions={{ item.permission }}
-  with_items:
-    - etype: user
-      permission: rw
-    - etype: group
-      permission: r
-    - etype: other
-      permission: r
 
-- name: install dependencies
-  apt: pkg={{ item }}
-       state=present
-       update_cache=yes
-       cache_valid_time=3600
-  with_items: "{{ ceph.debian_pkgs }}"
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: install dependencies
+    apt: pkg={{ item }}
+         state=present
+         update_cache=yes
+         cache_valid_time=3600
+    with_items: "{{ ceph.debian_pkgs }}"
+    register: result
+    until: result|succeeded
+    retries: 5
 
-- name: install ceph
-  apt: pkg={{ item }}={{ ceph.version }}
-       state=present
-  with_items: "{{ ceph.ceph_pkgs }}"
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: install ceph
+    apt: pkg={{ item }}={{ ceph.version }}
+         state=present
+    with_items: "{{ ceph.ceph_pkgs }}"
+    register: result
+    until: result|succeeded
+    retries: 5
+  when: ('ceph_monitors' in group_names) or ('ceph_osds' in group_names)
 
 - name: check for a ceph socket
   shell: "stat /var/run/ceph/*.asok > /dev/null 2>&1"
@@ -96,14 +100,16 @@
     - restart ceph mons
     - restart ceph osds
 
-- include: logging.yml
-  tags:
-    - logrotate
-    - logging
-  when: logging.enabled|default('True')|bool
+- block:
+  - include: logging.yml
+    tags:
+      - logrotate
+      - logging
+    when: logging.enabled|default('True')|bool
 
-- include: serverspec.yml
-  tags: 
-    - serverspec
-  when: serverspec.enabled|default('False')|bool
-
+  - include: serverspec.yml
+    tags: 
+      - serverspec
+    when: serverspec.enabled|default('False')|bool
+  when: ('ceph_monitors' in group_names) or ('ceph_osds' in group_names)
+  
