@@ -14,6 +14,7 @@ dependencies:
     alternatives: "{{ neutron.alternatives }}"
     system_dependencies: "{{ neutron.source.system_dependencies }}"
     python_dependencies: "{{ neutron.source.python_dependencies }}"
+    python_post_dependencies: "{{ neutron.source.python_post_dependencies }}"
     constrain: "{{ neutron.source.constrain }}"
     upper_constraints: "{{ neutron.source.upper_constraints }}"
     when: openstack_install_method == 'source'
@@ -21,9 +22,10 @@ dependencies:
     project_name: neutron
     rootwrap: True
     alternatives: "{{ neutron.alternatives }}"
-    when: openstack_install_method == 'package' 
+    when: openstack_install_method == 'package'
   - role: openstack-distro
     project_name: neutron
     dependent_packages: "{{ neutron.osp_sys_packages }}"
+    python_post_dependencies: "{{ neutron.distro.python_post_dependencies }}"
     rootwrap: True
     when: openstack_install_method == 'distro'
