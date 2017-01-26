@@ -22,6 +22,7 @@
 
 - name: RedHat Network registration for RedHat hosts
   hosts: all:!vyatta-*
+  any_errors_fatal: true
   roles:
     - role: rhn-subscription
       tags: ['rhn']
@@ -182,6 +183,7 @@
   any_errors_fatal: true
   roles:
     - role: ceph-monitor
+      when: ceph.enabled
       tags: ['ceph', 'ceph-monitor']
   environment: "{{ env_vars|default({}) }}"
 
@@ -190,8 +192,17 @@
   any_errors_fatal: true
   roles:
     - role: ceph-osd
+      when: ceph.enabled
       tags: ['ceph', 'ceph-osd']
   environment: "{{ env_vars|default({}) }}"
+
+- name: ceph client
+  hosts: controller:cinder_volume:compute
+  any_errors_fatal: true
+  roles:
+    - role: ceph-client
+      when: ceph.enabled
+      tags: ['ceph','ceph-client']
 
 # OPENSTACK SERVICES
 # # this next play can go away after 2.1.0+ is everywhere
@@ -235,7 +246,7 @@
   any_errors_fatal: true
   roles:
     - role: glance
-      tags: ['openstack', 'glance', 'control', 'ceph']
+      tags: ['openstack', 'glance', 'control']
   environment: "{{ env_vars|default({}) }}"
 
 - name: nova control plane
@@ -259,7 +270,7 @@
   any_errors_fatal: true
   roles:
     - role: cinder-control
-      tags: ['openstack', 'cinder', 'control', 'ceph']
+      tags: ['openstack', 'cinder', 'control']
       when: cinder.enabled|bool
   environment: "{{ env_vars|default({}) }}"
 
@@ -268,7 +279,7 @@
   any_errors_fatal: true
   roles:
     - role: cinder-data
-      tags: ['openstack', 'cinder', 'data', 'cinder-data', 'ceph']
+      tags: ['openstack', 'cinder', 'data', 'cinder-data']
       when: cinder.enabled|bool
   environment: "{{ env_vars|default({}) }}"
 

@@ -80,13 +80,13 @@
 - name: ceph logging
   hosts: ceph_monitors:ceph_osds
   vars_files:
-    - ../roles/ceph-common/defaults/main.yml
+    - ../roles/ceph-defaults/defaults/main.yml
   roles:
   - role: ../roles/logging-config
     service: ceph
     logdata: "{{ ceph.logs }}"
   tasks:
-    - include: ../roles/ceph-common/tasks/logging.yml
+    - include: ../roles/ceph-config/tasks/logging.yml
 
 - name: swift logging
   hosts: swiftnode

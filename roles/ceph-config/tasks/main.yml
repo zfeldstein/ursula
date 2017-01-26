@@ -1,9 +1,4 @@
 ---
-# run once for each host
-- include: upgrade_flags.yml
-  when: ceph_upgrade_flag_done is undefined
-  tags: ['openstack', 'cinder', 'control', 'data', 'cinder-data', 'glance', 'ceph-update']
-
 - name: create ceph directory
   file:
     path: /etc/ceph
@@ -21,43 +16,6 @@
       permission: r
     - etype: other
       permission: r
-
-- name: install dependencies
-  package: name={{ item }} state=present
-  with_items: "{{ ceph.depend_pkgs }}"
-  register: result
-  until: result|succeeded
-  retries: 5
-
-- name: install ceph common(include ceph client)
-  package: name=ceph-common{{ ceph.pkg_version_connector[os] }}{{ ceph.version[os] }}
-           state=present
-  register: result
-  until: result|succeeded
-  retries: 5
-  when: "'controller' in group_names or 'compute' in group_names"
-
-- name: install ceph monitor
-  package: name=ceph-mon{{ ceph.pkg_version_connector[os] }}{{ ceph.version[os] }}
-           state=present
-  register: result
-  until: result|succeeded
-  retries: 5
-  when: "'ceph_monitors' in group_names"
-
-- name: install ceph osd
-  package: name=ceph-osd{{ ceph.pkg_version_connector[os] }}{{ ceph.version[os] }}
-           state=present
-  register: result
-  until: result|succeeded
-  retries: 5
-  when: "'ceph_osds' in group_names"
-
-- name: check for a ceph socket
-  shell: "stat /var/run/ceph/*.asok > /dev/null 2>&1"
-  changed_when: false
-  failed_when: false
-  register: ceph_socket
 
 # generate uuid for ceph.conf
 # truncate is to get rid of the newline
@@ -99,6 +57,10 @@
     dest: "{{ cinder_uuid_file['source'] }}"
     content: "{{ cinder_uuid_file['content'] | b64decode }}"
 
+- name: check if ceph.conf exists
+  stat: path=/etc/ceph/ceph.conf
+  register: stat_ceph_conf
+
 - name: generate ceph configuration file
   template: src=etc/ceph/ceph.conf
             dest=/etc/ceph/ceph.conf
@@ -107,21 +69,23 @@
             mode=0644
   register: result_ceph_conf
 
-- name: set ceph restart flag for ceph conf change
-  copy: dest=/etc/ansible/facts.d/restart_ceph.fact content='true'
-  when: result_ceph_conf.changed
+# set restart flag for ceph in case we fail before restarting ceph
+# we dont' restart ceph for new osd node, because that will block scale-out
+- block:
+  - name: set ceph restart flag
+    copy: dest=/etc/ansible/facts.d/restart_ceph.fact content='true'
 
-- name: re-read facts after adding custom fact
-  setup: filter=ansible_local
-  when: result_ceph_conf.changed
+  - name: re-read facts after adding custom fact
+    setup: filter=ansible_local
+  when:
+    - "'ceph_monitors' in group_names or 'ceph_osds' in group_names" 
+    - stat_ceph_conf.stat.exists
+    - result_ceph_conf.changed
 
 - include: logging.yml
-  tags:
-    - logrotate
-    - logging
+  tags: ['logrotate', 'logging']
+  when: logging.enabled|default(true)
 
 - include: serverspec.yml
-  tags: 
-    - serverspec
-  when: serverspec.enabled|default('False')|bool
-
+  tags: ['serverspec']
+  when: serverspec.enabled|default(false)

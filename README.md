@@ -8,7 +8,7 @@ maintaining OpenStack powered clouds.
 Ursula was originally created by a team at [Blue Box](https://www.blueboxcloud.com) and is
 released under the MIT License (MIT).
 
-The `ceph-common`, `ceph-monitor`, and `ceph-osd` roles were originally taken from
+The `ceph-monitor`, and `ceph-osd` roles were originally taken from
 [ceph/ceph-ansible](https://github.com/ceph/ceph-ansible), but have since been
 modified. `ceph/ceph-ansible` is released under the Apache License.
 

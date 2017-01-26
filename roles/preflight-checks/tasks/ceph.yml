@@ -1,5 +1,5 @@
 ---
-# this yml is executed with ceph installed
+# this yml is only executed when ceph is installed
 - name: fail when ceph health is not ok
   shell: ceph health |grep -P '^(HEALTH_OK)|(HEALTH_WARN \d+ near full osd\(s\))$'
   delegate_to: "{{ groups['ceph_monitors'][0] }}"

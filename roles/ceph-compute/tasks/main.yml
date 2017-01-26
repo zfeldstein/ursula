@@ -1,9 +1,4 @@
 ---
-- name: create ceph directory
-  file:
-    path: /etc/ceph
-    state: directory
-
 - name: create client.cinder.key
   shell: ceph auth get-key client.cinder > /etc/ceph/client.cinder.key
          creates=/etc/ceph/client.cinder.key

@@ -11,8 +11,6 @@
     - inventory_hostname == groups['ceph_monitors'][0]
     - ceph_scale_out | default(false)
 
-# we restart ceph services when upgrade or config update
-# restarting ceph service demands ceph health ok
 # Wait for a max of 10 minutes
 - name: wait for ceph cluster to be in health ok state
   shell: ceph health |grep -P '^(HEALTH_OK)|(HEALTH_WARN \d+ near full osd\(s\))$'
@@ -22,13 +20,8 @@
   delay: 60
   delegate_to: "{{ groups['ceph_monitors'][0] }}"
 
-# tasks of ceph monitors
-- block:
-  - name: stop ceph mon
-    service: name={{ ceph.mon_service[os] }} state=stopped
-
-  - name: start ceph mons
-    service: name={{ ceph.mon_service[os] }} state=started enabled=yes
+- name: restart ceph mons
+  service: name={{ ceph.mon_service[os] }} state=restarted enabled=yes
   when: "'ceph_monitors' in group_names"
 
 # tasks of ceph osds
@@ -47,11 +40,8 @@
     command: ceph osd set nodeep-scrub
     delegate_to: "{{ groups['ceph_monitors'][0] }}"
 
-  - name: stop ceph osd
-    service: name={{ ceph.osd_service[os] }} state=stopped
-
-  - name: start ceph osds
-    service: name={{ ceph.osd_service[os] }} state=started enabled=yes
+  - name: restart ceph osds
+    service: name={{ ceph.osd_service[os] }} state=restarted enabled=yes
 
   # make sure ceph osd services are up before unset noout
   - name: make sure ceph osds are up
