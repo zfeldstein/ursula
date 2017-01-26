@@ -105,9 +105,15 @@
             owner=root
             group=root
             mode=0644
-  notify:
-    - restart ceph mons
-    - restart ceph osds
+  register: result_ceph_conf
+
+- name: set ceph restart flag for ceph conf change
+  copy: dest=/etc/ansible/facts.d/restart_ceph.fact content='true'
+  when: result_ceph_conf.changed
+
+- name: re-read facts after adding custom fact
+  setup: filter=ansible_local
+  when: result_ceph_conf.changed
 
 - include: logging.yml
   tags:
