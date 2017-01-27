@@ -1,8 +1,8 @@
 ---
 - name: Install ceph-common
-  apt: pkg={{ item }} state=latest
+  apt: pkg={{ item }}
   with_items:
-    - ceph-common
+    - ceph-common={{ ceph.ceph_cloud_archive_version }}
   register: result
   until: result|succeeded
   retries: 5
