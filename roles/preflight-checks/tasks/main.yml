@@ -43,9 +43,15 @@
   run_once: true
 
 #To ensure ceph-common is installed from cloud archive repo and not bbc ceph repo
-- name: remove ceph repo from controllers and computes
-  apt_repository:
-    repo: 'deb {{ apt_repos.ceph.repo }} {{ ansible_lsb.codename }} main'
-    state: absent
-    update_cache: yes
+- block:
+  - name: remove ceph repo from controllers and computes
+    apt_repository:
+      repo: 'deb {{ apt_repos.ceph.repo }} {{ ansible_lsb.codename }} main'
+      state: absent
+      update_cache: yes
+
+  #Remove unwanted ceph pkgs without removing dependecies to avoid impacts to libivrt
+  - name: remove unwanted ceph packages from controller and compute nodes
+    command: dpkg -P ceph ceph-osd ceph-mon ceph-mds ceph-fuse ceph-fs-common ceph-base
+
   when: ('controller' in group_names) or ('compute' in group_names)
