@@ -93,7 +93,7 @@ OPENSTACK_API_VERSIONS = {
 # Specify a regular expression to validate user passwords.
 HORIZON_CONFIG["password_validator"] = {
     "regex": "{{ horizon.password_validator.regex }}",
-    "help_text": _("{{ horizon.password_validator.help_text }}""),
+    "help_text": _("{{ horizon.password_validator.help_text }}"),
 }
 
 {% endif %}
