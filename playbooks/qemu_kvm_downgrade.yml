@@ -1,0 +1,31 @@
+---
+- name: downgrade qemu-kvm
+  hosts: compute:!vyatta-*
+  environment: "{{ env_vars|default({}) }}"
+  serial: 10
+  vars:
+    downgrade_version: 2.0.0+dfsg-2ubuntu1.30
+
+  handlers:
+  - name: restart nova services
+    service: name={{ item }} state=restarted must_exist=false
+    with_items:
+      - libvirt-bin
+      - nova-compute
+
+  tasks:
+  - name: install nova-compute packages
+    apt:
+      pkg: "{{ item }}"
+      autoremove: yes
+      force: yes
+    with_items:
+      - qemu-system-common={{ downgrade_version }}
+      - qemu-utils={{ downgrade_version }}
+      - qemu-system-x86={{ downgrade_version }}
+      - qemu-kvm={{ downgrade_version }}
+      - qemu-keymaps={{ downgrade_version }}
+    notify: restart nova services
+    register: result
+    until: result|succeeded
+    retries: 5
