@@ -3,6 +3,12 @@
 - name: compute process check
   sensu_process_check: service=nova-compute
   notify: restart sensu-client
+  when: openstack_install_method != 'distro'
+  
+- name: compute process check
+  sensu_process_check: service=openstack-nova-compute
+  notify: restart sensu-client
+  when: openstack_install_method == 'distro' and os == 'rhel'
 
 - name: neutron linuxbridge agent check
   sensu_process_check: service=neutron-linuxbridge-agent

@@ -1,6 +1,14 @@
 ---
 - name: python-mysqldb package
   apt: pkg=python-mysqldb
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: python-mysqldb package
+  package: name=MySQL-python
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -15,13 +23,16 @@
 
 - name: configure my.cnf
   template: src=etc/my.cnf dest=/etc/my.cnf mode=0644
-  when: ansible_distribution_version == "12.04"
+  when: os == 'rhel' or
+        (os == 'ubuntu' and
+        ansible_distribution_version == "12.04")
   notify:
     - restart mysql server
 
 - name: configure my.cnf
   template: src=etc/my.cnf dest=/etc/mysql/my.cnf mode=0644
-  when: ansible_distribution_version != "12.04"
+  when: os == 'ubuntu' and
+        ansible_distribution_version != "12.04"
   notify:
     - restart mysql server
 
@@ -35,6 +46,13 @@
   notify:
     - restart mysql server
 
+- name: install mysql low memory config
+  template: src=etc/mysql/conf.d/low_memory.cnf dest=/etc/mysql/conf.d/low_memory.cnf
+            mode=0644
+  when: ansible_memtotal_mb < 6000
+  notify:
+    - restart mysql server
+
 - name: install percona xtradb packages
   apt: pkg={{ item }} state=installed
   with_items:
@@ -42,6 +60,15 @@
   - percona-xtradb-cluster-client-{{ xtradb.client_version }}
   - percona-xtradb-cluster-server-{{ xtradb.server_version }}
   - percona-xtrabackup
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install percona xtradb packages
+  package:
+    name: "Percona-XtraDB-Cluster-server-{{ xtradb.server_version }}"
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -114,8 +141,16 @@
 
 - meta: flush_handlers
 
+- name: check on rhel if bootstrap service is running
+  command: systemctl status mysql@bootstrap.service
+  changed_when: false
+  failed_when: false
+  register: result
+
 - name: start mysql server
-  service: name=mysql state=started
+  service: name=mysql state=started enabled=true
+  when: os == 'ubuntu' or
+        ( os == 'rhel' and result.rc != 0 )
 
 - name: set mysql root password
   mysql_user: name=root password={{ mysql.root_password }}
@@ -126,7 +161,7 @@
 - name: add mysql user for haproxy health
   mysql_user:
     name: haproxy
-    host: "{{ hostvars[item]['ansible_fqdn'] }}"
+    host: "{{ hostvars[item][primary_interface]['ipv4']['address'] }}"
   with_items: "{{ groups['controller'] }}"
 
 - name: add fqdn mysql for haproxy health (because haproxy is dumb)
@@ -137,46 +172,57 @@
 - name: remove mysql test database
   mysql_db: state=absent name=test
 
-- name: are we already bootstrapped
-  shell: mysql -e "SHOW VARIABLES LIKE 'wsrep_on'" | grep 'ON'
-  register: already_bootstrapped
-  failed_when: False
+- block:
+  - name: are we already bootstrapped
+    shell: mysql -e "SHOW VARIABLES LIKE 'wsrep_on'" | grep 'ON'
+    register: already_bootstrapped
+    failed_when: False
 
-- name: create state snapshot transfer user from anywhere
-  mysql_user: name={{ xtradb.sst_auth_user }} host={{ item }}
-              password={{ xtradb.sst_auth_password }}
-              priv='*.*:RELOAD,LOCK TABLES,REPLICATION CLIENT'
-  with_items:
-    - '%'
-    - 'localhost'
-  when: percona.replication
+  - name: create state snapshot transfer user from anywhere
+    mysql_user: name={{ xtradb.sst_auth_user }} host={{ item }}
+                password={{ xtradb.sst_auth_password }}
+                priv='*.*:RELOAD,LOCK TABLES,REPLICATION CLIENT'
+    with_items:
+      - '%'
+      - 'localhost'
 
-- name: stop all of the mysql processes before we boostrap any replication
-  service: name=mysql state=stopped
-  when: percona.replication and not already_bootstrapped.rc == 0
+  - name: stop all of the mysql processes before we boostrap any replication
+    service: name=mysql state=stopped
+    when: not already_bootstrapped.rc == 0
 
-- name: register replication databases
-  command: echo {% for host in groups['db'] %}{% if not loop.last %}{{ hostvars[host][primary_interface]['ipv4']['address'] }},{% else %}{{ hostvars[host][primary_interface]['ipv4']['address'] }}{% endif %}{% endfor %}
-  register: percona_replication_nodes
-  when: percona.replication
+  - name: register replication databases
+    command: echo {% for host in groups['db'] %}{% if not loop.last %}{{ hostvars[host][primary_interface]['ipv4']['address'] }},{% else %}{{ hostvars[host][primary_interface]['ipv4']['address'] }}{% endif %}{% endfor %}
+    register: percona_replication_nodes
 
-- name: configure bootstrap replication
-  template: src=etc/mysql/conf.d/replication.cnf
-            dest=/etc/mysql/conf.d/replication.cnf mode=0644
-  when: percona.replication
-  notify:
-    - restart mysql server if upgrade
-  # the notify is for restart on upgrade. If restart on new install it will
-  # break. FIXME
+  - name: configure bootstrap replication
+    template: src=etc/mysql/conf.d/replication.cnf
+              dest=/etc/mysql/conf.d/replication.cnf mode=0644
+    notify:
+      - restart mysql server if upgrade
+    # the notify is for restart on upgrade. If restart on new install it will
+    # break. FIXME
 
-- name: bootstrap the primary node
-  command: /etc/init.d/mysql bootstrap-pxc
-  when: should_bootstrap_as_primary and not already_bootstrapped.rc == 0
+  - name: bootstrap the primary node
+    command: /etc/init.d/mysql bootstrap-pxc
+    when: os == 'ubuntu' and
+          ( should_bootstrap_as_primary and not
+            already_bootstrapped.rc == 0 )
 
-- name: bootstrap any secondary nodes
+  - name: bootstrap the primary node
+    command: systemctl start mysql@bootstrap.service
+    when: os == 'rhel' and
+          ( should_bootstrap_as_primary and not
+            already_bootstrapped.rc == 0 )
+
+  - name: bootstrap any secondary nodes
+    service: name=mysql state=started
+    when:  not should_bootstrap_as_primary and
+           not already_bootstrapped.rc == 0
+  when: percona.replication|bool
+
+- name: start percona
   service: name=mysql state=started
-  when: not should_bootstrap_as_primary and not already_bootstrapped.rc == 0
-
+  when: not percona.replication|bool
 - name: remove anonymous users
   mysql_user: name='' host={{ item }} state=absent
   with_items:

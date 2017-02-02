@@ -93,7 +93,7 @@ def _get_ksclient(module, kwargs):
                            username=kwargs.get('login_username'),
                            password=kwargs.get('login_password'),
                            tenant_name=kwargs.get('login_tenant_name'))
-        sess = session.Session(auth=auth)
+        sess = session.Session(auth=auth, verify=kwargs.get('verify'))
 
         kclient = ksclient.Client(session=sess)
         nclient = client.Client('2.0', session=sess)
@@ -178,6 +178,7 @@ def main():
         tenant_name                     = dict(default=None),
         state                           = dict(default='present', choices=['absent', 'present']),
         admin_state_up                  = dict(type='bool', default=True),
+        verify                          = dict(type='bool', default=False)
         ),
     )
 

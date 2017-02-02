@@ -10,6 +10,8 @@ neutron:
   path_mtu: 1550
   global_physnet_mtu: 1550
   max_subnet_host_routes: 20
+  osp_sys_packages:
+    - openstack-neutron-linuxbridge
   vxlan:
     # The multicast prefix to use for broadcast, multicast and unknown frames
     # Consider using a larger prefix (e.g. a /24) on deployments with a
@@ -81,7 +83,10 @@ neutron:
       - { name: "git+git://github.com/openstack/neutron-lbaas.git@stable/newton#egg=neutron-lbaas" }
       - { name: PyMySQL }
     system_dependencies:
-      - conntrack
+      ubuntu: []
+        #- conntrack
+      rhel: []
+        #- conntrack
   alternatives:
     - neutron-db-manage
     - neutron-debug

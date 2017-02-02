@@ -26,3 +26,6 @@ dependencies:
     when: ceph.enabled|bool
   - role: openstack-database
     database_name: glance
+  - role: openstack-distro
+    project_name: glance
+    when: openstack_install_method == 'distro'

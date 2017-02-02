@@ -8,7 +8,7 @@ ff00::0 ip6-mcastprefix
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 
-{% for entry in etc_hosts -%}
+{% for entry in etc_hosts|default([]) -%}
 {{ entry.ip }} {{ entry.name }}
 {% endfor %}
 

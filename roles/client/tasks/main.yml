@@ -4,13 +4,23 @@
   when: client.write_stackrc|bool
 
 - name: install required packages for clients
-  apt:
+  package:
     name: "{{ item }}"
     state: present
   with_items: "{{ client.apt_packages }}"
   register: result
   until: result|succeeded
   retries: 5
+  
+- name: install required packages for clients
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ client.names }}"
+  register: result
+  until: result|succeeded
+  retries: 5
+  when: os == 'rhel' and openstack_install_method == 'distro'
 
 - name: install openstack clients
   pip: name={{ item }}
@@ -20,6 +30,7 @@
   register: result
   until: result|succeeded
   retries: 5
+  when: (os == 'ubuntu') or (os == 'rhel' and openstack_install_method == 'source')
 
 - name: fix ssl certs for requests for keystone-client on trusty
   file: src=/etc/ssl/certs/ca-certificates.crt

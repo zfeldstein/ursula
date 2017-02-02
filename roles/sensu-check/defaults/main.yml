@@ -57,6 +57,13 @@ sensu_checks:
       standalone: true
       command: "check-procs.rb -p logstash-forwarder -W 1 -C 1"
       service_owner: openstack
+    check_filebeat_process:
+      handler: default
+      notification: "unexpected number of filebeat processes"
+      interval: 120
+      standalone: true
+      command: "check-procs.rb -p filebeat -W 1 -C 1"
+      service_owner: openstack
 
   neutron:
     check_neutron_agents:
@@ -149,3 +156,10 @@ sensu_checks:
       standalone: true
       command: "sudo check-serverspec.rb -d /etc/serverspec -s warning"
       service_owner: openstack
+    check_inspec:
+      interval: 600
+      handler: default
+      standalone: true
+      command: "sudo check-inspec.rb --control /etc/inspec/controls"
+      service_owner: openstack
+

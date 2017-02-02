@@ -38,7 +38,11 @@ import subprocess
 def _is_device_type(device, device_type, module):
     if not os.path.exists(device):
         return False
-    cmd = ['hd', '-n', '16384', device]
+    if os.path.exists('/usr/bin/hd'):
+        hd = '/usr/bin/hd'
+    else:
+        hd = '/bin/hexdump'
+    cmd = [hd, '-n', '16384', device]
     rc, out, err = module.run_command(cmd, check_rc=True)
     return re.search(device_type, out)
 
@@ -87,15 +91,24 @@ def main():
         module.fail_json(msg="Unable to set permissions: %s" % e)
 
     # Setup loop device
-    device = '/dev/loop0'
 
-    lines = ['start on filesystem', 'task',
-             'exec losetup %s %s' % (device, dest)]
-    try:
-        with open('/etc/init/losetup.conf', 'w') as f:
-            f.write('\n'.join(lines) + '\n')
-    except Exception, e:
-        module.fail_json(msg="Unable to write losetup file: %s" % e)
+    rc, out, err = module.run_command('losetup -f', check_rc=True)
+
+    device = out.strip('\n')
+
+    #if os.path.exists('/dev/loop0'):
+    #    device = '/dev/loop0'
+    #elif os.path.exists('/dev/loop1'):
+    #    device = '/dev/loop1'
+
+    if os.path.exists('/etc/init/losetup.conf'):
+        lines = ['start on filesystem', 'task',
+                 'exec losetup %s %s' % (device, dest)]
+        try:
+            with open('/etc/init/losetup.conf', 'w') as f:
+                f.write('\n'.join(lines) + '\n')
+        except Exception, e:
+            module.fail_json(msg="Unable to write losetup file: %s" % e)
 
     cmd = ['losetup', device, dest]
     rc, out, err = module.run_command(cmd, check_rc=True)

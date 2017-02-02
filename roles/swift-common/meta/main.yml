@@ -20,3 +20,7 @@ dependencies:
     project_name: swift
     alternatives: "{{ swift.alternatives }}"
     when: openstack_install_method == 'package'
+  - role: openstack-distro
+    project_name: swift
+    when: openstack_install_method == 'distro'
+

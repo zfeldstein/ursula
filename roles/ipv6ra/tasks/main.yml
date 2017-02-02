@@ -1,6 +1,6 @@
 ---
 - name: Update dnsmasq to the ppa version
-  apt: pkg=dnsmasq state=latest
+  package: name=dnsmasq state=latest
   register: result
   until: result|succeeded
   retries: 5
@@ -15,6 +15,7 @@
   lineinfile: dest=/etc/default/dnsmasq regexp="^DNSMASQ_EXCEPT="
               line="DNSMASQ_EXCEPT=lo"
   notify: restart-dnsmasq
+  when: ansible_distribution == 'Ubuntu'
 
 - name: Enable/start dnsmasq
   service: name=dnsmasq state=started enabled=yes

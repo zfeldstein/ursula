@@ -85,7 +85,7 @@
     - logging
 
 - include: serverspec.yml
-  tags: 
+  tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
 

@@ -12,10 +12,12 @@
     - headers
   notify:
     - reload apache
+  when: os == 'ubuntu'
 
 - name: remove custom headers config
   file: path=/etc/apache2/mods-enabled/headers.conf
         state=absent
+  when: os == 'ubuntu'
   notify:
     - reload apache
 
@@ -26,22 +28,52 @@
 - name: create horizon config directory
   file: dest=/etc/openstack-dashboard state=directory
 
+#- name: openstack dashboard config rhel)
+#  template: src=etc/apache2/sites-available/openstack_dashboard.conf
+#            dest=/etc/httpd/conf.d/openstack_dashboard.conf
+#  when: os == 'rhel'
+#  notify:
+#    - reload apache
+
 - name: openstack dashboard config (12.04)
   template: src=etc/apache2/sites-available/openstack_dashboard.conf
             dest=/etc/apache2/sites-available/openstack_dashboard
-  when: ansible_distribution_version == "12.04"
+  when:
+    - os == 'ubuntu'
+    - ansible_distribution_version == "12.04"
   notify:
     - reload apache
 
 - name: openstack dashboard config
   template: src=etc/apache2/sites-available/openstack_dashboard.conf
             dest=/etc/apache2/sites-available/openstack_dashboard.conf
-  when: ansible_distribution_version != "12.04"
+  when:
+    - os == 'ubuntu'
+    - ansible_distribution_version != "12.04"
+  notify:
+    - reload apache
+
+- name: openstack dashboard config
+  template: src=etc/apache2/sites-available/openstack_dashboard.conf
+            dest=/etc/apache2/sites-available/openstack_dashboard.conf
+  when:
+    - os == 'ubuntu'
+    - ansible_distribution_version != "12.04"
+  notify:
+    - reload apache
+
+- name: openstack dashboard config (rhel osp)
+  template: src=etc/httpd/conf.d/openstack-dashboard.conf
+            dest=/etc/httpd/conf.d/openstack-dashboard.conf
+  when:
+    - os == 'rhel'
+    - openstack_install_method == "distro"
   notify:
     - reload apache
 
 - name: enable horizon apache site
   apache2_site: name=openstack_dashboard state=present
+  when: os == 'ubuntu'
   notify:
     - reload apache
 
@@ -55,14 +87,14 @@
     src: "roles/keystone/templates/etc/keystone/policy.json"
     dest: "/etc/openstack-dashboard/keystone_policy.json"
     mode: 0640
-    owner: "www-data"
-    group: "www-data"
+    owner: "{{ apache_user }}"
+    group: "{{ apache_group }}"
   when: horizon.customize|default('False')|bool
   notify:
     - reload apache
 
-- name: horizon local settings 
-  template: 
+- name: horizon local settings
+  template:
     src: "etc/openstack-dashboard/__init__.py"
     dest: "/etc/openstack-dashboard/__init__.py"
     mode: 0644
@@ -71,25 +103,26 @@
   notify:
     - reload apache
 
-- name: horizon local settings 
+- name: horizon local settings
   template:
     src: "etc/openstack-dashboard/local_settings.py"
     dest: "/etc/openstack-dashboard/local_settings.py"
     mode: 0644
     owner: "root"
-    group: "www-data"
+    group: "{{ apache_group }}"
   notify:
     - reload apache
 
 #Use current Symlink for both package/source install
-- name: create static assets directory
+- name: create static assets directory (ubuntu)
   file: dest="{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/{{ item }}"
-        owner=www-data group=www-data state=directory
+        owner="{{ apache_user }}" group="{{ apache_group }}" state=directory
   with_items:
     - static
     - static/dashboard
     - static/img
     - static/dashboard/fonts
+  when: os == 'ubuntu'
 
 ## FIXME
 ## We need to figure out the proper way to get horizon to use /etc/ when
@@ -98,9 +131,21 @@
   file: src=/etc/openstack-dashboard/local_settings.py
         dest=/opt/openstack/current/horizon/lib/python2.7/site-packages/openstack_dashboard/local/local_settings.py
         owner=root
-        group=www-data
+        group="{{ apache_user }}"
         mode=0644
         state=link
+  when: os == 'ubuntu'
+
+- name: link local settings to /etc/openstack-dashboard
+  file: src=/etc/openstack-dashboard/local_settings.py
+        dest=/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
+        owner=root
+        group="{{ apache_user }}"
+        mode=0644
+        state=link
+  when:
+    - os == 'rhel'
+    - openstack_install_method == 'distro'
 
 - name: custom horizon logo
   get_url: url={{ item.url }}
@@ -110,16 +155,33 @@
     - { name: img/logo.png, url: "{{ horizon.logo_url|default('') }}"  }
     - { name: img/logo-splash.png, url: "{{ horizon.logo_url|default('') }}" }
     - { name: img/favicon.ico, url: "{{ horizon.favicon_url|default('') }}" }
-  when: (horizon.logo_url is defined and horizon.favicon_url is defined)
+  when:
+    - horizon.logo_url is defined
+    - horizon.favicon_url is defined
+    - openstack_install_method != 'distro'
 
-- name: Enable/Disable lbaas dashboard
+- name: custom horizon logo (rhel osp)
+  get_url: url={{ item.url }}
+           dest=/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/{{ item.name }}
+           force=True
+  with_items:
+    - { name: img/logo.png, url: "{{ horizon.logo_url|default('') }}"  }
+    - { name: img/logo-splash.png, url: "{{ horizon.logo_url|default('') }}" }
+    - { name: img/favicon.ico, url: "{{ horizon.favicon_url|default('') }}" }
+  when:
+    - horizon.logo_url is defined
+    - horizon.favicon_url is defined
+    - openstack_install_method == 'distro'
+
+- name: Enable/Disable lbaas dashboard (ubuntu)
   file:
     src: "{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/neutron_lbaas_dashboard/enabled/_1481_project_ng_loadbalancersv2_panel.py"
     path: "{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/local/enabled/_1481_project_ng_loadbalancersv2_panel.py"
     state: "{{ (neutron.lbaas.enabled | bool) | ternary('link', 'absent') }}"
   notify: reload apache
+  when: os == 'ubuntu'
 
-- name: gather static assets from openstack install
+- name: gather static assets from openstack install (ubuntu)
   environment:
     DJANGO_SETTINGS_MODULE: 'openstack_dashboard.settings'
     PYTHONPATH: "$PYTHONPATH"
@@ -127,19 +189,23 @@
   with_items:
     - "{{ horizon.horizon_lib_dir }}/bin/django-admin.py collectstatic --noinput"
     - "{{ horizon.horizon_lib_dir }}/bin/django-admin.py compress --force"
+  when: os == 'ubuntu'
+
 
 - name: trigger restart on upgrades
   debug:
     msg: "Triggering service restart for upgrade"
   changed_when: True
   notify: restart apache
-  when: code_has_changed | default('False') | bool and
-        upgrade | default('False') | bool
+  when:
+    - code_has_changed | default('False') | bool
+    - upgrade | default('False') | bool
 
 - meta: flush_handlers
 
 - name: ensure apache started
-  service: name=apache2 state=started
+  service: name="{{ apache.service_name[os] }}" state=started
+  when: os == 'ubuntu'
 
 - name: Permit HTTP and HTTPS
   ufw: rule=allow to_port={{ item }} proto=tcp
@@ -147,11 +213,23 @@
   with_items:
   - 80
   - 443
+  when: os == 'ubuntu'
+
+- name: Permit access to horizon
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - 80
+    - 443
+  tags: firewall
+  when: os == 'rhel'
 
 - meta: flush_handlers
 
 - name: ensure apache is enabled
-  service: name=apache2 state=started enabled=true
+  service: name="{{ apache.service_name[os] }}" state=started enabled=true
 
 - include: monitoring.yml
   tags:

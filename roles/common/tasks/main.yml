@@ -3,64 +3,81 @@
   hostname: name={{ hostname }}
   when: hostname is defined
 
-- name: ubuntu apt source list
-  template: src=etc/apt/sources.list dest=/etc/apt/sources.list
-  when: openstack.ubuntu_mirror is defined
-  notify:
-    - update apt index
+- block:
+  - name: ubuntu apt source list
+    template: src=etc/apt/sources.list dest=/etc/apt/sources.list
+    when: openstack.ubuntu_mirror is defined
+    notify:
+      - update apt index
 
-- meta: flush_handlers
+  - meta: flush_handlers
 
-- name: update apt index
-  apt: update_cache=yes cache_valid_time=3600
-  tags: ['prereboot']
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: update apt index
+    apt: update_cache=yes cache_valid_time=3600
+    tags: ['prereboot']
+    register: result
+    until: result|succeeded
+    retries: 5
+  when: ansible_distribution == "Ubuntu"
+
+#FIXME
+- name: set selinux to permissive on redhat
+  selinux:
+    policy: targeted
+    state: permissive
+  when: ansible_distribution == "RedHat"
+  tags: selinux
+
+- name: secure paths sudoers operations
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "^Defaults.*?secure_path"
+    line: 'Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"'
+    state: present
+  tags: sudoers
+
+- name: disable require tty for sudoers
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: "^Defaults.*?requiretty"
+    state: absent
+  tags: sudoers
 
 - include: system-tools.yml
-
-- name: python dependencies
-  apt: pkg={{ item }}
-  with_items:
-    - python-pip
-    - python-libxml2
-    - python-lxml
-    - python-greenlet
-    - python-openssl
-    - python2.7-dev
-    - python-httplib2
-    - python-software-properties
-    - python-virtualenv
-    - python-mysqldb
-    - python-jinja2
-    - cryptsetup
-    - libffi-dev
-    - libssl-dev
-    - libxml2-dev
-    - libxslt1-dev
-  register: result
-  until: result|succeeded
-  retries: 5
 
 - include: python.yml
   tags: pip, python
 
+
 - include: ruby.yml
   tags: ruby
 
-- name: set UTC timezone
+- name: set UTC timezone for Ubuntu
   template: src=etc/timezone dest=/etc/timezone owner=root group=root mode=0644
   notify:
     - update timezone
+  when: ansible_distribution in ["Ubuntu"]
+
+- name: Check timezone for RHEL
+  command: timedatectl status | grep Timezone | grep UTC
+  changed_when: false
+  failed_when: false
+  register: timezone
+  when: ansible_distribution in ["CentOS","RedHat"]
+
+- name: set UTC timezone for RHEL
+  command: timedatectl set-timezone UTC
+  when: ansible_distribution in ["CentOS","RedHat"] and
+        timezone.rc != 0
 
 - name: state path base directory
   file: dest={{ state_path_base }} state=directory
 
 - include: ssl.yml
-  tags: ssl
+  tags: [ssl, common-ssl]
 
 - include: ssh.yml
+  tags: ssh
 
 - include: networking.yml
 
@@ -77,7 +94,12 @@
   with_items: "{{ common.os_tuning_params_clean }}"
 
 - include: ufw.yml
+  when: os == 'ubuntu'
   tags: ufw
+
+- include: firewalld.yml
+  when: os == 'rhel'
+  tags: firewalld
 
 - include: ntp.yml
   tags: ntp
@@ -85,7 +107,7 @@
 # Include serial console before kernel-tuning to build serial_console_cmdline
 - include: serial-console.yml tty={{ common.serial_console.name }}
                               baud_rate={{ common.serial_console.baud_rate }}
-  when: common.serial_console.enabled | bool
+  when: common.serial_console.enabled | bool and os == 'ubuntu'
   tags: ['prereboot']
 
 - include: ipmi.yml
@@ -94,6 +116,7 @@
 
 - include: kernel-tuning.yml
   tags: ['prereboot']
+  when: os == 'ubuntu'
 
 - include: disable-swap.yml
 
@@ -106,7 +129,7 @@
   tags: hwraid
 
 - name: remove unwanted packages
-  apt:
+  package:
     name: "{{ item }}"
     state: absent
   with_items: "{{ common.packages_to_remove }}"
@@ -126,6 +149,7 @@
 # run this last so we only update if run was successful
 - name: drop an motd with ursula metadata
   template: src=etc/update-motd.d/90-ursula-motd dest=/etc/update-motd.d/90-ursula-motd mode=0755
+  when: os == 'ubuntu'
 
 - name: drop ursula release file
   template: src=etc/ursula-release dest=/etc/ursula-release mode=0640
@@ -149,3 +173,8 @@
   tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
+
+- include: inspec.yml
+  tags:
+    - inspec
+  when: inspec.enabled|default('False')|bool

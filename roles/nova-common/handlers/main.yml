@@ -6,10 +6,25 @@
     name: "{{ item[1] }}"
     state: restarted
     must_exist: false
+  failed_when: false
   run_once: True
   delegate_to: "{{ item[0] }}"
-  when: restart|default('True')
+  when: restart|default('True') and openstack_install_method == 'distro'
   with_nested:
     - "{{ play_hosts }}"
     - ['nova-api', 'nova-conductor', 'nova-compute',
        'nova-consoleauth', 'nova-novncproxy', 'nova-scheduler']
+
+- name: restart nova services (rhel osp)
+  service:
+    name: "{{ item[1] }}"
+    state: restarted
+    must_exist: false
+  failed_when: false
+  run_once: True
+  delegate_to: "{{ item[0] }}"
+  when: restart|default('True') and openstack_install_method == 'distro'
+  with_nested:
+    - "{{ play_hosts }}"
+    - ['openstack-nova-api', 'openstack-nova-conductor', 'openstack-nova-compute',
+       'openstack-nova-consoleauth', 'openstack-nova-novncproxy', 'openstack-nova-scheduler']

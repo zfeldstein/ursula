@@ -2,26 +2,51 @@
 - include: novnc.yml
   tags: novnc
 
-- name: remove retired nova controller services
-  upstart_service:
-    name: "{{ item }}"
-    user: nova
-    cmd: /usr/local/bin/{{ item }}
-    config_dirs: /etc/nova
-    state: absent
-  with_items:
-    - nova-cert
+- block:
+  - name: remove retired nova controller services
+    upstart_service:
+      name: "{{ item }}"
+      user: nova
+      cmd: /usr/local/bin/{{ item }}
+      config_dirs: /etc/nova
+      state: absent
+    with_items:
+      - nova-cert
 
-- name: install nova controller services
-  upstart_service: name={{ item }} user=nova
-                   cmd=/usr/local/bin/{{ item }}
-                   config_dirs=/etc/nova
-  with_items:
-    - nova-api
-    - nova-conductor
-    - nova-consoleauth
-    - nova-scheduler
-    - nova-novncproxy
+  - name: install nova controller services
+    upstart_service: name={{ item }} user=nova
+                     cmd=/usr/local/bin/{{ item }}
+                     config_dirs=/etc/nova
+    with_items:
+      - nova-api
+      - nova-conductor
+      - nova-consoleauth
+      - nova-scheduler
+      - nova-novncproxy
+  when: os == 'ubuntu'
+
+- block:
+  - name: remove retired nova controller services
+    systemd_service:
+      name: "{{ item }}"
+      user: nova
+      cmd: /usr/local/bin/{{ item }}
+      config_dirs: /etc/nova
+      state: absent
+    with_items:
+      - nova-cert
+
+  - name: install nova controller services
+    systemd_service: name={{ item }} user=nova
+                     cmd=/usr/local/bin/{{ item }}
+                     config_dirs=/etc/nova
+    with_items:
+      - nova-api
+      - nova-conductor
+      - nova-consoleauth
+      - nova-scheduler
+      - nova-novncproxy
+    when: os == 'rhel' and openstack_install_method == 'source'
 
 - name: install nova-quota-sync script
   copy: src=nova-quota-sync
@@ -59,16 +84,38 @@
 
 - name: start nova controller services
   service: name={{ item }} state=started
+  when: openstack_install_method != 'distro'
   with_items:
     - nova-api
     - nova-conductor
     - nova-consoleauth
     - nova-scheduler
     - nova-novncproxy
+    
+- name: start nova controller services (rhel osp)
+  service: name={{ item }} state=started
+  when: openstack_install_method == 'distro'
+  with_items:
+    - openstack-nova-api
+    - openstack-nova-conductor
+    - openstack-nova-consoleauth
+    - openstack-nova-scheduler
+    - openstack-nova-novncproxy
 
 - name: permit access to nova api
   ufw: rule=allow to_port={{ endpoints.nova.port.haproxy_api }} proto=tcp
+  when: os == 'ubuntu'
   tags: ufw
+
+- name: Permit access to nova
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.nova.port.haproxy_api }}"
+  tags: firewall
+  when: os == 'rhel'
 
 - include: monitoring.yml
   tags:

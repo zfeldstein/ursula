@@ -24,3 +24,7 @@ dependencies:
     when: openstack_install_method == 'package'
   - role: ceph-common
     when: ceph.enabled|bool
+  - role: openstack-distro
+    project_name: cinder
+    rootwrap: True
+    when: openstack_install_method == 'distro'

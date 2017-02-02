@@ -1,0 +1,2 @@
+openstack_distro:
+  osp_package_name: 'openstack-{{ project_name }}'

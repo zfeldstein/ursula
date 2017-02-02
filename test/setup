@@ -39,7 +39,9 @@ echo "deleting heat stack to destroy resources including VMs: ${VMS}"
 ${ROOT}/test/cleanup
 
 echo "creating heat template for test env ..."
-ursula --ursula-debug "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/create_heat_template.yml --extra-vars="use_private_ips=${USE_PRIVATE_IPS}"
+if [[ ! -e ${ROOT}/envs/test/heat_stack.yml ]]; then
+  ursula --ursula-debug "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/create_heat_template.yml --extra-vars="use_private_ips=${USE_PRIVATE_IPS}"
+fi
 
 echo "building config"
 rm -rf ${ROOT}/envs/test/group_vars/
@@ -48,30 +50,31 @@ mkdir -p ${ROOT}/envs/test/group_vars
 cp -r ${ROOT}/envs/example/${TEST_ENV}/* ${ROOT}/envs/test
 echo "testenv_instance_prefix: ${testenv_instance_prefix}" >> ${ROOT}/envs/test/group_vars/all.yml
 
-echo "generating ssl cert for openstack.example.com"
-CERT_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t 'setup')
-pushd ${CERT_DIR}
-${ROOT}/test/gen-cert openstack.example.com
-cat >> ${ROOT}/envs/test/group_vars/all.yml <<eof
-ssl:
-  crt: |
-eof
-cat ${CERT_DIR}/openstack.example.com.crt | sed 's/^/    /' >> ${ROOT}/envs/test/group_vars/all.yml
-cat >> ${ROOT}/envs/test/group_vars/all.yml <<eof
-  key: |
-eof
-cat ${CERT_DIR}/openstack.example.com.key | sed 's/^/    /' >> ${ROOT}/envs/test/group_vars/all.yml
+#echo "generating ssl cert for openstack.example.com"
+#CERT_DIR=$(mktemp -d 2> /dev/null || mktemp -d -t 'setup')
+#pushd ${CERT_DIR}
+#${ROOT}/test/gen-cert openstack.example.com
+#cat >> ${ROOT}/envs/test/group_vars/all.yml <<eof
+#ssl:
+#  crt: |
+#eof
+#cat ${CERT_DIR}/openstack.example.com.crt | sed 's/^/    /' >> ${ROOT}/envs/test/group_vars/all.yml
+#cat >> ${ROOT}/envs/test/group_vars/all.yml <<eof
+#  key: |
+#eof
+#cat ${CERT_DIR}/openstack.example.com.key | sed 's/^/    /' >> ${ROOT}/envs/test/group_vars/all.yml
 UNDERCLOUD_CIDR="$(python -c 'import shade; cloud = shade.openstack_cloud(); print cloud.search_subnets("internal")[0]["cidr"]')"
 cat >> ${ROOT}/envs/test/defaults-2.0.yml <<eof
 undercloud_cidr:
   - cidr: ${UNDERCLOUD_CIDR}
 eof
-popd
-rm -rf ${CERT_DIR}
+#popd
+#rm -rf ${CERT_DIR}
 
 echo "booting ${VMS} by heat, then copy files for pre-deployment"
-extra_args="--ursula-debug --provisioner=heat --heat-stack-name=${testenv_heat_stack_name}"
-ursula ${extra_args} "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/pre-deploy.yml -u ${LOGIN_USER} "$@"
+#sleep 30
+extra_args="--ursula-debug --provisioner=heat --heat-stack-name=${testenv_heat_stack_name} --ursula-user=${LOGIN_USER} --heat-parameters ${EXTRA_HEAT_PARAMS}"
+ursula ${extra_args} "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/pre-deploy.yml -u ${LOGIN_USER} "$@" -vvvv
 
 if [[ ${TEST_ENV} == "ci-allinone" ]]; then
   CONTROLLER_IP=$(private_ip ${testenv_instance_prefix}-allinone)

@@ -36,12 +36,14 @@
   # Set Locale
   - name: Generate en_US locale
     command: /usr/sbin/locale-gen en_US
+    when: ansible_distribution == 'Ubuntu'
 
   - name: set locale to en_US
     command: /usr/sbin/update-locale LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+    when: ansible_distribution == 'Ubuntu'
 
   - name: add pip
-    apt:
+    package:
       update_cache: yes
       cache_valid_time: 3600
       name: python-pip

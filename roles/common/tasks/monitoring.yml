@@ -3,10 +3,21 @@
   group: name=monitor state=present
 
 - name: install sensu
-  apt: pkg={{ item }}
-  with_items:
-  - sensu
-  - libfile-which-perl
+  package: name=sensu
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install perl which module - ubuntu
+  package: name=libfile-which-perl
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install perl which module - ubuntu
+  package: name=perl-File-Which
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -50,7 +61,7 @@
 
 - name: ensure PATH contains /usr/local/bin (OpenStack clients)
   lineinfile: dest=/etc/default/sensu regexp=^PATH
-              line="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+              line="PATH=/opt/sensu/embedded/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/etc/sensu/plugins"
   notify: restart sensu-client
 
 - name: sensu client config
@@ -75,6 +86,7 @@
 
 - name: override sensu-client startup
   shell: update-rc.d sensu-client defaults
+  when: os == 'ubuntu'
 
 - name: install sensu plugin pip modules
   pip: name=sensu_plugin version=0.1.0
@@ -243,8 +255,8 @@
 
 - block:
     - name: install snmp package on controllers
-      apt:
-        pkg: snmp
+      package:
+        name: "{{ common.system_tools[ansible_os_family | lower].snmp_package }}"
       register: result
       until: result|succeeded
       retries: 5

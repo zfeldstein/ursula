@@ -1,5 +1,7 @@
 ---
 - name: Add flavors
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_nova_flavor:
     name: '{{ item.name }}'
     ram: '{{ item.ram | int }}'
@@ -10,6 +12,7 @@
     ephemeral: '{{ item.ephemeral | default(omit) }}'
     is_public: '{{ item.is_public | default(omit) }}'
     swap: '{{ item.swap | default(omit) }}'
+    validate_certs: "{{ validate_certs|default(omit) }}"
     state: present
     auth:
       auth_url: "{{ endpoints.auth_uri  }}"
@@ -21,6 +24,8 @@
   # FIXME flavors are always added, even if it's just an Ironic cloud
 
 - name: Add ironic flavors
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_nova_flavor:
     name: '{{ item.name }}'
     ram: '{{ item.ram | int }}'
@@ -32,6 +37,7 @@
     is_public: '{{ item.is_public | default(omit) }}'
     swap: '{{ item.swap | default(omit) }}'
     state: present
+    validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
       auth_url: "{{ endpoints.auth_uri  }}"
       project_name: admin

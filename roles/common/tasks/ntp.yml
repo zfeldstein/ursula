@@ -1,4 +1,11 @@
 ---
+- set_fact:
+    ntpd_service_name: ntp
+  when: os == 'ubuntu'
+- set_fact:
+    ntpd_service_name: ntpd
+  when: os == 'rhel'
+
 - name: install ntp.conf
   template:
     dest: /etc/ntp.conf
@@ -10,6 +17,6 @@
 
 - name: ntp service enabled
   service:
-    name: ntp
+    name: "{{ ntpd_service_name }}"
     state: started
     enabled: true
