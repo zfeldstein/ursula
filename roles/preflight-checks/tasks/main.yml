@@ -54,4 +54,9 @@
   - name: remove unwanted ceph packages from controller and compute nodes
     command: dpkg -P ceph ceph-osd ceph-mon ceph-mds ceph-fuse ceph-fs-common ceph-base
 
+  - name: remove ceph serverspec checks
+    file:
+      path: /etc/serverspec/spec/localhost/ceph_spec.rb
+      state: absent
+
   when: ('controller' in group_names) or ('compute' in group_names)
