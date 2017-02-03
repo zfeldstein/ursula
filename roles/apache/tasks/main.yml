@@ -25,6 +25,7 @@
 
 - name: check selinux for httpd_can_network_connect
   seboolean: name=httpd_can_network_connect state=yes persistent=yes
+  when: os == 'rhel'
 
 - name: install apache module packages
   package: name={{ item }}
@@ -40,6 +41,8 @@
     - ssl
     - rewrite
     - uwsgi
+    - proxy
+    - proxy_http
   notify: reload apache
   when: os == 'ubuntu'
 

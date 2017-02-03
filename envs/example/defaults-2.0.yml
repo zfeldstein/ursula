@@ -609,7 +609,7 @@ aodh:
     verbose: True
 
 ironic:
-  enabled: True
+  enabled: False
   logging:
     debug: True
     verbose: True

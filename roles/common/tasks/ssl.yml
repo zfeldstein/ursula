@@ -4,7 +4,7 @@
     file: dest=/usr/local/share/ca-certificates state=directory
 
   - name: (possibly self-signed) ssl cert
-    template: src=openstack.crt
+    template: src=openstack.cacrt
               dest=/usr/local/share/ca-certificates/{{ endpoints.main }}.crt
     notify: refresh CAs
 

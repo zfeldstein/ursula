@@ -1,7 +1,7 @@
 ---
 - name: install filebeat apt
   apt:
-    pkg: "filebeat={{ logging.forward.version }}"
+    pkg: "filebeat"
   register: result
   until: result|success
   retries: 3
