@@ -155,7 +155,7 @@ common:
       check_lro:
         warning: False
         enabled: True
-        devices: "eth0"
+        devices: "{{ hostvars[inventory_hostname][hostvars[inventory_hostname].primary_interface|remove_vlan_tag]|net_physical_devices|join(',') }}"
       check_static_route:
         criticality: 'critical'
       check_raid:
