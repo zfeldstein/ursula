@@ -177,7 +177,7 @@
     environment:
       OS_IDENTITY_API_VERSION: 3
       PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-    shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" user delete --domain default heat_domain_admin
+    shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" user delete --domain default heat_domain_admin 
     register: remove_heat_admin
     failed_when: remove_heat_admin|failed and
                  "No user with a name or ID" not in remove_heat_admin.stderr|default('')
@@ -206,7 +206,7 @@
     environment:
       OS_IDENTITY_API_VERSION: 3
       PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-    shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" role add --domain "{{ heat_domain.domain.id }}" --user "{{ heat_admin_user.user.id }}" admin
+    shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" role add --domain "{{ heat_domain.domain.id }}" --user "{{ heat_admin_user.user.id }}" admin 
     when: heat.enabled|bool and heat_admin_user|changed
   run_once: true
 

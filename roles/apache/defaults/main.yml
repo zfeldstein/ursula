@@ -1,4 +1,7 @@
 ---
+os_log_path:
+  rhel: '/var/log/httpd'
+  ubuntu: '/var/log/apache2'
 apache:
   package_name:
     ubuntu: apache2
@@ -16,12 +19,12 @@ apache:
   listen: []
   logs:
     - paths:
-        - /var/log/apache2/access.log
+        - "{{ os_log_path[os] }}/access.log"
       fields:
         # type: <custom type defined in receiving Logstash>
         tags: apache_access
     - paths:
-        - /var/log/apache2/error.log
+        -  "{{ os_log_path[os] }}/error.log"
       fields:
         # type: <custom type defined in receiving Logstash>
         tags: apache_error

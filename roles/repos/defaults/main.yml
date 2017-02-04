@@ -46,6 +46,9 @@ apt_repos:
   logstash_forwarder:
     repo: ''
     key_url: ''
+  elastic:
+    repo: 'https://artifacts.elastic.co/packages/5.x/apt'
+    key_url: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
 
 yum_repos:
   epel:

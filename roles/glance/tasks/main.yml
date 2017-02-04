@@ -81,7 +81,16 @@
   with_items:
     - glance-api
     - glance-registry
-  when: openstack_install_method != 'distro'
+  when: openstack_install_method != 'distro' and os == 'rhel'
+  
+- name: install glance services
+  upstart_service: name={{ item }}
+                   user=glance
+                   cmd=/usr/local/bin/{{ item }}
+  with_items:
+    - glance-api
+    - glance-registry
+  when: os == 'ubuntu'
   
 - name: glance config
   template: src={{ item }} dest=/etc/glance mode={{ 0644 if 'policy.json' in item else 0640 }}

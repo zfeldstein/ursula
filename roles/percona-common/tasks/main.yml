@@ -28,3 +28,4 @@
   selinux_permissive:
     name: mysqld_t
     permissive: true
+  when: os == 'rhel'

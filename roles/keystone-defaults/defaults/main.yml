@@ -7,7 +7,7 @@ keystone:
   admin_project_name: admin
   admin_project_domain_name: Default
   uwsgi:
-    method: socket
+    method: port
     http_port:
       admin: 9091
       public: 9092
@@ -28,7 +28,7 @@ keystone:
         ubuntu:
         - openssl
         - libldap2-dev
-        - libsasl-dev
+        - libsasl2-dev
         - libkrb5-dev
         rhel:
         - openssl
