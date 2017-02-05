@@ -1,0 +1,400 @@
+---
+openstack_meta:
+  keystone:
+    services:
+      keystone_api:
+        ubuntu:
+          name: keystone
+          desc: OpenStack Identity Service
+        rhel:
+            name: openstack-keystone
+            desc: OpenStack Identity Service
+            type: notify
+            notify_access: all
+            user: keystone
+            args: --uid keystone --gid keystone --master --emperor /etc/keystone/uwsgi
+            restart: always
+  glance:
+    services:
+      glance_api:
+        ubuntu:
+          name: glance-api
+          desc: OpenStack Image API Service
+          user: glance
+          cmd: /usr/local/bin/glance-api
+        rhel:
+          name: openstack-glance-api
+          desc: OpenStack Image API Service
+          type: simple
+          user: glance
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}glance-api"
+          config_dirs: /etc/glance
+          config_files: /etc/glance/glance-api.conf
+          restart: on-failure
+      glance_registry:
+        ubuntu:
+          name: glance-registry
+          desc: OpenStack Image Registry Service
+          user: glance
+          cmd: /usr/local/bin/glance-registry
+        rhel:
+          name: openstack-glance-registry
+          desc: OpenStack Image Registry Service
+          type: simple
+          user: glance
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}glance-registry"
+          config_dirs: /etc/glance
+          config_files: /etc/glance/glance-registry.conf
+          restart: on-failure
+  cinder:
+    services:
+      cinder_api:
+        ubuntu:
+          name: cinder-api
+          desc: OpenStack Cinder API Service
+          user: cinder
+          cmd: /usr/local/bin/cinder-api
+          config_dirs: /etc/cinder
+        rhel:
+          name: openstack-cinder-api
+          desc: OpenStack Cinder API Service
+          type: simple
+          user: cinder
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-api"
+          config_dirs: /etc/cinder
+          config_files: /etc/cinder/cinder.conf
+          restart: on-failure
+      cinder_scheduler:
+        ubuntu:
+          name: cinder-scheduler
+          desc: OpenStack Cinder Scheduler Service
+          user: cinder
+          cmd: /usr/local/bin/cinder-scheduler
+          config_dirs: /etc/cinder
+        rhel:
+          name: openstack-cinder-scheduler
+          desc: OpenStack Cinder Scheduler Service
+          type: simple
+          user: cinder
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-scheduler"
+          config_dirs: /etc/cinder
+          config_files: /etc/cinder/cinder.conf
+          restart: on-failure
+      cinder_volume:
+        ubuntu:
+          name: cinder-volume
+          desc: OpenStack Cinder Volume Service
+          user: cinder
+          cmd: /usr/local/bin/cinder-volume
+          config_dirs: /etc/cinder
+        rhel:
+          name: openstack-cinder-volume
+          desc: OpenStack Cinder Volume Service
+          type: simple
+          user: cinder
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-volume"
+          config_dirs: /etc/cinder
+          config_files: /etc/cinder/cinder.conf
+          restart: on-failure
+          kill_mode: process
+      cinder_backup:
+        ubuntu:
+          name: cinder-backup
+          desc: OpenStack Cinder Backup Service
+          user: cinder
+          cmd: /usr/local/bin/cinder-backup
+          config_dirs: /etc/cinder
+        rhel:
+          name: openstack-cinder-backup
+          desc: OpenStack Cinder Backup Service
+          type: simple
+          user: cinder
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-backup"
+          config_dirs: /etc/cinder
+          config_files: /etc/cinder/cinder.conf
+          restart: on-failure
+  nova:
+    services:
+      nova_api:
+        ubuntu:
+          name: nova-api
+          desc: OpenStack Nova API Service
+          user: nova
+          cmd: /usr/local/bin/nova-api
+          config_dirs: /etc/nova
+        rhel:
+          name: openstack-nova-api
+          desc: OpenStack Nova API Service
+          type: notify
+          notify_access: all
+          user: nova
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-api"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+      nova_conductor:
+        ubuntu:
+          name: nova-conductor
+          desc: OpenStack Nova Conductor Service
+          user: nova
+          cmd: /usr/local/bin/nova-conductor
+          config_dirs: /etc/nova
+        rhel:
+          name: openstack-nova-conductor
+          desc: OpenStack Nova Conductor Service
+          type: notify
+          notify_access: all
+          user: nova
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-conductor"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+      nova_compute:
+        ubuntu:
+          name: nova-compute
+          desc: OpenStack Nova Compute Service
+          user: nova
+          cmd: /usr/local/bin/nova-compute
+          config_dirs: /etc/nova
+        rhel:
+          name: openstack-nova-compute
+          desc: OpenStack Nova Compute Service
+          after: syslog.target network.target libvirtd.service
+          type: notify
+          notify_access: all
+          user: nova
+          environment: "LIBGUESTFS_ATTACH_METHOD=appliance"
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-compute"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+      nova_consoleauth:
+        ubuntu:
+          name: nova-consoleauth
+          desc: OpenStack Nova Console Auth Service
+          user: nova
+          cmd: /usr/local/bin/nova-consoleauth
+          config_dirs: /etc/nova
+        rhel:
+          name: openstack-nova-consoleauth
+          desc: OpenStack Nova Console Auth Service
+          type: notify
+          notify_access: all
+          user: nova
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-consoleauth"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+      nova_novncproxy:
+        ubuntu:
+          name: nova-novncproxy
+          desc: OpenStack Nova NOVNCPROXY Service
+          user: nova
+          cmd: /usr/local/bin/nova-novncproxy
+          config_dirs: /etc/nova
+        rhel:
+          name: openstack-nova-novncproxy
+          desc: OpenStack Nova NOVNCPROXY Service
+          type: simple
+          user: nova
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-novncproxy"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+      nova_scheduler:
+        ubuntu:
+          name: nova-scheduler
+          desc: OpenStack Nova Scheduler Service
+          user: nova
+          cmd: /usr/local/bin/nova-scheduler
+          config_dirs: /etc/nova
+        rhel:
+          name: openstack-nova-scheduler
+          desc: OpenStack Nova Schedule Service
+          type: notify
+          notify_access: all
+          user: nova
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-scheduler"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+      nova_cert:
+        ubuntu:
+          name: nova-cert
+          desc: OpenStack Nova Cert Service
+          user: nova
+          cmd: /usr/local/bin/nova-cert
+          config_dirs: /etc/nova
+          state: absent
+        rhel:
+          name: openstack-nova-cert
+          desc: OpenStack Nova Cert Service
+          type: notify
+          notify_access: all
+          user: nova
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-cert"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+          state: absent
+      nova_cells:
+        ubuntu:
+          name: nova_cells
+          desc: OpenStack Nova Cells Service
+          user: nova
+          cmd: /usr/local/bin/nova_cells
+          config_dirs: /etc/nova
+          state: absent
+        rhel:
+          name: openstack-nova_cells
+          desc: OpenStack Nova Cells Service
+          type: notify
+          notify_access: all
+          user: nova
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova_cells"
+          config_dirs: /etc/nova
+          config_files: /etc/nova/nova.conf
+          restart: always
+          state: absent
+      libvirt:
+        ubuntu:
+          name: libvirt-bin
+          desc: Libvirt Service
+        rhel:
+          name: libvirtd
+          desc: Libvrt Service
+  neutron:
+    services:
+      neutron_server:
+        ubuntu:
+          name: neutron-server
+          desc: OpenStack Neutron Server Service
+          user: neutron
+          cmd: /usr/local/bin/neutron-server
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini
+        rhel:
+          name: neutron-server
+          desc: OpenStack Neutron Server Service
+          type: notify
+          notify_access: all
+          user: neutron
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-server"
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini
+          restart: on-failure
+          kill_mode: process
+      neutron_dhcp_agent:
+        ubuntu:
+          name: neutron-dhcp-agent
+          desc: OpenStack Neutron DHCP Agent Service
+          user: neutron
+          cmd: /usr/local/bin/neutron-dhcp-agent
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/dhcp_agent.ini
+          start_on: starting neutron-linuxbridge-agent
+          stop_on: stopping neutron-linuxbridge-agent
+        rhel:
+          name: neutron-dhcp-agent
+          desc: OpenStack Neutron DHCP Agent Service
+          type: simple
+          user: neutron
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-dhcp-agent"
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/dhcp_agent.ini
+          restart: on-failure
+          kill_mode: process
+      neutron_l3_agent:
+        ubuntu:
+          name: neutron-l3-agent
+          desc: OpenStack Neutron L3 Agent Service
+          user: neutron
+          cmd: /usr/local/bin/neutron-l3-agent
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/l3_agent.ini
+          pidfile: /var/run/neutron-l3-agent.pid
+          start_on: starting neutron-linuxbridge-agent
+          stop_on: stopping neutron-linuxbridge-agent
+        rhel:
+          name: neutron-l3-agent
+          desc: OpenStack Neutron L3 Agent Service
+          type: simple
+          user: neutron
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-l3-agent"
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/l3_agent.ini
+          pidfile: /var/run/neutron-l3-agent.pid
+          restart: on-failure
+          kill_mode: process
+      neutron_openvswitch_agent:
+        ubuntu:
+          name: neutron-openvswitch-agent
+          desc: OpenStack Neutron Open VSwitch Service
+          user: neutron
+          cmd: /usr/local/bin/neutron-openvswitch-agent
+          config_dirs: /etc/neutron
+        rhel:
+          name: neutron-openvswitch-agent
+          desc: OpenStack Neutron Open VSwitch Service
+          user: neutron
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-openvswitch-agent"
+          config_dirs: /etc/neutron
+      neutron_linuxbridge_agent:
+        ubuntu:
+          name: neutron-linuxbridge-agent
+          desc: OpenStack Neutron Linuxbridge Agent Service
+          user: neutron
+          cmd: /usr/local/bin/neutron-linuxbridge-agent
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
+        rhel:
+          name: neutron-linuxbridge-agent
+          desc: OpenStack Neutron Linuxbridge Agent Service
+          type: simple
+          user: neutron
+          #prestart_script: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/neutron-enable-bridge-firewall.sh', '') }}"
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-linuxbridge-agent"
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
+          restart: on-failure
+          kill_mode: process
+      neutron_metadata_agent:
+        ubuntu:
+          name: neutron-metadata-agent
+          desc: OpenStack Neutron Metadata Agent Service
+          user: neutron
+          cmd: /usr/local/bin/neutron-metadata-agent
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/metadata_agent.ini
+          start_on: starting neutron-linuxbridge-agent
+          stop_on: stopping neutron-linuxbridge-agent
+        rhel:
+          name: neutron-metadata-agent
+          desc: OpenStack Neutron Metadata Agent Service
+          type: simple
+          user: neutron
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-metadata-agent"
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/metadata_agent.ini
+          restart: on-failure
+          kill_mode: process
+      neutron_lbaasv2_agent:
+        ubuntu:
+          name: neutron-lbaasv2-agent
+          desc: OpenStack Neutron LBaasv2 Service
+          user: neutron
+          cmd: /usr/local/bin/neutron-lbaasv2-agent
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini,/etc/neutron/neutron_lbaas.conf
+          start_on: starting neutron-linuxbridge-agent
+          stop_on: stopping neutron-linuxbridge-agent
+        rhel:
+          name: neutron-lbaasv2-agent
+          desc: OpenStack Neutron LBaasv2 Service
+          type: simple
+          user: neutron
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-lbaasv2-agent"
+          config_dirs: /etc/neutron
+          config_files: /etc/neutron/neutron.conf,/etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini,/etc/neutron/neutron_lbaas.conf
+          restart: on-failure
+          kill_mode: process

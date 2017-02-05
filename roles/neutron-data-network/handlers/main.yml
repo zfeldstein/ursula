@@ -4,7 +4,9 @@
   failed_when: False
 
 - name: restart neutron lbaas agent
-  service: name=neutron-lbaasv2-agent state=restarted_if_running
+  service:
+    name: "{{ neutron.services.neutron_lbaasv2_agent.name }}"
+    state: restarted_if_running
   when: restart|default('True') and ((neutron.lbaas.enabled == "smart" and
                      groups['controller'][0] not in groups['compute']) or
                      neutron.lbaas.enabled|bool)

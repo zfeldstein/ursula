@@ -1,28 +1,7 @@
 ---
 - name: install cinder-data required packages
   package: name={{ item }}
-  with_items:
-    - cryptsetup
-    - lvm2
-    - tgt
-    - nbd-client
-    - open-iscsi
-    - qemu-utils
-  when: os == 'ubuntu'
-  register: result
-  until: result|succeeded
-  retries: 5
-
-- name: install cinder-data required packages
-  package: name={{ item }}
-  when: os == 'rhel'
-  with_items:
-    - cryptsetup
-    - lvm2
-    - targetcli
-    - nbd
-    - iscsi-initiator-utils
-    - qemu-kvm-tools
+  with_items: "{{ cinder.data_pkgs[os] }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -62,46 +41,58 @@
   when: cinder.fixed_key is not defined
 
 #When OS is Ubuntu
-- name: install cinder-volume service
-  upstart_service: name=cinder-volume user=cinder
-                   cmd=/usr/local/bin/cinder-volume
-                   config_dirs=/etc/cinder
+- block:
+  - name: install cinder-volume service (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+    with_items:
+      - "{{ cinder.services.cinder_volume }}"
+
+  - name: install cinder backup service (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+    when: swift.enabled|default("false")|bool
+    with_items:
+      - "{{ cinder.services.cinder_backup }}"
   when: os == 'ubuntu'
 
-- name: install cinder backup service
-  upstart_service: name=cinder-backup
-                   user=cinder
-                   cmd=/usr/local/bin/cinder-backup
-                   config_dirs=/etc/cinder
-  when: os == 'ubuntu' and swift.enabled|default("false")|bool
 
 #When OS is Rhel
-- name: install cinder-volume service
-  systemd_service: name=cinder-volume user=cinder
-                   cmd=/usr/local/bin/cinder-volume
-                   config_dirs=/etc/cinder
-  when: os == 'rhel' and openstack_install_method != 'distro'
+- block:
+  - name: install cinder-volume service (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      type: "{{ item.type }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      restart: "{{ item.restart }}"
+      kill_mode: "{{ item.kill_mode }}"
+    with_items:
+      - "{{ cinder.services.cinder_volume }}"
 
-- name: install cinder backup service
-  systemd_service: name=cinder-backup
-                   user=cinder
-                   cmd=/usr/local/bin/cinder-backup
-                   config_dirs=/etc/cinder
-  when: os == 'rhel' and swift.enabled|default("false")|bool and openstack_install_method !=distro
-
-- name: install cinder-volume service
-  systemd_service: name=cinder-volume user=cinder
-                   cmd=/usr/local/bin/cinder-volume
-                   config_dirs=/etc/cinder
+  - name: install cinder backup service (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      type: "{{ item.type }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      restart: "{{ item.restart }}"
+    when: swift.enabled|default("false")|bool
+    with_items:
+      - "{{ cinder.services.cinder_backup }}"
   when: os == 'rhel'
-
-- name: install cinder backup service
-  systemd_service: name=cinder-backup
-                   user=cinder
-                   cmd=/usr/local/bin/cinder-backup
-                   config_dirs=/etc/cinder
-  when: os == 'rhel' and swift.enabled|default("false")|bool
-
 
 - name: trigger restart on upgrades
   debug:
@@ -117,38 +108,21 @@
 
 - name: start cinder-volume
   service:
-    name: cinder-volume
+    name: "{{ cinder.services.cinder_volume.name }}"
     state: started
+    enabled: True
   delegate_to: "{{ item }}"
   run_once: True
   with_items: "{{ play_hosts }}"
-  when: openstack_install_method != 'distro'
-  
-- name: start cinder-volume (rhel osp)
-  service:
-    name: openstack-cinder-volume
-    state: started
-  delegate_to: "{{ item }}"
-  run_once: True
-  with_items: "{{ play_hosts }}"
-  when: openstack_install_method == 'distro'
 
 - name: start cinder backup
   service:
-    name: cinder-backup
+    name: "{{ cinder.services.cinder_backup.name }}"
     state: started
+    enabled: True
   delegate_to: "{{ item }}"
   run_once: True
-  when: swift.enabled|default("false")|bool and openstack_install_method != 'distro'
-  with_items: "{{ play_hosts }}"
-
-- name: start cinder backup (rhel osp)
-  service:
-    name: openstack-cinder-backup
-    state: started
-  delegate_to: "{{ item }}"
-  run_once: True
-  when: swift.enabled|default("false")|bool and openstack_install_method == 'distro'
+  when: swift.enabled|default("false")|bool
   with_items: "{{ play_hosts }}"
 
 - include: monitoring.yml

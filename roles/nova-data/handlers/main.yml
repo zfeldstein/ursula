@@ -1,13 +1,13 @@
 ---
 - name: restart libvirt-bin
   service:
-    name: "{{ libvirt_service }}"
+    name: "{{ nova.services.libvirt.name }}"
     state: restarted
 
 - name: novadocker rootwrap
   command: rsync -avh {{ nova.driver.docker.dest }}/etc/nova/rootwrap.d/ /etc/nova/rootwrap.d/
 
 - name: restart nova compute
-  service: name={{ item }} state=restarted must_exist=false
+  service: name={{ item.name }} state=restarted must_exist=false
   with_items:
-    - nova-compute
+    - "{{ nova.services.nova_compute }}"

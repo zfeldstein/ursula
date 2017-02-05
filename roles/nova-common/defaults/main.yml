@@ -1,6 +1,25 @@
 ---
 project_name: nova
 nova:
+  services:
+    nova_api: "{{ openstack_meta.nova.services.nova_api[os] }}"
+    nova_conductor: "{{ openstack_meta.nova.services.nova_conductor[os] }}"
+    nova_compute: "{{ openstack_meta.nova.services.nova_compute[os] }}"
+    nova_consoleauth: "{{ openstack_meta.nova.services.nova_consoleauth[os] }}"
+    nova_novncproxy: "{{ openstack_meta.nova.services.nova_novncproxy[os] }}"
+    nova_scheduler: "{{ openstack_meta.nova.services.nova_scheduler[os] }}"
+    nova_cert: "{{ openstack_meta.nova.services.nova_cert[os] }}"
+    nova_cells: "{{ openstack_meta.nova.services.nova_cells[os] }}"
+    libvirt: "{{ openstack_meta.nova.services.libvirt[os] }}"
+  libvirt:
+    ubuntu:
+      config_file: libvirtd.conf
+      defaults: /etc/default/libvirt
+      group: libvirtd
+    rhel:
+      config_file: libvirt.conf
+      defaults: /etc/sysconfig/libvirtd
+      group: libvirt
   enable_fatal_deprecations: True
   patches:
   compute_driver: libvirt.LibvirtDriver

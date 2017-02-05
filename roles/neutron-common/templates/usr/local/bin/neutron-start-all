@@ -1,8 +1,8 @@
 #!/bin/bash
 
-start neutron-server
-start neutron-linuxbridge-agent
-start neutron-metadata-agent
+start {{ neutron.services.neutron_server.name }}
+start {{ neutron.services.neutron_linuxbridge_agent.name }}
+start {{ neutron.services.neutron_metadata_agent.name }}
 
 # neutron-dhcp-agent and neutron-l3-agent will be started
 # when neutron-linuxbridge-agent is started due to service deps

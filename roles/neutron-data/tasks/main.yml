@@ -1,4 +1,5 @@
 ---
+  #FIXME do we need this on rhel?
 - name: install required packages and diagnostic tools
   package:
     name: "{{ item }}"
@@ -10,18 +11,56 @@
   until: result|succeeded
   retries: 5
 
-- name: update iproute2 to latest ppa
-  package: name=iproute2 state=latest
-  when: os == 'ubuntu'
-  register: result
-  until: result|succeeded
-  retries: 5
+- block:
+  - name: update iproute2 to latest ppa (ubuntu)
+    package: name=iproute2 state=latest
+    register: result
+    until: result|succeeded
+    retries: 5
 
-- name: permit VXLAN traffic
-  ufw: rule=allow to_port=4789 proto=udp
-  tags: ufw
-  when:  os == 'ubuntu' and
-         neutron.plugin == 'ml2' and 'vxlan' in neutron.tunnel_types
+  - name: permit VXLAN traffic (ubuntu)
+    ufw: rule=allow to_port=4789 proto=udp
+    tags: firewall
+    when:  neutron.plugin == 'ml2' and 'vxlan' in neutron.tunnel_types
+
+  - name: install neutron-linuxbridge-agent service (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files|default(omit) }}"
+    with_items:
+      - "{{ neutron.services.neutron_linuxbridge_agent }}"
+    when: neutron.plugin == 'ml2'
+  when: os == 'ubuntu'
+
+- block:
+  - name: permit VXLAN traffic (rhel)
+    firewalld:
+      state: enabled
+      permanent: true
+      port: 4789/udp
+    tags: firewall
+
+  - name: install neutron-linuxbridge-agent service (rhel package)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      type: "{{ item.type }}"
+      user: "{{ item.user }}"
+      #envs: "{{ neutron.service.envs }}"
+      #FIXME added prestart to match up osp systemd
+      #prestart_script: "{{ item.prestart_script }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      restart: "{{ item.restart }}"
+      kill_mode: "{{ item.kill_mode }}"
+    with_items:
+      - "{{ neutron.services.neutron_linuxbridge_agent }}"
+    when: neutron.plugin == 'ml2'
+  when: os == 'rhel'
 
 - name: ml2 dataplane config
   template: src=etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
@@ -30,30 +69,6 @@
   when: neutron.plugin == 'ml2'
   notify:
     - restart neutron services
-
-- name: install neutron-linuxbridge-agent service
-  upstart_service: name=neutron-linuxbridge-agent
-                   user=neutron
-                   cmd=/usr/local/bin/neutron-linuxbridge-agent
-                   config_dirs=/etc/neutron
-                   config_files=/etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
-  when: os == 'ubuntu' and neutron.plugin == 'ml2'
-
-- name: install neutron-linuxbridge-agent service (rhel source)
-  systemd_service: name=neutron-linuxbridge-agent
-                   user=neutron
-                   cmd=/usr/local/bin/neutron-linuxbridge-agent
-                   config_dirs=/etc/neutron
-                   config_files=/etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
-  when: os == 'rhel' and neutron.plugin == 'ml2' and openstack_install_method == 'source'
-
-- name: install neutron-linuxbridge-agent service (rhel package)
-  systemd_service: name=neutron-linuxbridge-agent
-                   user=neutron
-                   cmd=/bin/neutron-linuxbridge-agent
-                   config_dirs=/etc/neutron
-                   config_files=/etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
-  when: os == 'rhel' and neutron.plugin == 'ml2' and openstack_install_method == 'distro'
 
 - name: trigger restart on upgrades
   debug:
@@ -66,9 +81,13 @@
 - meta: flush_handlers
 
 - name: start neutron-linuxbridge-agent
-  service: name=neutron-linuxbridge-agent state=started
+  service:
+    name: "{{ neutron.services.neutron_linuxbridge_agent.name }}"
+    state: started
+    enabled: True
   when: neutron.plugin == 'ml2'
 
+#FIXME validate cron job on rhel
 - name: cleanup interface logs
   template: src=etc/cron.daily/cleanup-neutron-interfaces
             dest=/etc/cron.daily/cleanup-neutron-interfaces

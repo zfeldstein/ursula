@@ -1,4 +1,5 @@
 ---
+  #FIXME Do we need these pkgs on Rhel?
 - name: install neutron-data-network packages
   package: name={{ item }}
   with_items:
@@ -10,33 +11,23 @@
   until: result|succeeded
   retries: 5
 
-- name: install arping - ubuntu
-  package:
-    name: iputils-arping
+#FIXME can we move this to common systen_tools?
+- block:
+  - name: install arping (ubuntu)
+    package:
+      name: iputils-arping
+
+  - name: install resolvconf (ubuntu)
+    package:
+      name: resolvconf
   when: os == 'ubuntu'
 
-- name: install resolvconf - ubuntu
-  package:
-    name: resolvconf
-  when: os == 'ubuntu'
-
-- name: install arping - rhel
+- name: install arping (rhel)
   package:
     name: iputils
   when: os == 'rhel'
 
-- name: install custom ucarp scripts - rhel
-  template:
-    src: "usr/local/libexec/{{ item }}"
-    dest: "/usr/local/libexec/{{ item }}"
-    owner: root
-    group: root
-    mode: 0700
-  with_items:
-    - ucarp-vip-up
-    - ucarp-vip-down
-  when: ucarp is defined and os == 'rhel'
-
+#FIXME Do we need this for RHEL?
 - name: install packages for l3ha
   package: name=keepalived
   when: neutron.l3ha.enabled|bool
@@ -70,80 +61,79 @@
   failed_when: iproute_out.rc == 255
   when: "'vxlan' in neutron.tunnel_types"
 
-- name: install neutron-data-network services
-  upstart_service:
-    name: "{{ item.key }}"
-    user: neutron
-    cmd: "/usr/local/bin/{{ item.key }}"
-    pidfile: "{{ item.value.pidfile|default(omit) }}"
-    start_on: "starting neutron-linuxbridge-agent"
-    stop_on: "stopping neutron-linuxbridge-agent"
-    config_dirs: /etc/neutron
-    config_files: /etc/neutron/neutron.conf,{{ item.value.config_files }}
-    envs: "{{ neutron.service.envs }}"
+- block:
+  - name: install neutron-data-network services (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      start_on: "{{ item.start_on|default(omit) }}"
+      stop_on: "{{ item.stop_on|default(omit) }}"
+      user: "{{ item.user }}"
+      pidfile: "{{ item.pidfile|default(omit) }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files|default(omit) }}"
+      envs: "{{ neutron.service.envs }}"
+    with_items:
+      - "{{ neutron.services.neutron_dhcp_agent }}"
+      - "{{ neutron.services.neutron_l3_agent }}"
+      - "{{ neutron.services.neutron_metadata_agent }}"
+
+  - name: install neutron lbaas service (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      start_on: "{{ item.start_on|default(omit) }}"
+      stop_on: "{{ item.stop_on|default(omit) }}"
+      user: "{{ item.user }}"
+      pidfile: "{{ item.pidfile|default(omit) }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files|default(omit) }}"
+      envs: "{{ neutron.service.envs }}"
+    when: ((neutron.lbaas.enabled == "smart" and
+           groups['controller'][0] not in groups['compute']) or
+           neutron.lbaas.enabled|bool)
+    with_items:
+      - "{{ neutron.services.neutron_lbaasv2_agent }}"
   when: os == 'ubuntu'
-  with_dict:
-    neutron-dhcp-agent:
-      config_files: /etc/neutron/dhcp_agent.ini
-    neutron-l3-agent:
-      config_files: /etc/neutron/l3_agent.ini
-      pidfile: /var/run/neutron-l3-agent.pid
-    neutron-metadata-agent:
-      config_files: /etc/neutron/metadata_agent.ini
 
-- name: install neutron-data-network services (rhel source)
-  systemd_service:
-    name: "{{ item.key }}"
-    user: neutron
-    cmd: "/usr/local/bin/{{ item.key }}"
-    config_dirs: /etc/neutron
-    config_files: /etc/neutron/neutron.conf,{{ item.value.config_files }}
-    #envs: "{{ neutron.service.envs }}"
-  when: os == 'rhel' and openstack_install_method == 'source'
-  with_dict:
-    neutron-dhcp-agent:
-      config_files: /etc/neutron/dhcp_agent.ini
-    neutron-l3-agent:
-      config_files: /etc/neutron/l3_agent.ini
-      pidfile: /var/run/neutron-l3-agent.pid
-    neutron-metadata-agent:
-      config_files: /etc/neutron/metadata_agent.ini
+- block:
+  - name: install neutron-data-network services (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      type: "{{ item.type }}"
+      user: "{{ item.user }}"
+      #envs: "{{ neutron.service.envs }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      pidfile: "{{ item.pidfile|default(omit) }}"
+      restart: "{{ item.restart }}"
+      kill_mode: "{{ item.kill_mode }}"
+    with_items:
+      - "{{ neutron.services.neutron_dhcp_agent }}"
+      - "{{ neutron.services.neutron_l3_agent }}"
+      - "{{ neutron.services.neutron_metadata_agent }}"
 
-- name: install neutron-data-network services (rhel osp)
-  systemd_service:
-    name: "{{ item.key }}"
-    user: neutron
-    cmd: "/bin/{{ item.key }}"
-    config_dirs: /etc/neutron
-    config_files: /etc/neutron/neutron.conf,{{ item.value.config_files }}
-    #envs: "{{ neutron.service.envs }}"
-  when: os == 'rhel' and openstack_install_method == 'distro'
-  with_dict:
-    neutron-dhcp-agent:
-      config_files: /etc/neutron/dhcp_agent.ini
-    neutron-l3-agent:
-      config_files: /etc/neutron/l3_agent.ini
-      pidfile: /var/run/neutron-l3-agent.pid
-    neutron-metadata-agent:
-      config_files: /etc/neutron/metadata_agent.ini
-
-- name: install neutron-data-network services (rhel package)
-  systemd_service:
-    name: "{{ item.key }}"
-    user: neutron
-    cmd: "/bin/{{ item.key }}"
-    config_dirs: /etc/neutron
-    config_files: /etc/neutron/neutron.conf,{{ item.value.config_files }}
-    #envs: "{{ neutron.service.envs }}"
-  when: os == 'rhel' and openstack_install_method == 'package'
-  with_dict:
-    neutron-dhcp-agent:
-      config_files: /etc/neutron/dhcp_agent.ini
-    neutron-l3-agent:
-      config_files: /etc/neutron/l3_agent.ini
-      pidfile: /var/run/neutron-l3-agent.pid
-    neutron-metadata-agent:
-      config_files: /etc/neutron/metadata_agent.ini
+  - name: install neutron lbaas service (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      type: "{{ item.type }}"
+      user: "{{ item.user }}"
+      #envs: "{{ neutron.service.envs }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      pidfile: "{{ item.pidfile|default(omit) }}"
+      restart: "{{ item.restart }}"
+      kill_mode: "{{ item.kill_mode }}"
+    when: ((neutron.lbaas.enabled == "smart" and
+           groups['controller'][0] not in groups['compute']) or
+           neutron.lbaas.enabled|bool)
+    with_items:
+      - "{{ neutron.services.neutron_lbaasv2_agent }}"
+  when: os == 'rhel'
 
 - name: create lbaas templates folder
   file:
@@ -205,63 +195,6 @@
   notify:
     - restart neutron lbaas agent
 
-- name: install neutron lbaas service
-  upstart_service:
-    name: "{{ item.key }}"
-    user: neutron
-    cmd: "/usr/local/bin/{{ item.key }}"
-    pidfile: "{{ item.value.pidfile|default(omit) }}"
-    start_on: "starting neutron-linuxbridge-agent"
-    stop_on: "stopping neutron-linuxbridge-agent"
-    config_dirs: /etc/neutron
-    config_files: "{{ item.value.config_files|join(',') }}"
-    envs: "{{ neutron.service.envs }}"
-  when: os == 'ubuntu' and ((neutron.lbaas.enabled == "smart" and
-         groups['controller'][0] not in groups['compute']) or
-         neutron.lbaas.enabled|bool)
-  with_dict:
-    neutron-lbaasv2-agent:
-      config_files:
-        - /etc/neutron/neutron.conf
-        - /etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini
-        - /etc/neutron/neutron_lbaas.conf
-
-- name: install neutron lbaas service (rhel source)
-  systemd_service:
-    name: "{{ item.key }}"
-    user: neutron
-    cmd: "/usr/local/bin/{{ item.key }}"
-    config_dirs: /etc/neutron
-    config_files: "{{ item.value.config_files|join(',') }}"
-    #envs: "{{ neutron.service.envs }}"
-  when: os == 'rhel' and openstack_install_method == 'source' and ((neutron.lbaas.enabled == "smart" and
-         groups['controller'][0] not in groups['compute']) or
-         neutron.lbaas.enabled|bool)
-  with_dict:
-    neutron-lbaasv2-agent:
-      config_files:
-        - /etc/neutron/neutron.conf
-        - /etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini
-        - /etc/neutron/neutron_lbaas.conf
-        
-- name: install neutron lbaas service (rhel package)
-  systemd_service:
-    name: "{{ item.key }}"
-    user: neutron
-    cmd: "/bin/{{ item.key }}"
-    config_dirs: /etc/neutron
-    config_files: "{{ item.value.config_files|join(',') }}"
-    #envs: "{{ neutron.service.envs }}"
-  when: os == 'rhel' and openstack_install_method == 'package' and ((neutron.lbaas.enabled == "smart" and
-         groups['controller'][0] not in groups['compute']) or
-         neutron.lbaas.enabled|bool)
-  with_dict:
-    neutron-lbaasv2-agent:
-      config_files:
-        - /etc/neutron/neutron.conf
-        - /etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini
-        - /etc/neutron/neutron_lbaas.conf
-
 - name: kill namespaced neutron processes on upgrade
   command: pkill -f {{ item }}
   failed_when: False
@@ -282,14 +215,20 @@
 - meta: flush_handlers
 
 - name: start neutron-data-network services
-  service: name={{ item }} state=started
+  service:
+    name: "{{ item.name }}"
+    state: started
+    enabled: True
   with_items:
-    - neutron-l3-agent
-    - neutron-dhcp-agent
-    - neutron-metadata-agent
+    - "{{ neutron.services.neutron_l3_agent }}"
+    - "{{ neutron.services.neutron_dhcp_agent }}"
+    - "{{ neutron.services.neutron_metadata_agent }}"
 
 - name: start neutron lbaas agent
-  service: name=neutron-lbaasv2-agent state=started
+  service:
+    name: "{{ neutron.services.neutron_lbaasv2_agent.name }}"
+    state: started
+    enabled: True
   when: (neutron.lbaas.enabled == "smart" and
          groups['controller'][0] not in groups['compute']) or
          neutron.lbaas.enabled|bool

@@ -1,6 +1,9 @@
 ---
 project_name: glance
 glance:
+  services:
+    glance_api: "{{ openstack_meta.glance.services.glance_api[os] }}"
+    glance_registry: "{{ openstack_meta.glance.services.glance_registry[os] }}"
   api_workers: 5
   rbd_store_chunk_size: 8
   registry_workers: 5
