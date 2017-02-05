@@ -638,3 +638,12 @@ serverspec:
 
 inspec:
   enabled: False
+
+#openstack-ansible-security overrides
+security_enable_chrony: false
+security_ssh_permit_root_login: 'no'
+security_ssh_client_alive_count_max: 0
+security_password_minimum_length: 8
+security_password_minimum_days: 1
+security_password_maximum_days: 90
+security_password_warn_age: 7
