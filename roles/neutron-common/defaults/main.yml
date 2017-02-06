@@ -75,6 +75,13 @@ neutron:
     service_provider: LOADBALANCERV2:Haproxy:neutron_lbaas.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default
   service:
     envs: []
+  distro:
+    python_post_dependencies: []
+  # Example for distro/source:
+  # python_post_dependencies:
+  #   - name: python-memcached
+  #     version: 1.58
+  #     pip_extra_args: '--extra-index-url https://pypi-mirror.openstack.blueboxgrid.com/root/pypi...'
   source:
     rev: 'stable/newton'
     constrain: True
@@ -82,6 +89,7 @@ neutron:
     python_dependencies:
       - { name: "git+git://github.com/openstack/neutron-lbaas.git@stable/newton#egg=neutron-lbaas" }
       - { name: PyMySQL }
+    python_post_dependencies: []
     system_dependencies:
       ubuntu: []
         #- conntrack

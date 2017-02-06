@@ -15,6 +15,13 @@ keystone:
       distro: /usr/lib/python2.7/site-packages/keystone
       source: /opt/openstack/current/keystone
       package: /opt/openstack/current/keystone
+  distro:
+    python_post_dependencies: []
+  # Example for distro/source:
+  # python_post_dependencies:
+  #   - name: python-memcached
+  #     version: 1.58
+  #     pip_extra_args: '--extra-index-url https://pypi-mirror.openstack.blueboxgrid.com/root/pypi...'
   source:
     rev: 'stable/newton'
     constrain: True
@@ -24,6 +31,7 @@ keystone:
       - { name: uwsgi }
       - { name: pyldap }
       - { name: ldappool }
+    python_post_dependencies: []
     system_dependencies:
         ubuntu:
         - openssl
