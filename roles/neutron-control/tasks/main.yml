@@ -2,7 +2,7 @@
 - name: neutron api cache dir
   file: dest=/var/cache/neutron/api owner=neutron state=directory
 
-- name: install neutron-server service
+- name: install neutron-server service ( ubuntu source )
   upstart_service:
     name: neutron-server
     user: neutron
@@ -10,7 +10,28 @@
     config_dirs: /etc/neutron
     config_files: /etc/neutron/plugins/ml2/ml2_plugin.ini
     envs: "{{ neutron.service.envs }}"
+  when: os == 'ubuntu'
 
+- name: install neutron-server service (rhel source)
+  systemd_service:
+    name: neutron-server
+    user: neutron
+    cmd: /usr/local/bin/neutron-server
+    config_dirs: /etc/neutron
+    config_files: /etc/neutron/plugins/ml2/ml2_plugin.ini
+    #envs: "{{ neutron.service.envs }}"
+  when: os == 'rhel' and openstack_install_method == 'source'
+
+- name: install neutron-server service (rhel osp)
+  systemd_service:
+    name: neutron-server
+    user: neutron
+    cmd: /bin/neutron-server
+    config_dirs: /etc/neutron
+    config_files: /etc/neutron/plugins/ml2/ml2_plugin.ini
+    #envs: "{{ neutron.service.envs }}"
+  when: os == 'rhel' and openstack_install_method == 'distro'
+  
 - name: stop neutron service before db sync
   service: name=neutron-server state=stopped
   when: database_create.changed or force_sync|default('false')|bool
@@ -42,6 +63,17 @@
 - name: Permit access to Neutron
   ufw: rule=allow to_port={{ endpoints.neutron.port.haproxy_api }} proto=tcp
   tags: ufw
+  when: os == 'ubuntu'
+
+- name: Permit access to glance
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.neutron.port.haproxy_api }}"
+  tags: firewall
+  when: os == 'rhel'
 
 - include: monitoring.yml
   tags:

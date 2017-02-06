@@ -1,11 +1,19 @@
 ---
-- name: cinder-api process check
-  sensu_process_check: service=cinder-api
+- name: cinder control process check installation for non-distro installation
+  sensu_process_check: service={{ item }}
+  with_items:
+    - cinder-api
+    - cinder-scheduler
   notify: restart sensu-client
-
-- name: cinder-scheduler process check
-  sensu_process_check: service=cinder-scheduler
+  when: openstack_install_method != 'distro'
+ 
+- name: cinder control process check installation for non-distro installation
+  sensu_process_check: service={{ item }}
+  with_items:
+    - openstack-cinder-api
+    - openstack-cinder-scheduler
   notify: restart sensu-client
+  when: openstack_install_method == 'distro' and os == 'rhel'
 
 - name: cinder services check
   sensu_check: name=check-cinder-services plugin=check-cinder-services.sh

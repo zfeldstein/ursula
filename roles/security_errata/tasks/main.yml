@@ -1,15 +1,18 @@
 ---
 - name: update apt index
   apt: update_cache=yes cache_valid_time=3600
+  when: ansible_distribution == 'Ubuntu'
   register: result
   until: result|succeeded
   retries: 5
 
 - name: update SSL
-  apt: pkg={{ item }} state=latest
+  package: name={{ item }} state=latest
   with_items:
   - libssl1.0.0
   - openssl
+  when: ansible_distribution == 'Ubuntu'
+
   notify: reload haproxy
   register: result
   until: result|succeeded
@@ -30,7 +33,7 @@
   tags: CVE-2015-0235
 
 - name: update dpkg for CVE-2015-0860
-  apt: pkg={{ item }} state=latest
+  package: name={{ item }} state=latest
   with_items:
   - dpkg
   tags: CVE-2015-0860

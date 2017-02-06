@@ -1,79 +1,157 @@
 ---
+- name: python dependencies
+  package:
+    name: "{{ item }}"
+  with_items: " {{ common.python[ansible_os_family | lower].system_packages }}"
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: base venv directory
+  file: dest="{{ common.python.base_venv }}"
+        state=directory mode=0755
+
 - name: update pip
   pip: name=pip version={{ common.pip_version }}
-       extra_args='-i {{ openstack.pypi_mirror }}'
-  when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is defined
+       extra_args="-i {{ openstack.pypi_mirror }}"
+  when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is defined  and ansible_distribution == "Ubuntu"
   register: result
   until: result|succeeded
   retries: 5
 
 - name: update pip
   pip: name=pip version={{ common.pip_version }}
-       extra_args='-i {{ openstack.pypi_mirror }}'
+       extra_args="-i {{ openstack.pypi_mirror }}"
   when: ansible_distribution_version != "12.04"
   register: result
   until: result|succeeded
   retries: 5
 
-- name: root user pip config directory
-  file: dest=/root/.pip state=directory
+- block:
+  - name: set pip proxy args
+    set_fact:
+      pip_extra_args: " -i {{ openstack.pypi_mirror }}"
+    when: openstack.pypi_mirror is defined
 
-- name: pip config file
-  template: src=etc/pip.conf dest=/root/.pip/pip.conf
-  when: openstack.pypi_mirror is defined
+  - name: update pip
+    pip: name=pip version={{ common.pip_version }}
+         extra_args="-i {{ openstack.pypi_mirror }}"
+         virtualenv="{{ common.python.base_venv }}"
+    register: result
+    until: result|succeeded
+    retries: 5
 
-- name: easyinstall config file
-  template: src=etc/pydistutils.cfg dest=/root/.pydistutils.cfg
-  when: openstack.easy_install_mirror is defined
+  - name: upgrade setuptools for base venv (osp)
+    pip:
+      name: "setuptools"
+      virtualenv: "{{ common.python.base_venv }}"
+      extra_args: "{{ pip_extra_args }} --upgrade"
+    register: result
+    until: result|succeeded
+    retries: 5
 
-- name: update pip
-  pip: name=pip version={{ common.pip_version }}
-       extra_args='-i {{ openstack.pypi_mirror }}'
-  when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is not defined
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: python packages for base venv (osp)
+    pip:
+      name: "{{ item }}"
+      virtualenv: "{{ common.python.base_venv }}"
+      extra_args: "{{ pip_extra_args }}"
+    with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+    register: result
+    until: result|succeeded
+    retries: 5
 
-- name: uninstall python-setuptools
-  apt: pkg=python-setuptools state=absent
-  when: common.setuptools_version != "system"
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: install shade bits for ansible modules
+    pip:
+      name: "{{ item }}"
+      virtualenv: "{{ common.python.base_venv }}"
+    with_items:
+      - shade>=1.9.0
+    register: result
+    until: result|succeeded
+    retries: 5
 
-- name: install pip setuptools
-  pip: name=setuptools version={{ common.setuptools_version }}
-  when: common.setuptools_version != "system"
-  register: result
-  until: result|succeeded
-  retries: 5
 
-- name: pin alembic to 0.7.0
-  pip: name=alembic version=0.7.0
-  register: result
-  until: result|succeeded
-  retries: 5
+  when: openstack_install_method == "distro"
 
-- name: install additional python packages
-  git: repo={{ item.repo }} dest=/opt/stack/{{ item.name }}
-       version={{ item.rev }} accept_hostkey=True
-  with_items: "{{ common.python_extra_packages }}"
+- block:
+  - name: root user pip config directory
+    file: dest=/root/.pip state=directory
 
-- name: pip install eventlet
-  pip: name=eventlet
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: pip config file
+    template: src=etc/pip.conf dest=/root/.pip/pip.conf
+    when: openstack.pypi_mirror is defined
 
-- name: install drivers
-  command: python setup.py install chdir=/opt/stack/{{ item.name }}
-  with_items: "{{ common.python_extra_packages }}"
+  - name: easyinstall config file
+    template: src=etc/pydistutils.cfg dest=/root/.pydistutils.cfg
+    when: openstack.easy_install_mirror is defined
 
-- name: install shade bits for ansible modules
-  pip:
-    name: "{{ item }}"
-  with_items:
-    - shade>=1.9.0
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: update pip
+    pip: name=pip version={{ common.pip_version }}
+         extra_args='-i {{ openstack.pypi_mirror }}'
+    when: ansible_distribution_version == "12.04" and openstack.pypi_mirror is not defined
+    register: result
+    until: result|succeeded
+    retries: 5
+
+  - name: uninstall python-setuptools
+    package: name=python-setuptools state=absent
+    when: common.setuptools_version != "system"
+    register: result
+    until: result|succeeded
+    retries: 5
+
+  - name: install pip setuptools
+    pip: name=setuptools version={{ common.setuptools_version }}
+    when: common.setuptools_version != "system"
+    register: result
+    until: result|succeeded
+    retries: 5
+
+  - name: pin alembic to 0.7.0
+    pip: name=alembic version=0.7.0
+    register: result
+    until: result|succeeded
+    retries: 5
+  when: openstack_install_method != 'distro'
+
+- block:
+  - name: install python extra packages
+    pip:
+      name: "{{ item }}"
+    with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+    register: result
+    until: result|succeeded
+    retries: 5
+
+  # We are not using install extra python pkgs from git approach anywhere
+  # - name: install additional python packages
+  #   git: repo={{ item.repo }} dest=/opt/stack/{{ item.name }}
+  #        version={{ item.rev }} accept_hostkey=True
+  #   with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+  #
+  # - name: install drivers
+  #   command: python setup.py install chdir=/opt/stack/{{ item.name }}
+  #   with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+
+  - name: pip install python-dateutil
+    pip: name=python-dateutil
+    register: result
+    until: result|succeeded
+    retries: 5
+
+  - name: pip install eventlet
+    pip: name=eventlet
+    register: result
+    until: result|succeeded
+    retries: 5
+
+  - name: install shade bits for ansible modules
+    pip:
+      name: "{{ item }}"
+    with_items:
+      - six>=1.10.0
+      - shade>=1.9.0
+    register: result
+    until: result|succeeded
+    retries: 5
+  when: openstack_install_method != 'distro'

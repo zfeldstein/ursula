@@ -1,12 +1,4 @@
 ---
-- name: memcached gem requirements
-  apt: pkg={{ item }} state=present
-  with_items:
-    - libsasl2-dev
-  register: result
-  until: result|succeeded
-  retries: 5
-
 - name: memcached gem for sensu check
   gem: name=memcached user_install=no include_dependencies=yes
        executable=/opt/sensu/embedded/bin/gem

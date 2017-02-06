@@ -1,16 +1,22 @@
 ---
 - name: restart glance services
   service: name={{ item }} state=restarted must_exist=false
-  when: restart|default('True')
+  when: restart|default('True') and openstack_install_method != 'distro'
   with_items:
     - glance-api
     - glance-registry
 
+- name: restart glance services (rhel osp)
+  service: name={{ item }} state=restarted must_exist=false
+  when: restart|default('True') and openstack_install_method == 'distro'
+  with_items:
+    - openstack-glance-api
+    - openstack-glance-registry
 # Restarting rsync 3.0.9-1ubuntu1 on 12.04.4 was failing:
 #     bind () failed: Address already in use (address-family 2)
 # Adding retry logic to workaround
 - name: restart rsync
-  service: name=rsync state=restarted
+  service: name={{ rsync_service }} state=restarted
   register: result
   until: result|success
   retries: 3

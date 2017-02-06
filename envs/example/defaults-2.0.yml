@@ -1,11 +1,13 @@
 ---
 stack_env: example
 ursula_env_path: "{{ lookup('env','URSULA_ENV') }}"
-
 country_code: US
 
 openstack_install_method: 'source'
-#openstack_install_method: 'package'
+
+
+basevenv: "/opt/openstack/base"
+basevenv_lib_dir: "{{ basevenv }}/lib/python2.7/site-packages"
 
 primary_interface: 'ansible_eth0'
 primary_ip: "{{ hostvars[inventory_hostname][primary_interface]['ipv4']['address'] }}"
@@ -13,20 +15,20 @@ primary_ip: "{{ hostvars[inventory_hostname][primary_interface]['ipv4']['address
 secrets:
   db_password:      asdf
   mongodb_password: asdf
-  service_password: asdf
+  service_password: asdfA#8!
   rabbit_password:  asdf
-  admin_password:   asdf
-  stack_domain_admin_password: ydgurtH5erghithge57
+  admin_password:   asdfA#8!
+  stack_domain_admin_password: ydgurtH5erghithge57!
   metadata_proxy_shared_secret: asdf
   horizon_secret_key:           asdf
   glance_sync:      ADQ64XUQLUWH75M634RVBLP55RKPGGOWG
-  monitor_password: asdf
+  monitor_password: asdfA#8!
   telemetry_secret: asdf
-  cloud_admin_password: asdf
+  cloud_admin_password: asdfA#8!
 
 fqdn: openstack.example.com
 swift_fqdn: "{{ fqdn }}"
-floating_ip: "{{ controller_primary }}"
+floating_ip: "{{ hostvars[groups['controller'][0]][primary_interface]['ipv4']['address'] }}"
 undercloud_floating_ip: "{{ hostvars[groups['controller'][0]][primary_interface]['ipv4']['address'] }}"
 
 etc_hosts:
@@ -84,9 +86,6 @@ monitoring:
       role: admin
 
 openstack:
-  pypi_mirror: https://pypi.python.org/simple/
-  git_mirror:  https://github.com/openstack
-  git_update: yes
   pypi_mirror: https://pypi-mirror.openstack.blueboxgrid.com/root/pypi
   easy_install_mirror: https://pypi-mirror.openstack.blueboxgrid.com/root/pypi/+simple
   pip_trusted: pypi-mirror.openstack.blueboxgrid.com
@@ -135,6 +134,9 @@ apt_repos:
   collectd:
     repo: http://ppa.launchpad.net/raravena80/collectd5/ubuntu
     key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE97C3D97792BD34E"
+  chef:
+    repo: https://packages.chef.io/stable-apt
+    key_url: https://downloads.chef.io/packages-chef-io-public.key
 
 client:
   self_signed_cert: true
@@ -216,6 +218,9 @@ cinder:
       control_location: front-end
 
 neutron:
+  advertise_mtu: true
+  path_mtu: 1400
+  global_physnet_mtu: 1500
   plugin: ml2
   bridge_mappings: ''
   network_vlan_ranges: ''
@@ -308,7 +313,7 @@ keystone:
       password: "{{ secrets.admin_password }}"
       tenant: admin
     - name: demo
-      password: demopass
+      password: demopass$S5
       tenant: demo
     - name: nova
       password: "{{ secrets.service_password }}"
@@ -490,95 +495,74 @@ keystone:
     enabled: False
 
 ssl:
+  cafile: "{{ (os == 'rhel' ) | ternary('/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt', '/etc/ssl/certs/ca-certificates.crt') }}"
   crt: |
     -----BEGIN CERTIFICATE-----
-    THISISABADCERTgBAgIJAKgAkcf7aMnvMA0GCSqGSIb3DQEBCwUAMIGMMQswCQYD
-    VQQGEwJVUzELMAkGA1UECAwCV0ExEDAOBgNVBAcMB1NlYXR0bGUxFzAVBgNVBAoM
-    DkJsdWUgQm94IEdyb3VwMR4wHAYDVQQDDBVvcGVuc3RhY2suZXhhbXBsZS5jb20x
-    JTAjBgkqhkiG9w0BCQEWFmhvc3RtYXN0ZXJAYmx1ZWJveC5uZXQwHhcNMTUwMTAz
-    MjIwOTU5WhcNMjQxMjMxMjIwOTU5WjCBjDELMAkGA1UEBhMCVVMxCzAJBgNVBAgM
-    AldBMRAwDgYDVQQHDAdTZWF0dGxlMRcwFQYDVQQKDA5CbHVlIEJveCBHcm91cDEe
-    MBwGA1UEAwwVb3BlbnN0YWNrLmV4YW1wbGUuY29tMSUwIwYJKoZIhvcNAQkBFhZo
-    b3N0bWFzdGVyQGJsdWVib3gubmV0MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIIC
-    CgKCAgEArr0O1QgDQ/zG+D69KeJJmH9xyaSjrn3KapYsaNX63bK4BmrNeqi10dzO
-    CvJYiVdxVMDe4kl/SkYXGQBApflsjiYX8/Mpqdb3vUhsyKq54xHDgEpC+YrRb8RR
-    zHu08O24W40iyKwSY/+ZewOiCozIM2dSmx3K2kobUT4WePTl3Q5gTh+c5gxdZ+5E
-    0Rw5OeyMzs+GvMsnGhH+o67qE8NQMGRYxQ14FAqlrfst6m7PYuS/fAfqG7AY3na+
-    eMNNyD7mmFwo2Fw4/R+BiOs/BcfJvP4IpS+7PKuBEHJvKUvZpWQYzr8gYdjj5Ku9
-    mMU0f1K5gpODaNU8bbAp/ZnJ17RkGAJBO12CEvJDWNP+3DSJvW3Ol5PjzoBAevht
-    KXrU6vDq8C9ynxH0K5AsqsFkBBb/1q0xhfe8WNAOGpru/32O0x4a1RqBKjY13SdE
-    gbHh6lWNs5q7wBs1oNtppNr7eLaNdYHAxNmyg9DBfUBXm1mxhr0+RUGBaQDlXTKr
-    T6ndOKaulFgFd0b72BXXXgStJDW1oyb7V1FM4GQX0DsYtF03A/25EXX5dhZHglzY
-    QyqDBOhfKILh/97586ffUjRj8TB2ajtM8aGPO7JNuuc5fZa8aHfDQ6UV1f/mAYNK
-    t7NC2WjzqRPepKG8cWtUFGGgy32UrZTtOPqYXt1DARZiMKvwI6UCAwEAAaM8MDow
-    CQYDVR0TBAIwADALBgNVHQ8EBAMCBeAwIAYDVR0RBBkwF4IVb3BlbnN0YWNrLmV4
-    YW1wbGUuY29tMA0GCSqGSIb3DQEBCwUAA4ICAQAi8ER+pNEA3DLMU/JQjDSLHiW0
-    S5x+eZdAACLlQgbY+wCuBwZE64HMWwKuSD9AWHsjITtkS08npxGZpDoNEThIzi63
-    qngFVf+P5kP06LKW/y4CEw8nIOMHueuRVHsAWq0WtRdg2EnKYdc5+lUnE7JOqdUA
-    GtkV2VNeY40bwWwsW7x3jVEWCE4+VYyjKMCPNsK8nIutInHGCNEAQIQLs9M4uIxX
-    jab6QS0P9rIcGLEqTkaLk5sxar4+YVGmwyy/bDR1+TCa9TzVWSqHZByhkj/cz0AG
-    1ooEG+VrF6gvsxvvErSpO8Jg77kA9chkxqAuLu+5XmnKXNyaGAM7CgbPS0OTYwT4
-    HMGBe5bdkmWrFT0+Dti9nlIXVgVi+hOVgqYPn+nQ/yXazWIsC2tmUtVCa85vxnIK
-    bVSrTvQA9c6sMaRkWYBkC0Iiib6t65vu/veMlLMqAH4OcXBHVcktWtM5jVQLMUNY
-    foCp8MbLpzp5bn99/NhtsiMjqg37KnMXmi0uwqUwBm6g9q2C7TdiaZL3xtLrfx5m
-    HNkvVDXDCjiEfGsVMJ0OPoVMQFHh+BfQv6BAVTqVWvFCHZ9kl02ofW8LQBvtcPUW
-    5KnSYY3JqObVpX5q+ETZX95zJeBCRMRc10ryCjsHr6BlSQ6+5TBmZmDT/pqmnzIm
-    +WEpYCKCX7wyK9xGjA==
+    MIIDJzCCAg+gAwIBAgIJALHoTH80v+pAMA0GCSqGSIb3DQEBCwUAMBIxEDAOBgNV
+    BAMMB3Rlc3QtY2EwHhcNMTYxMjE0MjI0NjExWhcNMTcwMjEyMjI0NjExWjAgMR4w
+    HAYDVQQDDBVvcGVuc3RhY2suZXhhbXBsZS5jb20wggEiMA0GCSqGSIb3DQEBAQUA
+    A4IBDwAwggEKAoIBAQC/U/FcD0iNVxGFxcgDlgHCgK1qNdE7CmAmbkwfwczg8M33
+    EheSZULERKT+2TYm187hdpu/O1h1X2iVt5LAQ05ciWu0ff4vJOTwJcHKzj5CnNEQ
+    nlNHr3Plxl+RL/IiQxMTqRju1lrhl3yyJSiK6HLgQVEgOGjJLkgtvn9aSOj2XOi8
+    HYIlMN264XPgsAtvdGcJ4KomB7jM5qh46y5LnB2EVgCpI6QpOIN99aHBNmVqCSZc
+    XWwxybMpIm523QqLFkoqgUhO6DyxOSzFzG2bcl0zBRyLiA5H40qI0bivKEPte1QJ
+    Fvq6tJa8F0B7Eon5V9JVhlquCt8wtOG4g6nxD0jfAgMBAAGjcjBwMAkGA1UdEwQC
+    MAAwCwYDVR0PBAQDAgXgMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEFBQcDATA3
+    BgNVHREEMDAughVvcGVuc3RhY2suZXhhbXBsZS5jb22CFW9wZW5zdGFjay5leGFt
+    cGxlLmNvbTANBgkqhkiG9w0BAQsFAAOCAQEApkLUjX+RS3C5H3e/RHg72zQvckUT
+    3BA58T2ECC7WebtiCQhOw2/GJ+0qDqEzhV5yKAd2K0YJs+Y8LosaE/aedr/HD7rw
+    zCAVBWqM7R0eQN6RpTOvZ8YnjJOJjtagDS1F57Tsf/AgMBMq/aPL2MdPDmdUns0B
+    XVgModdIkj+UVTM/ZlzmUJqj5UDt5AclRM5B8a3gYMqdeJgtwwMKCfAg45h7rMjT
+    6VBn5OvAXmyzyvIqJ+cR49SMGtpFRSphOVzCOqfwcq7Q65JzioVmVctz8FoON3yB
+    cetJ28K7CX+OQL8mnmZhmcB9lE0r8/LNXIFQKwUOEC5zs3V5fyVA8B8w6A==
     -----END CERTIFICATE-----
   key: |
     -----BEGIN RSA PRIVATE KEY-----
-    THISISABADKEY%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
+    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
     -----END RSA PRIVATE KEY-----
-  # remove this line out if using a real CA supplied cert
-  cafile: /usr/local/share/ca-certificates/{{ endpoints.main }}.crt
+  cacrt: |
+    -----BEGIN CERTIFICATE-----
+    MIIC9zCCAd+gAwIBAgIJAKKmJqfVztR1MA0GCSqGSIb3DQEBCwUAMBIxEDAOBgNV
+    BAMMB3Rlc3QtY2EwHhcNMTYxMjE0MjI0NjEwWhcNMTcwMjEyMjI0NjEwWjASMRAw
+    DgYDVQQDDAd0ZXN0LWNhMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+    0sKsAlTtfkfoNDmLT2xTfXrOzSHT+c3PwN3Tc637eUJrEiTsztfxzOh9kZLIKvTZ
+    9mst0PIEtdckoPm7scTb0Zxdq29n1goGIimUc+qvdW56Ji8QKg8IqOk9CuwmmMdM
+    wC9gBPplVXHJiBhCAn4+c8yeACBnl7M+Q5+NcDAtE85NEcDHOHn7BiZPA78+O4bd
+    HxE6nOJ0cR7iTUGuzZLtrs6WViOtr9DtHn02BBqtA4iej4h6zlUgYG0krhsLIhbo
+    38nb7ziMdgasNGg708TK1IBdqo33t0r+mIyeLB+LGucCIuG8KtSKk0vld25AfxSa
+    9N1Si/wmFqKLTIPp24yeewIDAQABo1AwTjAdBgNVHQ4EFgQUuYGGv4mTzF9cyziP
+    ESW60/fynsYwHwYDVR0jBBgwFoAUuYGGv4mTzF9cyziPESW60/fynsYwDAYDVR0T
+    BAUwAwEB/zANBgkqhkiG9w0BAQsFAAOCAQEAQo6/GOOzDTJy5Uu6C9pY21ptfn3u
+    E3kGpFZ+1E8pHMLVp7bY8KU3j6IUNkhcwmCUZy1yNvs7SaO4I6RVipBOSYW0slAr
+    wYTcbktIoULCcEj2S6MdBGPjjaJWOX1GhlBpifqjwa4O1vymyiB9WyW0JsgXtav1
+    f5yEjmZmXN6vRgIj7svMyAmMAaZshKaBQM0iLCIZQPhzwDDyceWjdUTfFGqR1yW3
+    NVKxts9j4VyfPxPu/lulZod5NY55C3VzVC1YlMhCgXQ72/MGo8rMZ1VPUQZE5UAq
+    0O6JHpTBcXZmcXG+vSh8rrKaUDeahFIk84WM3oT9cflOvRbBwjTkw4oY8A==
+    -----END CERTIFICATE-----
 
 openstack_setup:
   add_users: True
@@ -597,8 +581,8 @@ common:
     mcelog: False
   ursula_monitoring:
     method: tar # git|tar
-    tar_url: https://file-mirror.openstack.blueboxgrid.com/ursula-monitoring/2.2.5.tar.gz
-    tar_version: 2.2.5
+    tar_url: https://file-mirror.openstack.blueboxgrid.com/ursula-monitoring/master.tar.gz
+    tar_version: master
   ntpd:
     servers: []
     #  - servertime.service.softlayer.com
@@ -622,7 +606,7 @@ aodh:
     verbose: True
 
 ironic:
-  enabled: True
+  enabled: False
   logging:
     debug: True
     verbose: True
@@ -650,4 +634,7 @@ magnum:
   debug: True
 
 serverspec:
+  enabled: False
+
+inspec:
   enabled: False

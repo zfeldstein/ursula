@@ -17,8 +17,15 @@
   hosts: all:!vyatta-*
   roles:
     - role: preflight-checks
-      tags: ['always', 'precheck']
+      tags: ['always','precheck']
   environment: "{{ env_vars|default({}) }}"
+
+- name: RedHat Network registration for RedHat hosts
+  hosts: all:!vyatta-*
+  roles:
+    - role: rhn-subscription
+      tags: ['rhn']
+      when: ansible_distribution == "RedHat" and openstack_install_method == 'distro'
 
 - name: common role for all hosts
   hosts: all:!vyatta-*
@@ -32,8 +39,12 @@
     - role: serverspec
       tags: ['common', 'serverspec']
       when: serverspec.enabled|default("False")|bool
+    - role: inspec
+      tags: ['common', 'inspec']
+      when: inspec.enabled|default("False")|bool
     - role: logging
       tags: ['common', 'logging']
+      when: logging.enabled|default("True")|bool
     - role: audit
       tags: ['common', 'logging', 'audit']
       when: audit.enabled|default('False')|bool
@@ -48,6 +59,7 @@
   roles:
     - role: security_errata
       tags: ['common', 'security', 'errata']
+      when: ansible_distribution == 'Ubuntu'
   environment: "{{ env_vars|default({}) }}"
 
 - name: install logging and dependencies
@@ -143,7 +155,7 @@
   any_errors_fatal: true
   roles:
     - role: memcached
-      tags: ['infra']
+      tags: ['infra','memcached']
   environment: "{{ env_vars|default({}) }}"
 
 - name: controller haproxy
@@ -162,6 +174,7 @@
   roles:
     - role: iptables
       tags: ['iptables', 'infra']
+      when: ansible_distribution in ['Ubuntu']
   environment: "{{ env_vars|default({}) }}"
 
 - name: ceph monitors
@@ -194,7 +207,7 @@
         - symlink
 
 - name: openstack client tools
-  hosts: all:!vyatta-*
+  hosts: all:!vyatta-*:!ceph_monitors:!ceph_osds
   any_errors_fatal: true
   roles:
     - role: client
@@ -231,7 +244,7 @@
   any_errors_fatal: true
   roles:
     - role: nova-control
-      tags: ['openstack', 'nova', 'control']
+      tags: ['openstack', 'nova', 'control', 'nova-control']
   environment: "{{ env_vars|default({}) }}"
 
 - name: nova data plane
@@ -239,7 +252,7 @@
   any_errors_fatal: true
   roles:
     - role: nova-data
-      tags: ['openstack', 'nova', 'data']
+      tags: ['openstack', 'nova', 'data', 'nova-data']
   environment: "{{ env_vars|default({}) }}"
 
 - name: cinder control plane

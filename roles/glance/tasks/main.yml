@@ -42,6 +42,18 @@
       permission: r
     - etype: other
       permission: r
+      
+#Glance-manage in OSP is creating the api.log with incorrect permissions
+# this prohibits glance-api from starting
+- name: glance fixme acl
+  acl:
+    name: /var/log/glance
+    state: present
+    default: yes
+    entity: glance
+    permissions: rw
+    etype: user
+    recursive: yes
 
 - name: permit access to glance
   ufw: rule=allow to_port={{ item }} proto=tcp
@@ -49,7 +61,28 @@
   with_items:
     - "{{ endpoints.glance.port.haproxy_api }}"
     - "{{ endpoints.glance.port.backend_api }}"
+  when: os == 'ubuntu'
 
+- name: Permit access to glance
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.glance.port.haproxy_api }}"
+    - "{{ endpoints.glance.port.backend_api }}"
+  tags: firewall
+  when: os == 'rhel'
+
+- name: install glance services
+  systemd_service: name={{ item }}
+                   user=glance
+                   cmd=/usr/local/bin/{{ item }}
+  with_items:
+    - glance-api
+    - glance-registry
+  when: openstack_install_method != 'distro' and os == 'rhel'
+  
 - name: install glance services
   upstart_service: name={{ item }}
                    user=glance
@@ -57,7 +90,8 @@
   with_items:
     - glance-api
     - glance-registry
-
+  when: os == 'ubuntu'
+  
 - name: glance config
   template: src={{ item }} dest=/etc/glance mode={{ 0644 if 'policy.json' in item else 0640 }}
             owner=glance group=glance
@@ -70,7 +104,15 @@
   with_items:
     - glance-api
     - glance-registry
-  when: database_create.changed or force_sync|default('false')|bool
+  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method != 'distro'
+  tags: db-migrate
+  
+- name: stop glance services before db sync (rhel osp)
+  service: name={{ item }} state=stopped
+  with_items:
+    - openstack-glance-api
+    - openstack-glance-registry
+  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method == 'distro'
   tags: db-migrate
 
 - name: sync glance database
@@ -82,6 +124,7 @@
     - restart glance services
   # we want this to always be changed so that it can notify the service restart
   tags: db-migrate
+
 
 - include: ceph_integration.yml
   when: ceph.enabled|bool
@@ -101,7 +144,15 @@
   with_items:
     - glance-api
     - glance-registry
+  when: openstack_install_method != 'distro'
 
+- name: start glance services (rhel osp)
+  service: name={{ item }} state=started
+  with_items:
+    - openstack-glance-api
+    - openstack-glance-registry
+  when: openstack_install_method == 'distro'
+  
 - include: image-sync.yml
   when: glance.sync.enabled
 
@@ -118,6 +169,6 @@
   when: logging.enabled|default('True')|bool
 
 - include: serverspec.yml
-  tags: 
+  tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool

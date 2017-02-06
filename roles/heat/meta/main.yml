@@ -20,5 +20,10 @@ dependencies:
     project_name: heat
     alternatives: "{{ heat.alternatives }}"
     when: openstack_install_method == 'package'
+  - role: openstack-distro
+    dependent_packages: "{{ heat.osp_sys_packages }}" 
+    project_name: heat
+    package_name: openstack-heat-common
+    when: openstack_install_method == 'distro'
   - role: openstack-database
     database_name: heat

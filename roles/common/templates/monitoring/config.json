@@ -6,7 +6,11 @@
       "openstack"
     ],
     "keepalive": {
-      "handler": "{{ monitoring.keepalive.handler }}"
+      "handler": "{{ monitoring.keepalive.handler }}",
+      "thresholds": {
+        "warning": {{ monitoring.keepalive.thresholds.warning }},
+        "critical": {{ monitoring.keepalive.thresholds.critical }}
+      }
     }
   },
   "rabbitmq": {

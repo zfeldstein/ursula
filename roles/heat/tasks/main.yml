@@ -19,6 +19,18 @@
   with_items:
     - "{{ endpoints.heat.port.haproxy_api }}"
     - "{{ endpoints.heat_cfn.port.haproxy_api }}"
+  when: os == 'ubuntu'
+
+- name: Permit access to heat
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.heat.port.haproxy_api }}"
+    - "{{ endpoints.heat_cfn.port.backend_api }}"
+  tags: firewall
+  when: os == 'rhel'
 
 - name: install heat services
   upstart_service: name={{ item }}
@@ -29,6 +41,18 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
+  when: os == 'ubuntu'
+
+- name: install heat services (rhel source)
+  systemd_service: name={{ item }}
+                   user=heat
+                   cmd=/usr/local/bin/{{ item }}
+                   config_files=/etc/heat/heat.conf
+  with_items:
+    - heat-api
+    - heat-api-cfn
+    - heat-engine
+  when: os == 'rhel' and openstack_install_method == 'source'
 
 - name: heat config
   template: src=etc/heat/{{ item }} dest=/etc/heat/{{ item }} mode={{ 0644 if 'policy.json' in item else 0640 }} owner=heat group=heat
@@ -40,96 +64,168 @@
   notify:
     - restart heat services
 
-- name: create heat trusts roles
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  os_keystone_role:
-    name: "{{ item }}"
-    auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
-      project_name: admin
-      project_domain_name: default
-      user_domain_name: default
-      username: admin
-      password: "{{ secrets.admin_password }}"
-  with_items:
-    - heat_stack_owner
-    - heat_stack_user
-  run_once: true
+- block:
+  - name: create heat stack user
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      OS_USER_DOMAIN_NAME: default
+      OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    os_user:
+      name: heat_stack_user
+      password: "{{ secrets.service_password }}"
+      default_project: admin
+      domain: default
+      validate_certs: "{{ validate_certs|default(omit) }}"
+      auth:
+        auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+        project_name: admin
+        username: admin
+        password: "{{ secrets.admin_password }}"
+    run_once: true
 
-- name: assign admin heat roles
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  os_user_role:
-    role: heat_stack_owner
-    user: admin
-    project: admin
-    auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/"
-      project_name: admin
-      project_domain_name: default
-      user_domain_name: default
-      username: admin
-      password: "{{ secrets.admin_password }}"
-  run_once: true
+  - name: create heat stack role
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      OS_USER_DOMAIN_NAME: default
+      OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    os_keystone_role:
+      name: heat_stack_user
+      validate_certs: "{{ validate_certs|default(omit) }}"
+      auth:
+        auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+        project_name: admin
+        project_domain_name: default
+        user_domain_name: default
+        username: admin
+        password: "{{ secrets.admin_password }}"
 
-- name: create heat domain
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  os_keystone_domain:
-    name: heat
-    auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
-      project_name: admin
-      project_domain_name: default
-      user_domain_name: default
-      username: admin
-      password: "{{ secrets.admin_password }}"
-  run_once: true
-  register: heat_domain
+  - name: create heat stack user role
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      OS_USER_DOMAIN_NAME: default
+      OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    os_user_role:
+      role: heat_stack_user
+      user: heat_stack_user
+      project: admin
+      validate_certs: "{{ validate_certs|default(omit) }}"
+      auth:
+        auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+        project_name: admin
+        project_domain_name: default
+        user_domain_name: default
+        username: admin
+        password: "{{ secrets.admin_password }}"
 
-- name: remove heat domain user from default domain
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" user delete --domain default heat_domain_admin
-  register: remove_heat_admin
-  failed_when: remove_heat_admin|failed and
-               "No user with a name or ID" not in remove_heat_admin.stderr|default('')
-  run_once: true
+  - name: create heat trusts roles
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      OS_USER_DOMAIN_NAME: default
+      OS_PROJECT_DOMAIN_NAME: default
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    os_keystone_role:
+      name: "{{ item }}"
+      validate_certs: "{{ validate_certs|default(omit) }}"
+      auth:
+        auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+        project_name: admin
+        project_domain_name: default
+        user_domain_name: default
+        username: admin
+        password: "{{ secrets.admin_password }}"
+    with_items:
+      - heat_stack_owner
+      - heat_stack_user
 
-- name: create heat domain admin user
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  os_user:
-    name: heat_domain_admin
-    password: "{{ secrets.stack_domain_admin_password }}"
-    domain: "{{ heat_domain.domain.id }}"
-    auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
-      project_name: admin
-      project_domain_name: default
-      user_domain_name: default
-      username: admin
-      password: "{{ secrets.admin_password }}"
-  register: heat_admin_user
-  failed_when: heat_admin_user|failed and
-               "409" not in heat_admin_user.msg|default('')
-  run_once: true
+  - name: assign admin heat roles
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    os_user_role:
+      role: heat_stack_owner
+      validate_certs: "{{ validate_certs|default(omit) }}"
+      user: admin
+      project: admin
+      auth:
+        auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+        project_name: admin
+        project_domain_name: default
+        user_domain_name: default
+        username: admin
+        password: "{{ secrets.admin_password }}"
 
-- name: add admin role to the heat domain admin user
-  environment:
-    OS_IDENTITY_API_VERSION: 3
-  shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" role add --domain "{{ heat_domain.domain.id }}" --user "{{ heat_admin_user.user.id }}" admin
-  when: heat.enabled|bool and heat_admin_user|changed
+  - name: create heat domain
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    os_keystone_domain:
+      validate_certs: "{{ validate_certs|default(omit) }}"
+      name: heat
+      auth:
+        auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+        project_name: admin
+        project_domain_name: default
+        user_domain_name: default
+        username: admin
+        password: "{{ secrets.admin_password }}"
+    register: heat_domain
+
+  - name: remove heat domain user from default domain
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" user delete --domain default heat_domain_admin 
+    register: remove_heat_admin
+    failed_when: remove_heat_admin|failed and
+                 "No user with a name or ID" not in remove_heat_admin.stderr|default('')
+
+  - name: create heat domain admin user
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    os_user:
+      name: heat_domain_admin
+      password: "{{ secrets.stack_domain_admin_password }}"
+      validate_certs: "{{ validate_certs|default(omit) }}"
+      domain: "{{ heat_domain.domain.id }}"
+      auth:
+        auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+        project_name: admin
+        project_domain_name: default
+        user_domain_name: default
+        username: admin
+        password: "{{ secrets.admin_password }}"
+    register: heat_admin_user
+    failed_when: heat_admin_user|failed and
+                 "409" not in heat_admin_user.msg|default('')
+
+  - name: add admin role to the heat domain admin user
+    environment:
+      OS_IDENTITY_API_VERSION: 3
+      PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+    shell: . /root/stackrc; openstack --os-auth-url "{{ endpoints.keystone.url.internal }}/v3" role add --domain "{{ heat_domain.domain.id }}" --user "{{ heat_admin_user.user.id }}" admin 
+    when: heat.enabled|bool and heat_admin_user|changed
   run_once: true
 
 - name: stop heat services before db sync
   service: name={{ item }} state=stopped
-  when: database_create.changed or force_sync|default('false')|bool
+  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method != 'distro'
   with_items:
     - heat-api
     - heat-api-cfn
     - heat-engine
+  tags: db-migrate
+  
+- name: stop heat services before db sync (rhel osp)
+  service: name={{ item }} state=stopped
+  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method == 'distro'
+  with_items:
+    - openstack-heat-api
+    - openstack-heat-api-cfn
+    - openstack-heat-engine
   tags: db-migrate
 
 - name: sync heat database
@@ -158,6 +254,15 @@
     - heat-api
     - heat-api-cfn
     - heat-engine
+  when: openstack_install_method != 'distro'
+  
+- name: start heat services (rhel osp)
+  service: name={{ item }} state=started
+  with_items:
+    - openstack-heat-api
+    - openstack-heat-api-cfn
+    - openstack-heat-engine
+  when: openstack_install_method == 'distro'
 
 - include: monitoring.yml
   tags:

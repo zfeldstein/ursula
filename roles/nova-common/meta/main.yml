@@ -5,6 +5,7 @@ dependencies:
     repos:
       - repo: 'deb {{ apt_repos.cloud_archive.repo }} {{ ansible_distribution_release }}-updates/mitaka main'
         key_package: ubuntu-cloud-keyring
+    when: os == 'ubuntu'
   - role: sensu-check
   - role: monitoring-common
     when: monitoring.enabled|default(True)|bool
@@ -27,3 +28,7 @@ dependencies:
     rootwrap: True
     alternatives: "{{ nova.alternatives }}"
     when: openstack_install_method == 'package'
+  - role: openstack-distro
+    project_name: nova
+    rootwrap: True
+    when: openstack_install_method == 'distro'

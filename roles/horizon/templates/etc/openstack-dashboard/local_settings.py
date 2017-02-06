@@ -89,11 +89,14 @@ OPENSTACK_API_VERSIONS = {
 # after clicking on backdrop.
 #HORIZON_CONFIG["modal_backdrop"] = "static"
 
+{% if horizon.password_validator.enabled|bool %}
 # Specify a regular expression to validate user passwords.
-#HORIZON_CONFIG["password_validator"] = {
-#    "regex": '.*',
-#    "help_text": _("Your password does not meet the requirements."),
-#}
+HORIZON_CONFIG["password_validator"] = {
+    "regex": "{{ horizon.password_validator.regex }}",
+    "help_text": _("{{ horizon.password_validator.help_text }}"),
+}
+
+{% endif %}
 
 # Disable simplified floating IP address management for deployments with
 # multiple floating IP pools or complex network requirements.
@@ -241,7 +244,7 @@ K2K_CHOICES = (
 {% endif %}
 
 # Disable SSL certificate checks (useful for self-signed certificates):
-OPENSTACK_SSL_NO_VERIFY = {{ client.self_signed_cert | bool }}
+OPENSTACK_SSL_NO_VERIFY = {{ insecure | default('false') | bool }}
 
 # The CA certificate to use to verify SSL connections
 #OPENSTACK_SSL_CACERT = '/path/to/cacert.pem'
@@ -325,7 +328,11 @@ OPENSTACK_NEUTRON_NETWORK = {
     'enable_ipv6': True,
     'enable_distributed_router': False,
     'enable_ha_router': False,
+{% if neutron.lbaas.enabled|bool %}
     'enable_lb': True,
+{% else %}
+    'enable_lb': False,
+{% endif %}
     'enable_firewall': True,
     'enable_vpn': True,
     'enable_fip_topology_check': True,
@@ -779,5 +786,6 @@ REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
 # http://tinyurl.com/anticlickjack
 #DISALLOW_IFRAME_EMBED = True
 
-
+{% if openstack_install_method != 'distro' %}
 STATIC_ROOT = "{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/static"
+{% endif %}

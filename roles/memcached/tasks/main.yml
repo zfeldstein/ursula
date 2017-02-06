@@ -1,10 +1,39 @@
 ---
 - name: install memcached packages
-  apt: pkg={{ item }}
-  with_items:
-    - memcached
-    - python-memcache
-    - libsasl2-dev
+  package: name=memcached
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install memcached packages
+  package:
+    name=libsasl2-dev
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install memcached packages
+  package:
+    name=cyrus-sasl-devel
+  when: os == 'rhel'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+
+- name: install memcached packages
+  package:
+    name=python-memcache
+  when: os == 'ubuntu'
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install memcached packages
+  package:
+    name=python-memcached
+  when: os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -16,9 +45,15 @@
   template: src=memcached.conf dest=/etc/memcached.conf mode=0644
   notify:
     - restart memcached
+  when: openstack_install_method != 'distro'
+
+- name: memcached configuration (rhel osp)
+  template: src=etc/sysconfig/memcached dest=/etc/sysconfig/memcached mode=0644
+  notify:
+    - restart memcached
+  when: openstack_install_method == 'distro'
 
 - include: monitoring.yml
   tags:
     - monitoring
-    - common
   when: monitoring.enabled|default('True')|bool

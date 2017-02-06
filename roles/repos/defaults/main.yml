@@ -1,5 +1,6 @@
 ---
 repos: []
+repo: ~
 apt_repos:
   # All key_urls should be HTTPS to ensure we are retrieving the key we are expecting too
   docker:
@@ -15,8 +16,8 @@ apt_repos:
     repo: 'http://hwraid.le-vert.net/ubuntu'
     key_url: 'http://hwraid.le-vert.net/debian/hwraid.le-vert.net.gpg.key'
   sensu:
-    repo: 'http://repos.sensuapp.org/apt'
-    key_url: 'https://repos.sensuapp.org/apt/pubkey.gpg'
+    repo: 'https://sensu.global.ssl.fastly.net/apt'
+    key_url: 'https://sensu.global.ssl.fastly.net/apt/pubkey.gpg'
     distribution: 'sensu'
     components: 'main'
   haproxy:
@@ -45,3 +46,25 @@ apt_repos:
   logstash_forwarder:
     repo: ''
     key_url: ''
+  elastic:
+    repo: 'https://artifacts.elastic.co/packages/5.x/apt'
+    key_url: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
+
+yum_repos:
+  epel:
+    package: https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm
+  percona:
+    package: http://www.percona.com/downloads/percona-release/redhat/0.1-3/percona-release-0.1-3.noarch.rpm
+  sensu:
+    repo: http://sensu.global.ssl.fastly.net/yum/$basearch/
+    description: sensu monitoring repo
+    gpgcheck: no
+  elastic:
+    repo: https://artifacts.elastic.co/packages/5.x/yum
+    description: Filebeat repo
+    gpgcheck: yes
+    key_url: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+  chef:
+    repo: https://packages.chef.io/repos/yum/stable/el/7/x86_64/
+    gpgcheck: yes
+    key_url: https://downloads.chef.io/packages-chef-io-public.key

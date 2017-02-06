@@ -59,7 +59,17 @@
   ufw: rule=allow to_port={{ item }} proto=tcp
   tags: ufw
   with_items:
-    - 9511
+    - "{{ endpoints.magnum.port.haproxy_api }}"
+
+
+- name: Permit access to magnum
+  firewalld:
+    permanent: true
+    port: "{{ item }}/tcp"
+  with_items:
+    - "{{ endpoints.magnum.port.haproxy_api }}"
+  tags: firewall
+  when: os == 'rhel'
 
 # TODO:
 #- include: monitoring.yml tags=monitoring,common

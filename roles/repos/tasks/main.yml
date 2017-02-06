@@ -1,0 +1,6 @@
+- include: apt.yml
+  when: os == "ubuntu"
+
+- include: yum.yml
+  when: os == "rhel"
+

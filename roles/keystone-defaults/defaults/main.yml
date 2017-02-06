@@ -6,6 +6,15 @@ keystone:
   public_workers: 5
   admin_project_name: admin
   admin_project_domain_name: Default
+  uwsgi:
+    method: port
+    http_port:
+      admin: 9091
+      public: 9092
+    home:
+      distro: /usr/lib/python2.7/site-packages/keystone
+      source: /opt/openstack/current/keystone
+      package: /opt/openstack/current/keystone
   source:
     rev: 'stable/newton'
     constrain: True
@@ -16,15 +25,25 @@ keystone:
       - { name: pyldap }
       - { name: ldappool }
     system_dependencies:
-      - openssl
-      - libldap2-dev
-      - libsasl2-dev
-      - libkrb5-dev
+        ubuntu:
+        - openssl
+        - libldap2-dev
+        - libsasl2-dev
+        - libkrb5-dev
+        rhel:
+        - openssl
+        - openldap-devel
+        - libgsasl-devel
+        - krb5-devel
   alternatives:
     - keystone-manage
     - keystone-wsgi-admin
     - keystone-wsgi-public
   jellyroll: False # custom middleware for password compliance
+  security_compliance:
+    enabled: true
+    password_regex: '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=()_]).{8,}$'
+    password_regex_description: 'Password is not compliant. Password must contain uppercase, lowercase, special characters !@#$%%^&+=()_, digits, and be at least 8 characters in length.'
   roles:
     - project_admin
     - cloud_admin

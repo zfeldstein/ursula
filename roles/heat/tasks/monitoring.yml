@@ -1,15 +1,21 @@
 ---
-- name: heat-api process check
-  sensu_process_check: service=heat-api
+- name: heat process check installation for non-distro installation
+  sensu_process_check: service={{ item }}
+  with_items:
+    - heat-api
+    - heat-api-cfn
+    - heat-engine
   notify: restart sensu-client
-
-- name: heat-api-cfn process check
-  sensu_process_check: service=heat-api-cfn
+  when: openstack_install_method != 'distro'
+  
+- name: heat process check installation for non-distro installation
+  sensu_process_check: service={{ item }}
+  with_items:
+    - openstack-heat-api
+    - openstack-heat-api-cfn
+    - openstack-heat-engine
   notify: restart sensu-client
-
-- name: heat-engine process check
-  sensu_process_check: service=heat-engine
-  notify: restart sensu-client
+  when: openstack_install_method == 'distro' and os == 'rhel'
 
 - name: heat-api check
   sensu_check: name=check-heat-api plugin=check-os-api.rb

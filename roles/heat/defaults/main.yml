@@ -1,6 +1,11 @@
 ---
 project_name: heat
 heat:
+  osp_sys_packages: 
+    - openstack-heat-api
+    - openstack-heat-api-cfn
+    - openstack-heat-engine
+    - openstack-heat-common
   enabled: True
   heartbeat_timeout_threshold: 30
   source:
@@ -9,7 +14,9 @@ heat:
     upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
-    system_dependencies: []
+    system_dependencies:
+      ubuntu: []
+      rhel: []
   alternatives:
     - heat-api
     - heat-api-cfn

@@ -26,6 +26,7 @@ export testenv_flavor=${testenv_flavor:=m1.large}
 export testenv_network=${testenv_network:=internal}
 export testenv_floating_ip_pool=${testenv_floating_ip_pool:=external}
 
+VMS="${testenv_instance_prefix}-controller-0 ${testenv_instance_prefix}-controller-1 ${testenv_instance_prefix}-compute-0"
 if [[ $TEST_ENV == "ci-allinone" ]]; then
   VMS="${testenv_instance_prefix}-allinone"
 elif [[ $TEST_ENV == "ci-ceph_swift" ]]; then
@@ -40,14 +41,15 @@ elif [[ $TEST_ENV == "ci-ceph_swift" ]]; then
   ${testenv_instance_prefix}-swift-2"
 
   export testenv_flavor_ceph_swift=${testenv_flavor_ceph_swift:=ci_ceph_swift}
-else
+elif [[ $TEST_ENV == "ci-full-centos" ]]; then
+  export EXTRA_HEAT_PARAMS="--heat-parameters key_name=${testenv_instance_prefix}_key"
+elif [[ $TEST_ENV != "ci-full-centos" ]]; then
   TEST_ENV="ci-full"
-  VMS="${testenv_instance_prefix}-controller-0 ${testenv_instance_prefix}-controller-1 ${testenv_instance_prefix}-compute-0"
 fi
 
 export KEY_NAME="${testenv_instance_prefix}_key"
 export KEY_PATH=${ROOT}/tmp/ssh_key
-LOGIN_USER=ubuntu
+LOGIN_USER=${LOGIN_USER:-"ubuntu"}
 SSH_ARGS=\
 " ${ANSIBLE_SSH_ARGS}"\
 ' -o LogLevel=quiet'\
@@ -56,6 +58,15 @@ SSH_ARGS=\
 " -i ${KEY_PATH}"
 export ANSIBLE_SSH_ARGS="${SSH_ARGS}"
 
+export SECURITYGROUP_NAME="${testenv_instance_prefix}_ursula"
+export CONTROLLER_0_NAME="${testenv_instance_prefix}-controller-0"
+export CONTROLLER_1_NAME="${testenv_instance_prefix}-controller-1"
+export COMPUTE_0_NAME="${testenv_instance_prefix}-compute-0"
+if [[ $TEST_ENV == "ci-full-centos" ]]; then
+    EXTRA_HEAT_PARAMS="image=${IMAGE_ID};key_name=${KEY_NAME};security_group=${SECURITYGROUP_NAME};controller-0_name=${CONTROLLER_0_NAME};controller-1_name=${CONTROLLER_1_NAME};compute-0_name=${COMPUTE_0_NAME}"
+else
+    EXTRA_HEAT_PARAMS="image=${IMAGE_ID}"
+fi
 
 die() {
   echo "[ERROR] $*"; exit 1
