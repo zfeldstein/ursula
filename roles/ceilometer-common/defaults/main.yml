@@ -19,6 +19,7 @@ ceilometer:
   mongodb_user: ceilometer
   mongodb_password: "{{ secrets.mongodb_password | default('BADPASS') }}"
   heartbeat_timeout_threshold: 30
+  collector_workers: 4
   logs:
     - paths:
         - /var/log/ceilometer/api.log
