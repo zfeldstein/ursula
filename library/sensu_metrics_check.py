@@ -19,9 +19,17 @@
 
 import os
 import traceback
+import socket
 
 from hashlib import md5
 from jinja2 import Environment
+
+def validIP(ip):
+  try:
+    socket.inet_aton(ip)
+    return True
+  except socket.error:
+    return False
 
 def main():
 
@@ -36,7 +44,8 @@ def main():
             check_dir=dict(default='/etc/sensu/conf.d/checks', required=False),
             prefix=dict(default='', required=False),
             interval=dict(default=60, required=False),
-            state=dict(default='present', required=False, choices=['present','absent'])
+            state=dict(default='present', required=False, choices=['present','absent']),
+            only_on_ip=dict(default='', required=False)
         )
     )
 
@@ -50,6 +59,8 @@ def main():
                 command = '%s %s' % (module.params['prefix'], command)
             if module.params['use_sudo']:
                 command = "sudo %s" % (command)
+            if module.params['only_on_ip'] is not None and validIP(module.params['only_on_ip']):
+                command = "/etc/sensu/plugins/execute-on-ip.sh -i %s -c '%s'" % ( module.params['only_on_ip'], command )
             check=dict({
                 'checks': {
                     module.params['name']: {

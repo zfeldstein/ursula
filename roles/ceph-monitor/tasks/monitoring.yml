@@ -19,6 +19,7 @@
 - name: ceph usage metrics
   sensu_metrics_check:
     name: ceph-usage-metrics
-    plugin: metrics-ceph.py
+    plugin: metrics-ceph-pool-capacity.rb
+    args: '--scheme {{ monitoring.graphite.cluster_prefix }}.ceph'
     use_sudo: true
   notify: restart sensu-client

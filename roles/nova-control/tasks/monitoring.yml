@@ -14,26 +14,10 @@
     - nova-consoleauth
     - nova-scheduler
   notify: restart sensu-client
-  when: openstack_install_method != 'distro'
-  
-- name: nova process checks
-  sensu_process_check: service={{ item }}
-  with_items:
-    - openstack-nova-conductor
-    - openstack-nova-consoleauth
-    - openstack-nova-scheduler
-  notify: restart sensu-client
-  when: openstack_install_method == 'distro' and os == 'rhel'
 
 - name: nova-api process checks
   sensu_process_check: service=nova-api warn_over=20 crit_over=30
   notify: restart sensu-client
-  when: openstack_install_method != 'distro'
-  
-- name: nova-api process checks
-  sensu_process_check: service=openstack-nova-api warn_over=20 crit_over=30
-  notify: restart sensu-client
-  when: openstack_install_method == 'distro' and os == 'rhel'
 
 - name: nova-api check
   sensu_check: name=check-nova-api plugin=check-os-api.rb
@@ -84,10 +68,20 @@
   sensu_metrics_check:
     name: compute-quotas-metrics
     plugin: metrics-nova-project-quotas.py
+    state: absent
   notify: restart sensu-client
 
 - name: nova usage metrics
   sensu_metrics_check:
     name: compute-usage-metrics
     plugin: metrics-nova-project-usage.py
+    state: absent
+  notify: restart sensu-client
+  
+- name: nova limit metrics (quota/usage)
+  sensu_metrics_check:
+    name: compute-limit-metrics
+    plugin: metrics-openstack-project-limits.py
+    args: '-S nova --scheme {{ monitoring.graphite.cluster_prefix }}'
+    only_on_ip: "{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
