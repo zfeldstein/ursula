@@ -24,16 +24,8 @@
 - name: create horizon config directory
   file: dest=/etc/openstack-dashboard state=directory
 
-
 - name: create horizon config directory
   file: dest=/etc/openstack-dashboard state=directory
-
-#- name: openstack dashboard config rhel)
-#  template: src=etc/apache2/sites-available/openstack_dashboard.conf
-#            dest=/etc/httpd/conf.d/openstack_dashboard.conf
-#  when: os == 'rhel'
-#  notify:
-#    - reload apache
 
 - name: openstack dashboard config (12.04)
   template: src=etc/apache2/sites-available/openstack_dashboard.conf
@@ -172,6 +164,60 @@
     - horizon.logo_url is defined
     - horizon.favicon_url is defined
     - openstack_install_method == 'distro'
+
+- name: Install horizon-customization module (rhel osp)
+  pip:
+    name: "bb-horizon-customization"
+    extra_args: "-i {{ openstack.pypi_mirror }}"
+  register: result
+  until: result|succeeded
+  retries: 5
+  when:
+    - horizon.customize|default('False')|bool
+    - openstack_install_method == 'distro'
+  
+- name: rcue settings file exists (rhel osp)
+  stat:
+    path: /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py
+  register: rcue
+  when:
+    - horizon.customize|default('False')|bool
+    - openstack_install_method == 'distro'
+  
+- name: Disable OSP custom dashboard (rhel osp)
+  command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled
+  when:
+    - horizon.customize|default('False')|bool
+    - os == 'rhel'
+    - openstack_install_method == 'distro'
+    - rcue.stat.exists == True
+  notify: reload apache
+
+- name: rcue disabled file exists (rhel osp)
+  stat:
+    path: /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled
+  register: rcued
+  when:
+    - not horizon.customize|default('False')|bool
+    - openstack_install_method == 'distro'
+    - os == 'rhel'
+  
+- name: Enable OSP custom dashboard (rhel osp)
+  command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py 
+  when:
+    - not horizon.customize|default('False')|bool
+    - openstack_install_method == 'distro'
+    - os == 'rhel'
+    - rcued.stat.exists == True
+  notify: reload apache
+
+- name: Enable/Disable lbaas dashboard (ubuntu)
+  file:
+    src: "{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/neutron_lbaas_dashboard/enabled/_1481_project_ng_loadbalancersv2_panel.py"
+    path: "{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/local/enabled/_1481_project_ng_loadbalancersv2_panel.py"
+    state: "{{ (neutron.lbaas.enabled | bool) | ternary('link', 'absent') }}"
+  notify: reload apache
+  when: os == 'ubuntu'
 
 - name: Enable/Disable lbaas dashboard (ubuntu)
   file:

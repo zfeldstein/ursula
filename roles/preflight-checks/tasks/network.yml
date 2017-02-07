@@ -1,5 +1,7 @@
 ---
 - name: checking network {{ item.name }}
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_networks_facts:
     name: "{{ item.name }}"
     auth:
@@ -7,6 +9,7 @@
       project_name: admin
       username: admin
       password: "{{ secrets.admin_password }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
 
 - block:
   - name: ensure provider physical netowrk
