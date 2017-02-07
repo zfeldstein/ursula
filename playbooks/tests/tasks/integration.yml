@@ -107,5 +107,4 @@
                cirros@{{ item.floating_ip.floating_ip_address }}
                ping -c 5 www.google.com
       with_items: "{{ floating_ip.results }}"
-      when: item.floating_ip is defined and
-            ansible_distribution_version == "12.04"
+      when: item.floating_ip is defined
