@@ -160,18 +160,50 @@
     - horizon.favicon_url is defined
     - openstack_install_method != 'distro'
 
-- name: custom horizon logo (rhel osp)
-  get_url: url={{ item.url }}
-           dest=/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/{{ item.name }}
-           force=True
-  with_items:
-    - { name: img/logo.png, url: "{{ horizon.logo_url|default('') }}"  }
-    - { name: img/logo-splash.png, url: "{{ horizon.logo_url|default('') }}" }
-    - { name: img/favicon.ico, url: "{{ horizon.favicon_url|default('') }}" }
-  when:
-    - horizon.logo_url is defined
-    - horizon.favicon_url is defined
-    - openstack_install_method == 'distro'
+- block:
+  - name: custom horizon logo (rhel osp)
+    get_url: url={{ item.url }}
+             dest=/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/{{ item.name }}
+             force=True
+    with_items:
+      - { name: img/logo.png, url: "{{ horizon.logo_url|default('') }}"  }
+      - { name: img/logo-splash.png, url: "{{ horizon.logo_url|default('') }}" }
+      - { name: img/favicon.ico, url: "{{ horizon.favicon_url|default('') }}" }
+    when:
+      - horizon.logo_url is defined
+      - horizon.favicon_url is defined
+
+  - name: rcue settings file exists (rhel osp)
+    stat:
+      path: /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py
+    register: rcue
+    when:
+      - horizon.customize|default('False')|bool
+
+  - name: Disable OSP custom dashboard (rhel osp)
+    command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled
+    when:
+      - horizon.customize|default('False')|bool
+      - os == 'rhel'
+      - rcue.stat.exists == True
+    notify: reload apache
+  
+  - name: rcue disabled file exists (rhel osp)
+    stat:
+      path: /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled
+    register: rcued
+    when:
+      - not horizon.customize|default('False')|bool
+      - os == 'rhel'
+
+  - name: Enable OSP custom dashboard (rhel osp)
+    command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py 
+    when:
+      - not horizon.customize|default('False')|bool
+      - os == 'rhel'
+      - rcued.stat.exists == True
+    notify: reload apache
+  when: openstack_install_method == 'distro'
 
 - name: Enable/Disable lbaas dashboard (ubuntu)
   file:

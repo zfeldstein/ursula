@@ -14,7 +14,10 @@ horizon:
     enabled: True
     regex: '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=()_]).{8,}$'
     help_text: 'Password is not compliant. Password must contain uppercase, lowercase, special characters !@#$%%^&+=()_, digits, and be at least 8 characters in length.'
+  distro:
+    python_post_dependencies: []
   source:
+    python_post_dependencies: []
     rev: 'stable/newton'
     constrain: True
     upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
@@ -22,7 +25,6 @@ horizon:
       - { name: PyMySQL }
       - { name: python-memcached }
       - { name: neutron-lbaas-dashboard }
-      - { name: "git+https://github.com/blueboxgroup/horizon-customization#egg=horizon-customization"}
       - { name: django_openstack_auth, version: '2.2.1.dev1' }
     system_dependencies:
       ubuntu:
