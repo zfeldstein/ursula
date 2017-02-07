@@ -23,6 +23,7 @@
     - event_pipeline.yaml
     - pipeline.yaml
     - ceilometer_api_audit_map.conf
+  notify: restart ceilometer services
 
 - include: logging.yml
   tags:
