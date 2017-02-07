@@ -15,6 +15,7 @@ dependencies:
     constrain: "{{ horizon.source.constrain }}"
     upper_constraints: "{{ horizon.source.upper_constraints }}"
     additional_handlers: [ "compress horizon assets" ]
+    python_post_dependencies: "{{ horizon.source.python_post_dependencies }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: horizon
@@ -23,6 +24,7 @@ dependencies:
     project_name: horizon
     dependent_packages: "{{ horizon.osp_sys_packages }}"
     package_name: openstack-dashboard
+    python_post_dependencies: "{{ horizon.distro.python_post_dependencies }}"
     when: openstack_install_method == 'distro' 
   - role: apache
   - role: keystone-defaults
