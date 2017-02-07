@@ -38,3 +38,8 @@ monitoring:
     vhost: /sensu
   check_handler: pagerduty
   metrics_handler: graphite
+  keepalive:
+    handler: default
+    thresholds:
+      warning: 40
+      critical: 60
