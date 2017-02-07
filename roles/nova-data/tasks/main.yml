@@ -13,6 +13,7 @@
 - include: docker.yml
   when: nova.compute_driver == "novadocker.virt.docker.DockerDriver"
 
+#FIXME Do we need this on RHOSP
 - name: install nova data plan requirements
   package: name=sysfsutils
   register: result
@@ -27,7 +28,6 @@
     group: "{{ (os == 'rhel' ) | ternary('qemu', 'nova') }}"
     mode: 0755
 
-
 - name: nova instances directory
   file:
     dest: "{{ nova.state_path }}/instances"
@@ -36,32 +36,34 @@
     group: "{{ (os == 'rhel' ) | ternary('qemu', 'nova') }}"
     mode: 0755
 
-- name: nbd module - ubuntu
-  lineinfile: dest=/etc/modules line="nbd"
+- block:
+  - name: nbd module - ubuntu
+    lineinfile: dest=/etc/modules line="nbd"
+    when: os == 'ubuntu'
+
+  - name: probe nbd - ubuntu
+    modprobe: name=nbd state=present
   when: os == 'ubuntu'
 
-- name: probe nbd - ubuntu
-  modprobe: name=nbd state=present
-  when: os == 'ubuntu'
-
+#FIXME do we need this on rhosp?
 - name: install nbd package - rhel
   package:
     name: nbd
   when: os == 'rhel'
 
-- name: check if SMT is enabled
-  command: "ppc64_cpu --smt"
-  failed_when: False
-  changed_when: False
-  register: smt
-  when: ansible_architecture == "ppc64le"
+- block:
+  - name: check if SMT is enabled
+    command: "ppc64_cpu --smt"
+    failed_when: False
+    changed_when: False
+    register: smt
 
-- name: disable SMT for ppc64le
-  command: "ppc64_cpu --smt=off"
-  when: ansible_architecture == "ppc64le" and not smt.stdout|search("SMT is off")
+  - name: disable SMT for ppc64le
+    command: "ppc64_cpu --smt=off"
+    when: not smt.stdout|search("SMT is off")
 
-- name: ensure that SMT is off at runtime before we startup libvirt (ppc64)
-  lineinfile: dest=/etc/default/libvirt-bin line="ppc64_cpu --smt=off"
+  - name: ensure that SMT is off at runtime before we startup libvirt (ppc64)
+    lineinfile: dest=/etc/default/libvirt-bin line="ppc64_cpu --smt=off"
   when: ansible_architecture == "ppc64le"
 
 - name: enable cinder encryption
@@ -70,20 +72,37 @@
   notify: restart nova compute
   when: cinder.fixed_key is defined
 
-- name: disable  cinder encryption
+- name: disable cinder encryption
   file: dest=/etc/nova/nova.cinder_encryption.conf state=absent
   notify: restart nova compute
   when: cinder.fixed_key is not defined
 
-- name: install nova-compute service
-  upstart_service: name=nova-compute user=nova cmd=/usr/local/bin/nova-compute
-                   config_dirs=/etc/nova
+- name: install nova-compute service (ubuntu)
+  upstart_service:
+    name: "{{ item.name }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+  with_items:
+    - "{{ nova.services.nova_compute }}"
   when: os == 'ubuntu'
 
-- name: install nova-compute service (rhel source)
-  systemd_service: name=nova-compute user=nova cmd=/usr/local/bin/nova-compute
-                   config_dirs=/etc/nova
-  when: os == 'rhel' and openstack_install_method == 'source'
+- name: install nova-compute service (rhel)
+  systemd_service:
+    name: "{{ item.name }}"
+    description: "{{ item.desc }}"
+    after: "{{ item.after }}"
+    type: "{{ item.type }}"
+    notify_access: "{{ item.notify_access|default(omit) }}"
+    user: "{{ item.user }}"
+    environment: "{{ item.environment }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+    config_files: "{{ item.config_files }}"
+    restart: "{{ item.restart }}"
+  with_items:
+    - "{{ nova.services.nova_compute }}"
+  when: os == 'rhel'
 
 - name: trigger restart on upgrades
   debug:
@@ -96,12 +115,10 @@
 - meta: flush_handlers
 
 - name: start nova-compute
-  when: openstack_install_method != 'distro'
-  service: name=nova-compute state=started
-
-- name: start nova-compute (rhel osp)
-  when: openstack_install_method == 'distro'
-  service: name=openstack-nova-compute state=started
+  service:
+    name: "{{ nova.services.nova_compute.name }}"
+    state: started
+    enabled: True
 
 - include: monitoring.yml
   tags:

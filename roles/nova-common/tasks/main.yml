@@ -1,11 +1,15 @@
 ---
-- set_fact:
-    libvirt_service: libvirt-bin
-  when: os == 'ubuntu'
+#FIXME, find a better way to handle this
+- stat:
+    path: /etc/httpd/conf.d/00-nova-placement-api.conf
+  register: np
 
-- set_fact:
-    libvirt_service: libvirtd
-  when: os == 'rhel'
+- name: disable nova placement API
+  command: mv /etc/httpd/conf.d/00-nova-placement-api.conf /etc/httpd/conf.d/00-nova-placement-api.disabled
+  when:
+    - np.stat.exists == True
+    - os == 'rhel'
+    - openstack_install_method == 'distro'
 
 - name: nova user
   user:
@@ -25,18 +29,6 @@
   register: result
   until: result|succeeded
   retries: 5
-
-#FIXME, find a better way to handle this
-- stat:
-    path: /etc/httpd/conf.d/00-nova-placement-api.conf
-  register: np
-
-- name: disable nova placement API
-  command: mv /etc/httpd/conf.d/00-nova-placement-api.conf /etc/httpd/conf.d/00-nova-placement-api.disabled
-  when: 
-    - np.stat.exists == True 
-    - os == 'rhel' 
-    - openstack_install_method == 'distro'
 
 - name: create nova config dir
   file: dest=/etc/nova state=directory

@@ -1,4 +1,5 @@
 ---
+# FIXME move to defaults
 # set facts to deal with cross platform
 - set_fact:
     rsync_defaults: /etc/sysconfig/rsyncd

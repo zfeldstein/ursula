@@ -1,6 +1,11 @@
 ---
 project_name: cinder
 cinder:
+  services:
+    cinder_api: "{{ openstack_meta.cinder.services.cinder_api[os] }}"
+    cinder_scheduler: "{{ openstack_meta.cinder.services.cinder_scheduler[os] }}"
+    cinder_volume: "{{ openstack_meta.cinder.services.cinder_volume[os] }}"
+    cinder_backup: "{{ openstack_meta.cinder.services.cinder_backup[os] }}"
   enabled: True
   enabled_backends: [] # determined automatically by Ceph roles
   default_backend:
@@ -13,6 +18,22 @@ cinder:
   create_vg: False
   common_volume_name: True
   allow_availability_zone_fallback: True
+  data_pkgs:
+    ubuntu:
+      - cryptsetup
+      - lvm2
+      - tgt
+      - nbd-client
+      - open-iscsi
+      - qemu-utils
+    #FIXME do we need these pkgs on rhel?
+    rhel:
+      - cryptsetup
+      - lvm2
+      - targetcli
+      - nbd
+      - iscsi-initiator-utils
+      - qemu-kvm-tools
   iscsi_helper:
     ubuntu: tgtadm
     rhel: targetcli

@@ -62,6 +62,7 @@
     group: nova
     mode: 0755
 
+#FIXME WHy only ubuntu?
 - name: verify ssh among compute nodes
   command: "{{ nova.state_path }}/bin/verify-ssh"
   become: yes

@@ -23,48 +23,55 @@ import traceback
 from hashlib import md5
 from jinja2 import Environment
 
-UPSTART_TEMPLATE = """
+SYSTEMD_TEMPLATE = """
 [Unit]
 {% if description -%}
 Description={{ description }}
 {% endif %}
-
-{% if after -%}
 After={{ after }}
-{% else -%}
-After=network.target syslog.target
-{% endif %}
 
 [Install]
-{% if wanted_by -%}
 WantedBy={{ wanted_by }}
+{% if alias -%}
+Alias={{ alias }}.service
 {% endif %}
-Alias={{ name }}.service
 
 [Service]
 {% if environment_file -%}
-EnvironmentFile=-{{ environment_file }}
+EnvironmentFile={{ environment_file }}
 {% endif %}
-
-# Start main service
-ExecStart={{ cmd }} {{ args }}
-
-{% if prestart_script -%}
-ExecStartPre={{ prestart_script }}
+{% if environment -%}
+Environment={{ environment }}
 {% endif %}
-
-#ExecStop=
-
-#ExecStopPost=
-
-#ExecReload=
-
+Type={{ type }}
+{% if notify_access -%}
+NotifyAccess={{ notify_access }}
+{% endif %}
 {% if user -%}
 User={{ user }}
 {% endif %}
-
-TimeoutStartSec=120
-TimeoutStopSec=120
+{% if restart -%}
+Restart={{ restart }}
+{% endif %}
+{% if restart_secs -%}
+RestartSec={{ restart_secs }}
+{% endif %}
+{% if restart_secs -%}
+PIDFile={{ pidfile }}
+{% endif %}
+# Start main service
+ExecStart={{ cmd }} {{ args }}
+{% if prestart_script -%}
+ExecStartPre={{ prestart_script }}
+{% endif %}
+{% if kill_mode -%}
+KillMode={{ kill_mode }}
+{% endif %}
+#ExecStop=
+#ExecStopPost=
+#ExecReload=
+TimeoutStartSec={{ timeout_start_secs }}
+TimeoutStopSec={{ timeout_stop_secs }}
 
 """
 
@@ -74,13 +81,31 @@ def main():
         argument_spec=dict(
             name=dict(default=None, required=True),
             cmd=dict(default=None, required=True),
+            environment=dict(default=None),
+            environment_file=dict(default=None),
             args=dict(default=None),
             user=dict(default=None),
             description=dict(default=None),
+            after=dict(default='network.target syslog.target'),
+            wanted_by=dict(default='multi-user.target'),
+            alias=dict(default=None),
+            type=dict(default='simple', choices=['simple',
+                                                 'forking', 'oneshot', 'dbus',
+                                                 'notify', 'idle']),
+            restart=dict(default=None, choices=['always', 'on-success',
+                                                'on-failure', 'on-abnormal',
+                                                'on-abort"', 'on-watchdog']),
+            restart_secs=dict(default=None),
+            notify_access=dict(default=None, choices=['none', 'main', 'all']),
             config_dirs=dict(default=None),
             config_files=dict(default=None),
-            state=dict(default='present'),
+            state=dict(default='present', choices=['present', 'absent']),
             prestart_script=dict(default=None),
+            timeout_start_secs=dict(default='120'),
+            timeout_stop_secs=dict(default='120'),
+            kill_mode=dict(default=None, choices=['control-group', 'process',
+                                                  'mixed', 'none']),
+            pidfile=dict(default=None),
             path=dict(default=None)
         )
     )
@@ -89,7 +114,7 @@ def main():
         changed = False
         service_path = None
         if not module.params['path']:
-            service_path = '/etc/systemd/system/%s.service' % module.params['name']
+            service_path = '/usr/lib/systemd/system/%s.service' % module.params['name']
         else:
             service_path = module.params['path']
 
@@ -120,7 +145,7 @@ def main():
         template_vars = module.params
         template_vars['args'] = args
 
-        env = Environment().from_string(UPSTART_TEMPLATE)
+        env = Environment().from_string(SYSTEMD_TEMPLATE)
         rendered_service = env.render(template_vars)
 
         if os.path.exists(service_path):

@@ -45,16 +45,46 @@
     uwsgi_path: "/usr/sbin/uwsgi"
   when: openstack_install_method == 'distro'
 
-- name: install keystone uwsgi service
-  template: src=etc/init/keystone.conf
-            dest=/etc/init/keystone.conf mode=0644
+- block:
+  - name: install keystone uwsgi service (ubuntu)
+    template: src=etc/init/keystone.conf
+              dest=/etc/init/keystone.conf mode=0644
+
+  - name: permit access to keystone (ubuntu)
+    ufw: rule=allow to_port={{ item }} proto=tcp
+    tags: ufw
+    with_items:
+      - "{{ endpoints.keystone.port.haproxy_api }}"
+      - "{{ endpoints.keystone_admin.port.haproxy_api }}"
+      - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
+    tags: firewall
   when: os == 'ubuntu'
 
-- name: install keystone uwsgi service
-  systemd_service:
-    name: keystone
-    cmd: "{{ uwsgi_path }}"
-    args: "--uid keystone --gid keystone --master --emperor /etc/keystone/uwsgi"
+- block:
+  - name: install keystone uwsgi service (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      cmd: "{{ uwsgi_path }}"
+      args: "{{ item.args }}"
+      user: "{{ item.user }}"
+      type: "{{ item.type }}"
+      notify_access: "{{ item.notify_access }}"
+      restart: "{{ item.restart }}"
+    with_items:
+      - "{{ openstack_meta.keystone.services.keystone_api[os] }}"
+
+  - name: Permit access to keystone (rhel)
+    firewalld:
+      state: enabled
+      permanent: true
+      immediate: true
+      port: "{{ item }}/tcp"
+    with_items:
+      - "{{ endpoints.keystone.port.haproxy_api }}"
+      - "{{ endpoints.keystone_admin.port.haproxy_api }}"
+      - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
+    tags: firewall
   when: os == 'rhel'
 
 - name: Creates keystone uwsgi and httpd directories
@@ -83,7 +113,7 @@
 - include: openidc.yml
   when: keystone.federation.enabled|bool and keystone.federation.sp.oidc.enabled|bool
 
-- name: keystone apache vhost
+- name: keystone apache vhost (ubuntu)
   template: src=etc/apache2/sites-available/keystone.conf
             dest=/etc/apache2/sites-available/keystone.conf
   when: os == 'ubuntu'
@@ -91,7 +121,7 @@
     - reload apache
   tags: keystone-federation
 
-- name: keystone apache vhost
+- name: keystone apache vhost (rhel)
   template: src=etc/apache2/sites-available/keystone.conf
             dest=/etc/httpd/conf.d/keystone.conf
   when: os == 'rhel'
@@ -142,34 +172,16 @@
 - meta: flush_handlers
 
 - name: start keystone
-  service: name=keystone state=started enabled=true
+  service:
+    name: "{{ openstack_meta.keystone.services.keystone_api[os].name }}"
+    state: started
+    enabled: true
 
 - name: start shibboleth service
   service: name=shibd state=started enabled=true
   when: keystone.federation.enabled|bool and keystone.federation.sp.saml.enabled|bool
 
-- name: permit access to keystone
-  ufw: rule=allow to_port={{ item }} proto=tcp
-  tags: ufw
-  with_items:
-    - "{{ endpoints.keystone.port.haproxy_api }}"
-    - "{{ endpoints.keystone_admin.port.haproxy_api }}"
-    - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
-  when: os == 'ubuntu'
-
-- name: Permit access to keystone
-  firewalld:
-    state: enabled
-    permanent: true
-    immediate: true
-    port: "{{ item }}/tcp"
-  with_items:
-    - "{{ endpoints.keystone.port.haproxy_api }}"
-    - "{{ endpoints.keystone_admin.port.haproxy_api }}"
-    - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
-  tags: firewall
-  when: os == 'rhel'
-
+# FIXME adjust template for /us/bin on rhel
 - name: add cron job to clean up expired tokens
   template:
     src: etc/cron.d/drop-expired-keystone-tokens

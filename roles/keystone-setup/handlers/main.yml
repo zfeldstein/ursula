@@ -1,4 +1,7 @@
 ---
 - name: restart keystone services
-  service: name=keystone state=restarted must_exist=false
+  service:
+    name: "{{ openstack_meta.keystone.services.keystone_api[os].name }}"
+    state: restarted
+    must_exist: false
   when: restart|default('True')

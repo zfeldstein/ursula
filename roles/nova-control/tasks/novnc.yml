@@ -6,32 +6,39 @@
        update={{ openstack.git_update }}
   when: nova.novnc_method == 'git'
 
-- name: novnc staging dir
-  file: dest=/opt/stack/novnc state=directory
+#For novnc+method=file
+- block:
+  - name: novnc staging dir
+    file: dest=/opt/stack/novnc state=directory
+
+  - name: fetch novnc tarball
+    get_url: url={{ nova.novnc_url }} dest=/opt/stack/novnc/novnc-0.5.1.tgz
+
+  - name: unzip novnc tarball
+    unarchive: src=/opt/stack/novnc/novnc-0.5.1.tgz dest=/opt/stack/novnc/ copy=no
+
+  - name: is /usr/share/novnc a symlink or a dir
+    stat: path=/usr/share/novnc
+    register: sym
+
+  - name: rm novnc if not a symlink
+    file: path=/usr/share/novnc state=absent
+    when: sym.stat.islnk is defined and sym.stat.islnk == False
+
+  - name: ensure novnc dir exists
+    file: src=/opt/stack/novnc/noVNC-0.5.1 dest=/usr/share/novnc state=link
+    when: not sym.stat.exists
   when: nova.novnc_method == 'file'
 
-
-- name: fetch novnc tarball
-  get_url: url={{ nova.novnc_url }} dest=/opt/stack/novnc/novnc-0.5.1.tgz
-  when: nova.novnc_method == 'file'
-
-- name: unzip novnc tarball
-  unarchive: src=/opt/stack/novnc/novnc-0.5.1.tgz dest=/opt/stack/novnc/ copy=no
-  when: nova.novnc_method == 'file'
-
-- name: is /usr/share/novnc a symlink or a dir
-  stat: path=/usr/share/novnc
-  register: sym
-
-- name: rm novnc if not a symlink
-  file: path=/usr/share/novnc state=absent
-  when: nova.novnc_method == 'file' and sym.stat.islnk is defined and sym.stat.islnk == False
-
-- name: ensure novnc dir exists
-  file: src=/opt/stack/novnc/noVNC-0.5.1 dest=/usr/share/novnc state=link
-  when: nova.novnc_method == 'file' and not sym.stat.exists
-
-- name: Permit access to NoVNC
+- name: Permit access to NoVNC (ubuntu)
   ufw: rule=allow to_port={{ endpoints.novnc.port.haproxy_api }} proto=tcp
   when: os == 'ubuntu'
-  tags: ufw
+  tags: firewalld
+
+- name: permit access to NoVNC (rhel)
+  firewalld:
+    state: enabled
+    permanent: true
+    port: "{{ endpoints.novnc.port.haproxy_api }}/udp"
+  when: os == 'rhel'
+  tags: firewall

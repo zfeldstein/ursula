@@ -43,6 +43,7 @@
     - etype: other
       permission: r
 
+# FIXME - Probably do not need this as we now overwriting systemd
 #Glance-manage in OSP is creating the api.log with incorrect permissions
 # this prohibits glance-api from starting
 - name: glance fixme acl
@@ -55,43 +56,50 @@
     etype: user
     recursive: yes
 
-- name: permit access to glance
-  ufw: rule=allow to_port={{ item }} proto=tcp
-  tags: ufw
-  with_items:
-    - "{{ endpoints.glance.port.haproxy_api }}"
-    - "{{ endpoints.glance.port.backend_api }}"
+- block:
+  - name: permit access to glance (ubuntu)
+    ufw: rule=allow to_port={{ item }} proto=tcp
+    tags: ufw
+    with_items:
+      - "{{ endpoints.glance.port.haproxy_api }}"
+      - "{{ endpoints.glance.port.backend_api }}"
+
+  - name: install glance services (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+    with_items:
+      - "{{ glance.services.glance_api }}"
+      - "{{ glance.services.glance_registry }}"
   when: os == 'ubuntu'
 
-- name: Permit access to glance
-  firewalld:
-    state: enabled
-    permanent: true
-    immediate: true
-    port: "{{ item }}/tcp"
-  with_items:
-    - "{{ endpoints.glance.port.haproxy_api }}"
-    - "{{ endpoints.glance.port.backend_api }}"
-  tags: firewall
+- block:
+  - name: Permit access to glance (rhel)
+    firewalld:
+      state: enabled
+      permanent: true
+      immediate: true
+      port: "{{ item }}/tcp"
+    with_items:
+      - "{{ endpoints.glance.port.haproxy_api }}"
+      - "{{ endpoints.glance.port.backend_api }}"
+    tags: firewall
+
+  - name: install glance services (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      type: "{{ item.type }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      restart: "{{ item.restart }}"
+    with_items:
+      - "{{ glance.services.glance_api }}"
+      - "{{ glance.services.glance_registry }}"
   when: os == 'rhel'
-
-- name: install glance services
-  systemd_service: name={{ item }}
-                   user=glance
-                   cmd=/usr/local/bin/{{ item }}
-  with_items:
-    - glance-api
-    - glance-registry
-  when: openstack_install_method != 'distro' and os == 'rhel'
-
-- name: install glance services
-  upstart_service: name={{ item }}
-                   user=glance
-                   cmd=/usr/local/bin/{{ item }}
-  with_items:
-    - glance-api
-    - glance-registry
-  when: os == 'ubuntu'
 
 - name: glance config
   template: src={{ item }} dest=/etc/glance mode={{ 0644 if 'policy.json' in item else 0640 }}
@@ -101,19 +109,11 @@
     - restart glance services
 
 - name: stop glance services before db sync
-  service: name={{ item }} state=stopped
+  service: name={{ item.name }} state=stopped
   with_items:
-    - glance-api
-    - glance-registry
-  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method != 'distro'
-  tags: db-migrate
-
-- name: stop glance services before db sync (rhel osp)
-  service: name={{ item }} state=stopped
-  with_items:
-    - openstack-glance-api
-    - openstack-glance-registry
-  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method == 'distro'
+    - "{{ glance.services.glance_api }}"
+    - "{{ glance.services.glance_registry }}"
+  when: (database_create.changed or force_sync|default('false')|bool)
   tags: db-migrate
 
 - name: sync glance database
@@ -125,7 +125,6 @@
     - restart glance services
   # we want this to always be changed so that it can notify the service restart
   tags: db-migrate
-
 
 - include: ceph_integration.yml
   when: ceph.enabled|bool
@@ -141,18 +140,10 @@
 - meta: flush_handlers
 
 - name: start glance services
-  service: name={{ item }} state=started
+  service: name={{ item.name }} state=started enabled=true
   with_items:
-    - glance-api
-    - glance-registry
-  when: openstack_install_method != 'distro'
-
-- name: start glance services (rhel osp)
-  service: name={{ item }} state=started
-  with_items:
-    - openstack-glance-api
-    - openstack-glance-registry
-  when: openstack_install_method == 'distro'
+    - "{{ glance.services.glance_api }}"
+    - "{{ glance.services.glance_registry }}"
 
 - include: image-sync.yml
   when: glance.sync.enabled

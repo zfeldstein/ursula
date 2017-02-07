@@ -16,8 +16,10 @@
 - name: ipchanged systemd service
   systemd_service:
     name: ipchanged
+    type: simple
     cmd: /usr/local/sbin/ipchanged
-
+    wanted_by: multi-user.target
+  when: os == 'rhel'
 
 - name: ipchanged dirs - undercloud
   file: dest=/etc/ipchanged/{{ item }} state=directory
