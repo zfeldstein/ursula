@@ -14,3 +14,25 @@
                        interval=10
   notify: restart sensu-client
   when: not ceph.enabled|default('False')|bool
+  
+# remove neutron agents check on compute
+- name: neutron agents check
+  sensu_check_dict:
+    name: "check-neutron-agents"
+    check: "{{ sensu_checks.neutron.check_neutron_agents }}"
+    state: "absent"
+  notify: restart sensu-client missing ok
+
+- name: neutron agents duplicate check
+  sensu_check_dict:
+    name: "check-neutron-agents-duplicate"
+    check: "{{ sensu_checks.neutron.check_neutron_agents_duplicate }}"
+    state: "absent"
+  notify: restart sensu-client missing ok
+
+- name: neutron router check multiple l3 agents active or all standby status
+  sensu_check_dict:
+    name: "check-neutron-l3-routers"
+    check: "{{ sensu_checks.neutron.check_neutron_l3_routers }}"
+    state: "absent"
+  notify: restart sensu-client missing ok
