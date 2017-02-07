@@ -91,7 +91,7 @@
     - nova-consoleauth
     - nova-scheduler
     - nova-novncproxy
-    
+
 - name: start nova controller services (rhel osp)
   service: name={{ item }} state=started
   when: openstack_install_method == 'distro'
@@ -111,6 +111,7 @@
   firewalld:
     state: enabled
     permanent: true
+    immediate: true
     port: "{{ item }}/tcp"
   with_items:
     - "{{ endpoints.nova.port.haproxy_api }}"

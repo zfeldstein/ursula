@@ -65,6 +65,7 @@
 - name: Permit access to magnum
   firewalld:
     permanent: true
+    immediate: true
     port: "{{ item }}/tcp"
   with_items:
     - "{{ endpoints.magnum.port.haproxy_api }}"

@@ -219,6 +219,7 @@
   firewalld:
     state: enabled
     permanent: true
+    immediate: true
     port: "{{ item }}/tcp"
   with_items:
     - 80

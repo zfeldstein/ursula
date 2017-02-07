@@ -61,6 +61,7 @@
   firewalld:
     state: enabled
     permanent: true
+    immediate: true
     port: "{{ endpoints.cinder.port.haproxy_api }}/tcp"
   tags: firewall
   when: os == 'rhel'

@@ -39,7 +39,7 @@
   set_fact:
     uwsgi_path: "{{ openstack_package.virtualenv_base }}/keystone/bin/uwsgi"
   when: openstack_install_method == 'package' and os == 'ubuntu'
-  
+
 - name: set uwsgi path (package install rhel)
   set_fact:
     uwsgi_path: "/usr/sbin/uwsgi"
@@ -161,6 +161,7 @@
   firewalld:
     state: enabled
     permanent: true
+    immediate: true
     port: "{{ item }}/tcp"
   with_items:
     - "{{ endpoints.keystone.port.haproxy_api }}"
