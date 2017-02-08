@@ -13,47 +13,52 @@
   file: dest=/var/cache/heat state=directory mode=0700
         owner=heat group=heat
 
-- name: permit access to heat
-  ufw: rule=allow to_port={{ item }} proto=tcp
-  tags: ufw
-  with_items:
-    - "{{ endpoints.heat.port.haproxy_api }}"
-    - "{{ endpoints.heat_cfn.port.haproxy_api }}"
+- block:
+  - name: permit access to heat
+    ufw: rule=allow to_port={{ item }} proto=tcp
+    tags: ufw
+    with_items:
+      - "{{ endpoints.heat.port.haproxy_api }}"
+      - "{{ endpoints.heat_cfn.port.haproxy_api }}"
+
+  - name: install heat services (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+    with_items:
+      - "{{ heat.services.heat_api }}"
+      - "{{ heat.services.heat_api_cfn }}"
+      - "{{ heat.services.heat_engine }}"
   when: os == 'ubuntu'
 
-- name: Permit access to heat
-  firewalld:
-    state: enabled
-    permanent: true
-    immediate: true
-    port: "{{ item }}/tcp"
-  with_items:
-    - "{{ endpoints.heat.port.haproxy_api }}"
-    - "{{ endpoints.heat_cfn.port.backend_api }}"
-  tags: firewall
+- block:
+  - name: Permit access to heat
+    firewalld:
+      state: enabled
+      permanent: true
+      immediate: true
+      port: "{{ item }}/tcp"
+    with_items:
+      - "{{ endpoints.heat.port.haproxy_api }}"
+      - "{{ endpoints.heat_cfn.port.backend_api }}"
+    tags: firewall
+
+  - name: install heat services (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      type: "{{ item.type }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      restart: "{{ item.restart }}"
+    with_items:
+      - "{{ heat.services.heat_api }}"
+      - "{{ heat.services.heat_api_cfn }}"
+      - "{{ heat.services.heat_engine }}"
   when: os == 'rhel'
-
-- name: install heat services
-  upstart_service: name={{ item }}
-                   user=heat
-                   cmd=/usr/local/bin/{{ item }}
-                   config_files=/etc/heat/heat.conf
-  with_items:
-    - heat-api
-    - heat-api-cfn
-    - heat-engine
-  when: os == 'ubuntu'
-
-- name: install heat services (rhel source)
-  systemd_service: name={{ item }}
-                   user=heat
-                   cmd=/usr/local/bin/{{ item }}
-                   config_files=/etc/heat/heat.conf
-  with_items:
-    - heat-api
-    - heat-api-cfn
-    - heat-engine
-  when: os == 'rhel' and openstack_install_method == 'source'
 
 - name: heat config
   template: src=etc/heat/{{ item }} dest=/etc/heat/{{ item }} mode={{ 0644 if 'policy.json' in item else 0640 }} owner=heat group=heat
@@ -212,21 +217,12 @@
   run_once: true
 
 - name: stop heat services before db sync
-  service: name={{ item }} state=stopped
-  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method != 'distro'
+  service: name={{ item.name }} state=stopped
+  when: (database_create.changed or force_sync|default('false')|bool)
   with_items:
-    - heat-api
-    - heat-api-cfn
-    - heat-engine
-  tags: db-migrate
-
-- name: stop heat services before db sync (rhel osp)
-  service: name={{ item }} state=stopped
-  when: (database_create.changed or force_sync|default('false')|bool) and openstack_install_method == 'distro'
-  with_items:
-    - openstack-heat-api
-    - openstack-heat-api-cfn
-    - openstack-heat-engine
+    - "{{ heat.services.heat_api }}"
+    - "{{ heat.services.heat_api_cfn }}"
+    - "{{ heat.services.heat_engine }}"
   tags: db-migrate
 
 - name: sync heat database
@@ -250,20 +246,11 @@
 - meta: flush_handlers
 
 - name: start heat services
-  service: name={{ item }} state=started
+  service: name={{ item.name }} state=started enabled=true
   with_items:
-    - heat-api
-    - heat-api-cfn
-    - heat-engine
-  when: openstack_install_method != 'distro'
-
-- name: start heat services (rhel osp)
-  service: name={{ item }} state=started
-  with_items:
-    - openstack-heat-api
-    - openstack-heat-api-cfn
-    - openstack-heat-engine
-  when: openstack_install_method == 'distro'
+    - "{{ heat.services.heat_api }}"
+    - "{{ heat.services.heat_api_cfn }}"
+    - "{{ heat.services.heat_engine }}"
 
 - include: monitoring.yml
   tags:
