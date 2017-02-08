@@ -167,22 +167,25 @@
     - haproxy.loadbalancer.j2
     - haproxy_proxies.j2
   notify: restart neutron lbaas agent
-  when: (neutron.lbaas.enabled == "smart" and
-         groups['controller'][0] not in groups['compute']) or
-         neutron.lbaas.enabled|bool
+  when:
+    - openstack_install_method != 'distro'
+    - (neutron.lbaas.enabled == "smart" and groups['controller'][0] not in groups['compute']) or neutron.lbaas.enabled|bool
 
-- name: neutron lbaas config
-  template:
-    src: etc/neutron/neutron_lbaas.conf
-    dest: /etc/neutron/neutron_lbaas.conf
+- name: symlink other neutron lbaas haproxy templates (distro)
+  file:
+    src: /usr/lib/python2.7/site-packages/neutron_lbaas/drivers/haproxy/templates/{{ item }}
+    dest: /etc/neutron/lbaas_templates/{{ item }}
     owner: root
     group: neutron
-    mode: 0644
-  when: (neutron.lbaas.enabled == "smart" and
-         groups['controller'][0] not in groups['compute']) or
-         neutron.lbaas.enabled|bool
-  notify:
-    - restart neutron lbaas agent
+    state: link
+    force: true
+  with_items:
+    - haproxy.loadbalancer.j2
+    - haproxy_proxies.j2
+  notify: restart neutron lbaas agent
+  when: 
+    - openstack_install_method == 'distro'
+    - (neutron.lbaas.enabled == "smart" and groups['controller'][0] not in groups['compute']) or neutron.lbaas.enabled|bool
 
 - name: neutron lbaas agent config
   template:
