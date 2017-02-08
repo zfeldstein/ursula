@@ -38,16 +38,16 @@ eof
 echo "deleting heat stack to destroy resources including VMs: ${VMS}"
 ${ROOT}/test/cleanup
 
-echo "creating heat template for test env ..."
-if [[ ! -e ${ROOT}/envs/test/heat_stack.yml ]]; then
-  ursula --ursula-debug "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/create_heat_template.yml --extra-vars="use_private_ips=${USE_PRIVATE_IPS}"
-fi
-
 echo "building config"
 rm -rf ${ROOT}/envs/test/group_vars/
 rm -f ${ROOT}/envs/test/hosts
+rm -f ${ROOT}/envs/test/heat_stack.yml
 mkdir -p ${ROOT}/envs/test/group_vars
 cp -r ${ROOT}/envs/example/${TEST_ENV}/* ${ROOT}/envs/test
+echo "creating heat template for test env if no heat_stack.yml in envs/test/..."
+if [[ ! -e ${ROOT}/envs/test/heat_stack.yml ]]; then
+  ursula --ursula-debug "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/create_heat_template.yml --extra-vars="use_private_ips=${USE_PRIVATE_IPS}"
+fi
 echo "testenv_instance_prefix: ${testenv_instance_prefix}" >> ${ROOT}/envs/test/group_vars/all.yml
 
 #echo "generating ssl cert for openstack.example.com"
