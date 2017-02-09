@@ -1,5 +1,4 @@
 ---
-  #FIXME do we need this on rhel?
 - name: install required packages and diagnostic tools
   package:
     name: "{{ item }}"

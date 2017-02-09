@@ -1,5 +1,4 @@
 ---
-  #FIXME Do we need these pkgs on Rhel?
 - name: install neutron-data-network packages
   package: name={{ item }}
   with_items:
@@ -27,7 +26,6 @@
     name: iputils
   when: os == 'rhel'
 
-#FIXME Do we need this for RHEL?
 - name: install packages for l3ha
   package: name=keepalived
   when: neutron.l3ha.enabled|bool
