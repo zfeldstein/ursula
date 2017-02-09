@@ -398,3 +398,50 @@ openstack_meta:
           config_files: /etc/neutron/neutron.conf,/etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini,/etc/neutron/neutron_lbaas.conf
           restart: on-failure
           kill_mode: process
+  heat:
+    services:
+      heat_api:
+        ubuntu:
+          name: heat-api
+          desc: OpenStack Orchestration API Service
+          user: heat
+          cmd: /usr/local/bin/heat-api
+        rhel:
+          name: openstack-heat-api
+          desc: OpenStack Orchestration API Service
+          type: simple
+          user: heat
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}heat-api"
+          config_dirs: /etc/heat
+          config_files: /etc/heat/heat.conf
+          restart: on-failure
+      heat_api_cfn:
+        ubuntu:
+          name: heat-api-cfn
+          desc: OpenStack Orchestration CFN API Service
+          user: heat
+          cmd: /usr/local/bin/heat-api-cfn
+        rhel:
+          name: openstack-heat-api-cfn
+          desc: OpenStack Orchestration CFN API Service
+          type: simple
+          user: heat
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}heat-api-cfn"
+          config_dirs: /etc/heat
+          config_files: /etc/heat/heat.conf
+          restart: on-failure
+      heat_engine:
+        ubuntu:
+          name: heat-engine
+          desc: OpenStack Engine Service
+          user: heat
+          cmd: /usr/local/bin/heat-engine
+        rhel:
+          name: openstack-heat-engine
+          desc: OpenStack Engine Service
+          type: simple
+          user: heat
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}heat-engine"
+          config_dirs: /etc/heat
+          config_files: /etc/heat/heat.conf
+          restart: on-failure
