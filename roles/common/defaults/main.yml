@@ -76,6 +76,10 @@ common:
         - curl
         - dstat
         - ethtool
+        - net-tools
+        - bind-utils
+        - traceroute
+        - tcpdump
         - git
         - iotop
         - ltrace
