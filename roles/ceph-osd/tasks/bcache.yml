@@ -48,6 +48,15 @@
   when: journal_partitions.rc != 0 and
         bcache_partition.rc != 0
 
+- name: initialize partition_connector flag
+  set_fact:
+    partition_connector: ''
+
+- name: set partition_connector flag for nvme
+  set_fact:
+    partition_connector: 'p'
+  when: ceph.bcache_ssd_device|search('nvme')
+
 - name: mklabel gpt
   command: "parted -s /dev/{{ ceph.bcache_ssd_device }} mklabel gpt"
   when: ok_to_deploy
@@ -64,7 +73,7 @@
   when: ok_to_deploy
 
 - name: make-bcache -C <ssd device>
-  command: make-bcache -C /dev/{{ ceph.bcache_ssd_device }}{{ ceph.disks|length + 1 }}
+  command: make-bcache -C /dev/{{ ceph.bcache_ssd_device }}{{ partition_connector }}{{ ceph.disks|length + 1 }}
   ignore_errors: true
   when: ok_to_deploy
 
@@ -87,14 +96,14 @@
   with_sequence: "start=0 end={{ ceph.disks|length - 1 }}"
   when: ok_to_deploy
 
-- name: determine bcache uuid
-  shell: bcache-super-show /dev/{{ ceph.bcache_ssd_device }}{{ ceph.disks|length + 1 }} |
+- name: determine bcache uuid SSD
+  shell: bcache-super-show /dev/{{ ceph.bcache_ssd_device }}{{ partition_connector }}{{ ceph.disks|length + 1 }} |
          grep cset.uuid | awk '{print $2}'
   changed_when: false
   register: bcache_uuid
   when: ok_to_deploy
 
-- name: attach to bcache devices
+- name: attach to bcache devices SSD
   shell: echo {{ bcache_uuid.stdout }} > /sys/block/bcache{{ item }}/bcache/attach
   with_sequence: "start=0 end={{ ceph.disks|length - 1 }}"
   when: ok_to_deploy
