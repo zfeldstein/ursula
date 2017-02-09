@@ -52,12 +52,11 @@
 
   - name: permit access to keystone (ubuntu)
     ufw: rule=allow to_port={{ item }} proto=tcp
-    tags: ufw
+    tags: firewall
     with_items:
       - "{{ endpoints.keystone.port.haproxy_api }}"
       - "{{ endpoints.keystone_admin.port.haproxy_api }}"
       - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
-    tags: firewall
   when: os == 'ubuntu'
 
 - block:

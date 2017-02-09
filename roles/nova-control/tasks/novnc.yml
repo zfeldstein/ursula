@@ -33,7 +33,7 @@
 - name: Permit access to NoVNC (ubuntu)
   ufw: rule=allow to_port={{ endpoints.novnc.port.haproxy_api }} proto=tcp
   when: os == 'ubuntu'
-  tags: firewalld
+  tags: firewall
 
 - name: permit access to NoVNC (rhel)
   firewalld:

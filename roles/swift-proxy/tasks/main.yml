@@ -1,7 +1,7 @@
 ---
 - name: permit swift proxy from anywhere
   ufw: rule=allow to_port=8090 proto=tcp
-  tags: ufw
+  tags: firewall
 
 - name: swift-proxy service script
   upstart_service: name=swift-proxy
@@ -18,7 +18,7 @@
 - stat: path=/etc/swift/account.ring.gz
   register: account_ring
 
-- set_fact: start_proxy={{ container_ring.stat.exists }} and 
+- set_fact: start_proxy={{ container_ring.stat.exists }} and
                         {{ object_ring.stat.exists }} and
                         {{ account_ring.stat.exists }}
 

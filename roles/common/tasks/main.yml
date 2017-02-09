@@ -95,11 +95,11 @@
 
 - include: ufw.yml
   when: os == 'ubuntu'
-  tags: ufw
+  tags: firewall
 
 - include: firewalld.yml
   when: os == 'rhel'
-  tags: firewalld
+  tags: firewall
 
 - include: ntp.yml
   tags: ntp
