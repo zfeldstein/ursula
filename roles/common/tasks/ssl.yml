@@ -48,51 +48,25 @@
   tags:
     - cert
 
-- block:
-  - name: pip install httplib2
-    pip: name=httplib2 version=0.8
-    register: result
-    until: result|succeeded
-    retries: 5
-    when: (os == 'ubuntu') or (os == 'rhel' and openstack_install_method == 'source')
-
-  - name: pip install requests
-    pip: name=requests version=2.11.1
-    register: result
-    until: result|succeeded
-    retries: 5
-  when: (os == 'rhel' and openstack_install_method != 'distro') or
-        (os == 'ubuntu' and ansible_distribution_version == "12.04")
-
 # ugly hack: some python http libs don't honor the system ca-certs, and ship with
 # their own list, instead.
 # pre-install these client libs, and force them to use the system cert list.
-- name: force our ssl cert for python libs on precise
+
+- name: force our ssl cert for python libs on trusty
   file: src=/etc/ssl/certs/ca-certificates.crt dest={{ item }} owner=root
         mode=0644 state=link force=yes
   with_items:
-    - /usr/share/pyshared/httplib2/cacerts.txt
-    - /usr/local/lib/python2.7/dist-packages/httplib2/cacerts.txt
-    - /usr/local/lib/python2.7/dist-packages/requests/cacert.pem
-  when: os == 'ubuntu' and ansible_distribution_version == "12.04"
+    - "{{ basevenv_lib_dir }}/requests/cacert.pem"
+  when: os == 'ubuntu'
 
-- name: force our ssl cert for python libs on precise
+- name: force our ssl cert for python libs on rhel
   file: src=/etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt dest={{ item }} owner=root
         mode=0644 state=link force=yes
   with_items:
-    - /usr/lib/python2.7/site-packages/httplib2/cacerts.txt
+    - "{{ basevenv_lib_dir }}/requests/cacert.pem"
     - /usr/lib/python2.7/site-packages/requests/cacert.pem
+    - "{{ ca_bundle }}"
   when: os == 'rhel'
-
-- name: httplib2 and request Python modules that already use system CA certs
-  package: name={{ item }}
-  with_items:
-    - python-httplib2
-    - python-requests
-  when: os == 'ubuntu' and ansible_distribution_version == "14.04"
-  register: result
-  until: result|succeeded
-  retries: 5
 
 - meta: flush_handlers
 

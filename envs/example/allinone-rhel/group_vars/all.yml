@@ -1,12 +1,10 @@
 ---
 openstack_install_method: 'distro'
 openstack_distro_type: 'osp'
-
 stack_env: example_allinone
 floating_ip: 172.16.0.100
 xtradb:
   sst_auth_password: asdf
-validate_certs: false
 percona:
   replication: False
 

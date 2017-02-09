@@ -2,6 +2,7 @@
 - name: create ldap domain
   environment:
     OS_IDENTITY_API_VERSION: 3
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_keystone_domain:
     name: "{{ keystone.ldap_domain.domain }}"
     validate_certs: "{{ validate_certs|default(omit) }}"
@@ -18,6 +19,7 @@
 - name: create ldap project
   environment:
     OS_IDENTITY_API_VERSION: 3
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_project:
     name: "{{ keystone.ldap_domain.project }}"
     domain_id: "{{ ldap_domain.domain.id }}"
