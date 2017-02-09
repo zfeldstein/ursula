@@ -241,7 +241,7 @@
 
 - name: Permit HTTP and HTTPS
   ufw: rule=allow to_port={{ item }} proto=tcp
-  tags: ufw
+  tags: firewall
   with_items:
   - 80
   - 443

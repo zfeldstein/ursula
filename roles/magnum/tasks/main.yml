@@ -57,7 +57,7 @@
 
 - name: permit access to magnum
   ufw: rule=allow to_port={{ item }} proto=tcp
-  tags: ufw
+  tags: firewall
   with_items:
     - "{{ endpoints.magnum.port.haproxy_api }}"
 

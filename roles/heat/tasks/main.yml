@@ -13,10 +13,11 @@
   file: dest=/var/cache/heat state=directory mode=0700
         owner=heat group=heat
 
+
 - block:
   - name: permit access to heat
     ufw: rule=allow to_port={{ item }} proto=tcp
-    tags: ufw
+    tags: firewall
     with_items:
       - "{{ endpoints.heat.port.haproxy_api }}"
       - "{{ endpoints.heat_cfn.port.haproxy_api }}"
