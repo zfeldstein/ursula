@@ -27,51 +27,48 @@
   until: result|succeeded
   retries: 5
 
-- block:
-  - name: set pip proxy args
-    set_fact:
-      pip_extra_args: " -i {{ openstack.pypi_mirror }}"
-    when: openstack.pypi_mirror is defined
 
-  - name: update pip
-    pip: name=pip version={{ common.pip_version }}
-         extra_args="-i {{ openstack.pypi_mirror }}"
-         virtualenv="{{ common.python.base_venv }}"
-    register: result
-    until: result|succeeded
-    retries: 5
+- name: set pip proxy args
+  set_fact:
+    pip_extra_args: " -i {{ openstack.pypi_mirror }}"
+  when: openstack.pypi_mirror is defined
 
-  - name: upgrade setuptools for base venv (osp)
-    pip:
-      name: "setuptools"
-      virtualenv: "{{ common.python.base_venv }}"
-      extra_args: "{{ pip_extra_args }} --upgrade"
-    register: result
-    until: result|succeeded
-    retries: 5
+- name: update pip
+  pip: name=pip version={{ common.pip_version }}
+       extra_args="-i {{ openstack.pypi_mirror }}"
+       virtualenv="{{ common.python.base_venv }}"
+  register: result
+  until: result|succeeded
+  retries: 5
 
-  - name: python packages for base venv (osp)
-    pip:
-      name: "{{ item }}"
-      virtualenv: "{{ common.python.base_venv }}"
-      extra_args: "{{ pip_extra_args }}"
-    with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
-    register: result
-    until: result|succeeded
-    retries: 5
+- name: upgrade setuptools for base venv
+  pip:
+    name: "setuptools"
+    virtualenv: "{{ common.python.base_venv }}"
+    extra_args: "{{ pip_extra_args }} --upgrade"
+  register: result
+  until: result|succeeded
+  retries: 5
 
-  - name: install shade bits for ansible modules
-    pip:
-      name: "{{ item }}"
-      virtualenv: "{{ common.python.base_venv }}"
-    with_items:
-      - shade>=1.9.0
-    register: result
-    until: result|succeeded
-    retries: 5
+- name: python packages for base venv
+  pip:
+    name: "{{ item }}"
+    virtualenv: "{{ common.python.base_venv }}"
+    extra_args: "{{ pip_extra_args }}"
+  with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+  register: result
+  until: result|succeeded
+  retries: 5
 
-
-  when: openstack_install_method == "distro"
+- name: install shade bits for ansible modules
+  pip:
+    name: "{{ item }}"
+    virtualenv: "{{ common.python.base_venv }}"
+  with_items:
+    - shade>=1.9.0
+  register: result
+  until: result|succeeded
+  retries: 5
 
 - block:
   - name: root user pip config directory
