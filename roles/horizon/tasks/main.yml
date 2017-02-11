@@ -186,7 +186,7 @@
       - horizon.customize|default('False')|bool
       - os == 'rhel'
       - rcue.stat.exists == True
-    notify: reload apache
+    notify: restart apache
   
   - name: rcue disabled file exists (rhel osp)
     stat:
@@ -202,7 +202,7 @@
       - not horizon.customize|default('False')|bool
       - os == 'rhel'
       - rcued.stat.exists == True
-    notify: reload apache
+    notify: restart apache
   when: openstack_install_method == 'distro'
 
 - name: Enable/Disable lbaas dashboard (ubuntu)
