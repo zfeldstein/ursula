@@ -115,6 +115,14 @@
   when: keystone.federation.enabled|bool
   notify: restart keystone services
 
+- name: set ownership and permissions for logging.conf
+  file:
+    path: /etc/keystone/logging.conf
+    owner: keystone
+    group: keystone
+    mode: 0640
+  when: openstack_install_method == 'distro'
+
 - include: openidc.yml
   when: keystone.federation.enabled|bool and keystone.federation.sp.oidc.enabled|bool
 
@@ -139,7 +147,7 @@
 
 - name: configure keystone
   template: src={{ item }} dest=/etc/keystone/
-            mode={{ 0644 if 'policy.json' in item else 0640 }}
+            mode=0640
             owner=keystone group=keystone
   with_fileglob: ../templates/etc/keystone/*
   notify:
@@ -147,8 +155,8 @@
 
 - name: set horizon keystone policy fact
   set_fact: policy_for_horizon=True
-  when: 
-    - horizon is defined 
+  when:
+    - horizon is defined
     - horizon.customize|default('False')|bool
 
 - name: configure custom keystone policy

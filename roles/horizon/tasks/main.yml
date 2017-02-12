@@ -29,7 +29,7 @@
   template:
     src: "etc/openstack-dashboard/__init__.py"
     dest: "/etc/openstack-dashboard/__init__.py"
-    mode: 0644
+    mode: 0640
     owner: "root"
     group: "root"
   notify:
@@ -39,7 +39,7 @@
   template:
     src: "etc/openstack-dashboard/local_settings.py"
     dest: "/etc/openstack-dashboard/local_settings.py"
-    mode: 0644
+    mode: 0640
     owner: "root"
     group: "{{ openstack_meta.apache[os].group }}"
   notify:
@@ -127,7 +127,7 @@
       - os == 'rhel'
       - rcue.stat.exists == True
     notify: restart apache
-  
+
   - name: rcue disabled file exists (rhel osp)
     stat:
       path: /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled
@@ -137,7 +137,7 @@
       - os == 'rhel'
 
   - name: Enable OSP custom dashboard (rhel osp)
-    command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py 
+    command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py
     when:
       - not horizon.customize|default('False')|bool
       - os == 'rhel'
