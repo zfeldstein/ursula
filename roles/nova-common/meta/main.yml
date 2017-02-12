@@ -31,5 +31,23 @@ dependencies:
     when: openstack_install_method == 'package'
   - role: openstack-distro
     project_name: nova
+    osp_packages:
+      - 'openstack-nova-compute'
     rootwrap: True
-    when: openstack_install_method == 'distro'
+    when:
+      - openstack_install_method == 'distro'
+      - inventory_hostname in groups['compute']
+  - role: openstack-distro
+    project_name: nova
+    osp_packages:
+      - 'openstack-nova-api'
+      - 'openstack-nova-cells'
+      - 'openstack-nova-conductor'
+      - 'openstack-nova-console'
+      - 'openstack-nova-scheduler'
+      - 'openstack-nova-novncproxy'
+      - 'openstack-nova-placement-api'
+    rootwrap: True
+    when:
+      - openstack_install_method == 'distro'
+      - inventory_hostname in groups['controller']

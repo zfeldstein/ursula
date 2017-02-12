@@ -1,4 +1,5 @@
 openstack_distro:
-  osp_package_name: 'openstack-{{ project_name }}'
+  osp_packages:
+    - "openstack-{{ project_name }}"
   python_post_dependencies: "{{ python_post_dependencies|default([]) }}"
   pip_extra_args: ""

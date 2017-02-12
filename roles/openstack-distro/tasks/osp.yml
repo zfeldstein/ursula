@@ -1,10 +1,11 @@
 ---
 - name: "install {{ project_name }} package"
   yum:
-    name: "{{ package_name|default(openstack_distro.osp_package_name) }}"
+    name: "{{ item }}"
     state: present
   register: project_package
   until: project_package|succeeded
+  with_items: "{{ osp_packages|default(openstack_distro.osp_packages) }}"
   retries: 5
 
 - name: "Install {{ project_name }} dependent packages"
