@@ -17,6 +17,9 @@ ironic:
     - agent_ssh
     - agent_ipmitool
   heartbeat_timeout_threshold: 30
+  distro:
+    project_packages:
+      - openstack-ironic
   source:
     rev: 'stable/newton'
     constrain: True

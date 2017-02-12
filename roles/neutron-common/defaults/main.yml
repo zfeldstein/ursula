@@ -18,8 +18,6 @@ neutron:
   path_mtu: 1550
   global_physnet_mtu: 1550
   max_subnet_host_routes: 20
-  osp_sys_packages:
-    - openstack-neutron-linuxbridge
   vxlan:
     # The multicast prefix to use for broadcast, multicast and unknown frames
     # Consider using a larger prefix (e.g. a /24) on deployments with a
@@ -84,6 +82,12 @@ neutron:
   service:
     envs: []
   distro:
+    project_packages:
+      - openstack-neutron
+      - openstack-neutron-linuxbridge
+    lbaas_v2:
+      project_packages:
+        - openstack-neutron-lbaas
     python_post_dependencies: []
   # Example for distro/source:
   # python_post_dependencies:

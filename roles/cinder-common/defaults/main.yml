@@ -54,6 +54,9 @@ cinder:
       - cinder-volume
       - cinder-volume-usage-audit
   heartbeat_timeout_threshold: 30
+  distro:
+    project_packages:
+      - openstack-cinder
   source:
     rev: 'stable/newton'
     constrain: True

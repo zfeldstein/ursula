@@ -2,6 +2,9 @@
 project_name: ceilometer
 ceilometer:
   enabled: False
+  distro:
+    project_packages:
+      - openstack-ceilometer
   source:
     rev: 'stable/newton'
     constrain: True

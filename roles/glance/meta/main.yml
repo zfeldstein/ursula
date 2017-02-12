@@ -29,4 +29,5 @@ dependencies:
     database_name: glance
   - role: openstack-distro
     project_name: glance
+    project_packages: "{{ glance.distro.project_packages }}"
     when: openstack_install_method == 'distro'

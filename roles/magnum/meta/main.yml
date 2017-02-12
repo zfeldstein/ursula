@@ -27,4 +27,5 @@ dependencies:
     database_name: magnum
   - role: openstack-distro
     project_name: magnum
+    project_packages: "{{ magnum.distro.project_packages }}"
     when: openstack_install_method == 'distro'

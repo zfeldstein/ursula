@@ -24,6 +24,9 @@ glance:
   store_swift: False
   store_ceph: False
   store_file: False
+  distro:
+    project_packages:
+      - openstack-glance
   source:
     rev: 'stable/newton'
     constrain: True

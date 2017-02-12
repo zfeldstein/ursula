@@ -31,5 +31,15 @@ dependencies:
     when: openstack_install_method == 'package'
   - role: openstack-distro
     project_name: nova
+    project_packages: "{{ nova.distro.controller.project_packages }}"
     rootwrap: True
-    when: openstack_install_method == 'distro'
+    when: 
+      - openstack_install_method == 'distro'
+      - inventory_hostname in groups['controller']
+  - role: openstack-distro
+    project_name: nova
+    project_packages: "{{ nova.distro.compute.project_packages }}"
+    rootwrap: True
+    when:
+      - openstack_install_method == 'distro'
+      - inventory_hostname in groups['compute']

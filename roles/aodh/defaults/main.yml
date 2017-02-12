@@ -2,6 +2,9 @@
 project_name: aodh
 aodh:
   debug: False
+  distro:
+    project_packages:
+      - openstack-aodh
   source:
     rev: 'stable/newton'
     constrain: True
