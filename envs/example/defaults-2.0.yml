@@ -596,6 +596,8 @@ common:
 
 heat:
   enabled: True
+  plugin_dirs:
+    - '/opt/openstack/current/heat/lib/heat/ibm_sw_orch/heat/'
   logging:
     debug: True
     verbose: True
