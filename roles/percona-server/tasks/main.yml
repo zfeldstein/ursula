@@ -158,16 +158,26 @@
 - name: install root .my.cnf defaults file
   template: src=root/.my.cnf dest=/root/.my.cnf owner=root group=root mode=0600
 
+#FIXME Why is haproxy user created without password?
 - name: add mysql user for haproxy health
   mysql_user:
     name: haproxy
     host: "{{ hostvars[item][primary_interface]['ipv4']['address'] }}"
   with_items: "{{ groups['controller'] }}"
 
+#FIXME Why is haproxy user created without password?
 - name: add fqdn mysql for haproxy health (because haproxy is dumb)
   mysql_user:
     name: haproxy
     host: "{{ fqdn }}"
+
+- name: ensure anonymous users are not in the database
+  mysql_user: name='' host={{ item }} state=absent
+  with_items:
+    - localhost
+    - "{{ ansible_hostname }}"
+    - "{{ ansible_nodename }}"
+    - "{{ inventory_hostname }}"
 
 - name: remove mysql test database
   mysql_db: state=absent name=test
