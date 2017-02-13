@@ -68,6 +68,9 @@ nova:
 
 heat:
   enabled: True
+  plugin_dirs:
+    - '/usr/lib/heat'
+    - '/usr/lib64/heat'
 
 ironic:
   enabled: False
