@@ -1,0 +1,3 @@
+{% for name,value in inspec.openstack.horizon.attributes.iteritems() %}
+{{ name }}: {{ value }}
+{% endfor %}

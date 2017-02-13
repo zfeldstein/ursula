@@ -3,3 +3,16 @@ inspec:
   version: ~
   enabled: true
   interval: 3600
+  dependency_install_method: 'tar'
+  dependency_path: /etc/inspec/
+  profile_dependencies:
+    - name: inspec-openstack-security
+      version: master
+      url: https://github.com/chef-partners/inspec-openstack-security/archive/master.tar.gz
+  openstack:
+    horizon:
+      required_controls:
+        - check-dashboard-01
+        - check-dashboard-02
+      attributes:
+        horizon_config_group: apache
