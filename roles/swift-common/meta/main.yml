@@ -22,5 +22,5 @@ dependencies:
     when: openstack_install_method == 'package'
   - role: openstack-distro
     project_name: swift
+    project_packages: "{{ swift.distro.project_packages }}"
     when: openstack_install_method == 'distro'
-

@@ -16,6 +16,8 @@ keystone:
       source: /opt/openstack/current/keystone
       package: /opt/openstack/current/keystone
   distro:
+    project_packages:
+      - openstack-keystone
     python_post_dependencies: []
   # Example for distro/source:
   # python_post_dependencies:

@@ -8,13 +8,14 @@ horizon:
   nextgen_instance_panel: true
   legacy_instance_panel: false
   session_engine: django.contrib.sessions.backends.cache
-  osp_sys_packages:
-    - neutron-lbaas-dashboard
   password_validator:
     enabled: True
     regex: '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=()_]).{8,}$'
     help_text: 'Password is not compliant. Password must contain uppercase, lowercase, special characters !@#$%%^&+=()_, digits, and be at least 8 characters in length.'
   distro:
+    project_packages:
+      - openstack-dashboard
+      - openstack-neutron-lbaas-ui
     python_post_dependencies: []
   source:
     python_post_dependencies: []

@@ -65,6 +65,17 @@ nova:
       rev: 'stable/newton'
       git_mirror: https://github.com/stackforge/nova-docker.git
       dest: /opt/stack/novadocker
+  distro:
+    controller:
+      project_packages:
+        - openstack-nova-api
+        - openstack-nova-conductor
+        - openstack-nova-scheduler
+        - openstack-nova-novncproxy
+        - openstack-nova-console
+    compute:
+      project_packages:
+        - openstack-nova-compute
   source:
     rev: 'stable/newton'
     constrain: True

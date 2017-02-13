@@ -19,12 +19,11 @@ dependencies:
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: horizon
-    when: openstack_install_method == 'package' 
+    when: openstack_install_method == 'package'
   - role: openstack-distro
     project_name: horizon
-    dependent_packages: "{{ horizon.osp_sys_packages }}"
-    package_name: openstack-dashboard
+    project_packages: "{{ horizon.distro.project_packages }}"
     python_post_dependencies: "{{ horizon.distro.python_post_dependencies }}"
-    when: openstack_install_method == 'distro' 
+    when: openstack_install_method == 'distro'
   - role: apache
   - role: keystone-defaults

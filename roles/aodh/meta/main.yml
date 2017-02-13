@@ -20,4 +20,5 @@ dependencies:
     database_name: aodh
   - role: openstack-distro
     project_name: aodh
+    project_packages: "{{ aodh.distro.project_packages }}"
     when: openstack_install_method == 'distro'
