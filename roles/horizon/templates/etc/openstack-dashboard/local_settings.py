@@ -113,7 +113,7 @@ HORIZON_CONFIG["password_validator"] = {
 {% if horizon.customize %}
 HORIZON_CONFIG["customization_module"] = "horizon-customization.horizon_customization"
 {% endif %}
-HORIZON_CONFIG["help_url"] = "http://docs.openstack.org/mitaka"
+HORIZON_CONFIG["help_url"] = "http://docs.openstack.org/newton"
 
 LOCAL_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -361,6 +361,10 @@ OPENSTACK_NEUTRON_NETWORK = {
 OPENSTACK_HEAT_STACK = {
     'enable_user_pass': False,
 }
+
+# Enables upload from remote location
+IMAGES_ALLOW_LOCATION = True
+HORIZON_IMAGES_UPLOAD_MODE = 'legacy'
 
 # The OPENSTACK_IMAGE_BACKEND settings can be used to customize features
 # in the OpenStack Dashboard related to the Image service, such as the list
@@ -769,7 +773,8 @@ SECURITY_GROUP_RULES = {
 # You should not add settings to this list for out of tree extensions.
 # See: https://wiki.openstack.org/wiki/Horizon/RESTAPI
 REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
-                              'LAUNCH_INSTANCE_DEFAULTS']
+                              'LAUNCH_INSTANCE_DEFAULTS',
+                              'OPENSTACK_IMAGE_FORMATS']
 
 # Additional settings can be made available to the client side for
 # extensibility by specifying them in REST_API_ADDITIONAL_SETTINGS
