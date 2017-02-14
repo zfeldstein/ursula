@@ -72,7 +72,7 @@ haproxy:
 
 keystone:
   ldap_domain:
-    enabled: True
+    enabled: False
     domain: users
   uwsgi:
     method: port

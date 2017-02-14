@@ -247,7 +247,7 @@ K2K_CHOICES = (
 OPENSTACK_SSL_NO_VERIFY = {{ insecure | default('false') | bool }}
 
 # The CA certificate to use to verify SSL connections
-#OPENSTACK_SSL_CACERT = '/path/to/cacert.pem'
+OPENSTACK_SSL_CACERT = '{{ ca_bundle }}'
 
 # The OPENSTACK_KEYSTONE_BACKEND settings can be used to identify the
 # capabilities of the auth backend for Keystone.
