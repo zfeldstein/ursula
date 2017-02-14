@@ -84,6 +84,12 @@
       - "{{ endpoints.keystone_admin.port.haproxy_api }}"
       - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
     tags: firewall
+
+  - name: Configure tmpfiles.d for creation of /run/uwsgi on reboot
+    template:
+      src: usr/lib/tmpfiles.d/openstack-keystone.conf
+      dest: /usr/lib/tmpfiles.d/openstack-keystone.conf
+      mode: 0644
   when: os == 'rhel'
 
 - name: Creates keystone uwsgi and httpd directories

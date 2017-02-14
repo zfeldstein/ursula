@@ -21,13 +21,24 @@
   template: src=etc/init.d/haproxy dest=/etc/init.d/haproxy mode=0755
   when: os == "ubuntu"
 
-- name: install haproxy rsyslog config
-  template: src=etc/rsyslog.d/haproxy.conf
-            dest=/etc/rsyslog.d/49-haproxy.conf
+- block:
+  - name: configure tmpfiles.d for creation of /run/haproxy on reboot
+    template:
+      src: usr/lib/tmpfiles.d/haproxy.conf
+      dest: /usr/lib/tmpfiles.d/haproxy.conf
+      mode: 0644
+
+  - name: install haproxy rsyslog config
+    template: src=etc/rsyslog.d/haproxy.conf
+              dest=/etc/rsyslog.d/49-haproxy.conf
+    notify: restart rsyslog
+    tags:
+      - ssl
+
+  - name: set selinux policy for haproxy
+    seboolean: name=haproxy_connect_any state=yes persistent=yes
+    tags: selinux
   when: os == 'rhel'
-  notify: restart rsyslog
-  tags:
-    - ssl
 
 - name: install ssl cert+key
   template: src=etc/haproxy/openstack.pem dest=/etc/haproxy/openstack.pem
@@ -42,11 +53,6 @@
   notify: reload haproxy
 
 - meta: flush_handlers
-
-- name: set selinux policy for haproxy
-  seboolean: name=haproxy_connect_any state=yes persistent=yes
-  when: os == 'rhel'
-  tags: selinux
 
 - name: start and enable haproxy
   service: name=haproxy state=started enabled=yes
