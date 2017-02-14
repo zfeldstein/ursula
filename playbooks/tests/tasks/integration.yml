@@ -100,12 +100,18 @@
       with_items: "{{ floating_ip.results }}"
       when: item.floating_ip is defined
 
-    # (due to 1450 MTU on VXLAN this doesn't work with recent version of SSH)
+    - name: test instance can ping 8888
+      command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+               -i /root/.ssh/id_rsa
+               cirros@{{ item.floating_ip.floating_ip_address }}
+               ping -c 5 8.8.8.8
+      with_items: "{{ floating_ip.results }}"
+      when: item.floating_ip is defined
+
     - name: test instance can ping Google
       command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
                -i /root/.ssh/id_rsa
                cirros@{{ item.floating_ip.floating_ip_address }}
                ping -c 5 www.google.com
       with_items: "{{ floating_ip.results }}"
-      when: item.floating_ip is defined and
-            ansible_distribution_version == "12.04"
+      when: item.floating_ip is defined
