@@ -6,7 +6,15 @@
 - name: enable ip forwarding
   sysctl: name="net.ipv4.ip_forward" value=1 sysctl_set=yes state=present reload=yes
 
-- name: enable ip masq
+- name: enable masquerade on public
+  firewalld:
+    masquerade: yes
+    state: enabled
+    immediate: true
+    permanent: true
+    zone: public
+
+- name: enable ipv4 masquerade rule on public
   firewalld:
     state: enabled
     immediate: true
