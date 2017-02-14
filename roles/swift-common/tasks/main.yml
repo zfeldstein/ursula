@@ -28,12 +28,17 @@
   template: src=etc/sudoers.d/swiftops dest=/etc/sudoers.d/swiftops
             owner=root group=root mode=0440
 
+- name: set swifttool venv on ubuntu
+  set_fact:
+    swifttool_venv: "{{ swift.venv_dir }}"
+  when: openstack_distro_type != 'osp'
+
 - name: get swifttool repo
   git: |
     repo=https://github.com/blueboxgroup/swifttool.git
     dest=/opt/stack/{{ swift.swifttool_dir  }}
-    depth=50
     update={{ openstack.git_update }}
+    virtualenv={{ swifttool_venv|default(omit) }}
   notify:
     - pip install swifttool
   when: swift.swifttool_method == 'git'
@@ -43,7 +48,7 @@
     name: swifttool
     version: "{{ swift.swifttool_version }}"
     extra_args: "-i {{ openstack.pypi_mirror }} --extra-index-url {{ swift.swifttool_pypi_mirror | default(omit) }}"
-    virtualenv: "{{ swift.venv_dir }}"
+    virtualenv: "{{ swifttool_venv|default(omit) }}"
   register: result
   until: result|success
   retries: 3
@@ -74,6 +79,14 @@
   register: result
   until: result|succeeded
   retries: 5
+  when: ursula_os == 'ubuntu'
+
+- name: install rsync
+  yum: pkg=rsync
+  register: result
+  until: result|succeeded
+  retries: 5
+  when: ursula_os == 'rhel'
 
 - template: src=etc/rsyncd.conf dest=/etc/rsyncd.conf owner=root
             group=root mode=0644
@@ -82,6 +95,7 @@
 - lineinfile: dest=/etc/default/rsync regexp=^RSYNC_ENABLE
               line=RSYNC_ENABLE=true
   notify: restart rsync
+  when: ursula_os == 'ubuntu'
 
 - name: configure dispersion tools
   template: src=etc/swift/dispersion.conf dest=/etc/swift/dispersion.conf
@@ -100,6 +114,13 @@
 
 - name: include swift warning in message of the day
   template: src=etc/update-motd.d/99-swift-motd dest=/etc/update-motd.d/99-swift-motd mode=0755
+  when: ursula_os == 'ubuntu'
+
+- name: include swift warning in message of the day
+  lineinfile:
+    destfile: /etc/motd
+    line: WARNING Swift node -- do not replace disks without consulting Swift specific procedures
+  when: ursula_os == 'rhel'
 
 - name: system tuning recommendations for swift per deployment guide
   sysctl: name={{ item.key }} value={{ item.value }}
@@ -107,6 +128,13 @@
 
 - name: disable swift directory parsing by updatedb
   command: updatedb -e /srv/node
+  when: ursula_os == 'ubuntu'
+
+- name: ensure mlocate is not installed
+  yum:
+    pkg: mlocate
+    state: absent
+  when: ursula_os == 'rhel'
 
 - include: serverspec.yml
   tags:

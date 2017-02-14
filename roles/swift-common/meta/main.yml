@@ -1,5 +1,6 @@
 ---
 dependencies:
+  - role: openstack-meta
   - role: endpoints
   - role: monitoring-common
     when: monitoring.enabled|default(True)|bool
@@ -23,4 +24,5 @@ dependencies:
   - role: openstack-distro
     project_name: swift
     project_packages: "{{ swift.distro.project_packages }}"
+    dependent_packages: "{{ swift.distro.dependent_packages }}"
     when: openstack_install_method == 'distro'

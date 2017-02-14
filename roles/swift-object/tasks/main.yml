@@ -4,18 +4,25 @@
   register: result
   until: result|succeeded
   retries: 5
+  when: ursula_os == 'ubuntu'
+
+- name: install xfsprogs
+  yum: pkg=xfsprogs
+  when: ursula_os == 'rhel'
 
 - name: swift-object service scripts
-  upstart_service: name=swift-{{ item.name }}
-                   cmd=/usr/local/bin/swift-{{ item.cmd|default(item.name) }}
-                   args=/etc/swift/{{ item.conf|default('object-server.conf') }}
-                   user=swift
+  upstart_service:
+      name: "{{ item.name }}"
+      user: "{{ item.user }}"
+      cmd:  "{{ item.cmd }}"
+      args: "{{ item.config_dirs }}"
   with_items:
-    - { name: object, cmd: object-server }
-    - { name: object-expirer, conf: object-expirer.conf }
-    - { name: object-auditor }
-    - { name: object-replicator }
-    - { name: object-updater }
+    - "{{ swift.services.swift_object }}"
+    - "{{ swift.services.swift_object_expirer }}"
+    - "{{ swift.services.swift_object_auditor }}"
+    - "{{ swift.services.swift_object_replicator }}"
+    - "{{ swift.services.swift_object_updater }}"
+  when: ursula_os == 'ubuntu'
 
 - stat: path=/etc/swift/object.ring.gz
   register: object_ring
@@ -63,11 +70,11 @@
             dest=/usr/local/bin/swift-drive-auditor owner=root group=root
 
 - name: start swift-object services
-  service: name={{ item }} state=started
+  service: name={{ item.name }} state=started enabled=true
   with_items:
-    - swift-object-replicator
-    - swift-object
-    - swift-object-expirer
-    - swift-object-updater
-    - swift-object-auditor
+    - "{{ swift.services.swift_object }}"
+    - "{{ swift.services.swift_object_expirer }}"
+    - "{{ swift.services.swift_object_auditor }}"
+    - "{{ swift.services.swift_object_replicator }}"
+    - "{{ swift.services.swift_object_updater }}"
   when: start_object|bool

@@ -1,6 +1,6 @@
 ---
 - name: create swift log files directory
-  file: dest=/var/log/swift state=directory owner=syslog group=adm mode=2750
+  file: dest=/var/log/swift state=directory owner={{ (ursula_os == 'rhel') | ternary('root', 'syslog') }} group=adm mode=2750
 
 - name: send swift logs to local files
   copy: src=etc/rsyslog.d/{{ item }} dest=/etc/rsyslog.d/{{ item }} mode=0644
