@@ -5,9 +5,6 @@
   until: result|succeeded
   retries: 5
 
-- name: create horizon config directory
-  file: dest=/etc/openstack-dashboard state=directory
-
 - name: horizon local settings
   template:
     src: "etc/openstack-dashboard/__init__.py"
@@ -24,13 +21,13 @@
     dest: "/etc/openstack-dashboard/local_settings.py"
     mode: 0644
     owner: "root"
-    group: "{{ apache_group }}"
+    group: "{{ openstack_meta.apache[os].group }}"
   notify:
     - reload apache
 
 - name: create static assets directory (source)
   file: dest="{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/{{ item }}"
-        owner="{{ apache_user }}" group="{{ apache_group }}" state=directory
+        owner="{{ openstack_meta.apache[os].user }}" group="{{ openstack_meta.apache[os].group }}" state=directory
   with_items:
     - static
     - static/dashboard
@@ -92,7 +89,6 @@
     with_items:
     - 80
     - 443
-
   when: os == 'ubuntu'
 
 # RHEL OSP horizon config
@@ -138,7 +134,7 @@
     file: src=/etc/openstack-dashboard/local_settings.py
           dest=/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
           owner=root
-          group="{{ apache_user }}"
+          group="{{ openstack_meta.apache[os].user }}"
           mode=0644
           state=link
   when: openstack_install_method == 'distro'
@@ -158,7 +154,7 @@
     file: src=/etc/openstack-dashboard/local_settings.py
           dest=/opt/openstack/current/horizon/lib/python2.7/site-packages/openstack_dashboard/local/local_settings.py
           owner=root
-          group="{{ apache_user }}"
+          group="{{ openstack_meta.apache[os].user }}"
           mode=0644
           state=link
         
@@ -173,21 +169,10 @@
 
   when: openstack_install_method == 'source'
 
+# Use custom policy to allow cloud_admin admin panel access
 - name: set horizon keystone policy fact
   set_fact: policy_for_horizon=True
   when: horizon.customize|default('False')|bool
-
-# Use custom policy to allow cloud_admin admin panel access
-- name: configure custom keystone policy
-  template:
-    src: "roles/keystone/templates/etc/keystone/policy.json"
-    dest: "/etc/openstack-dashboard/keystone_policy.json"
-    mode: 0640
-    owner: "{{ apache_user }}"
-    group: "{{ apache_group }}"
-  when: horizon.customize|default('False')|bool
-  notify:
-    - reload apache
 
 - name: trigger restart on upgrades
   debug:
@@ -237,3 +222,4 @@
   tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
+

@@ -108,6 +108,15 @@
   notify:
     - restart glance services
 
+- name: copy policy files to openstack-dashboard
+  template:
+    src: "etc/glance/policy.json"
+    dest: "/etc/openstack-dashboard/glance_policy.json"
+    owner: "root"
+    group: "{{ openstack_meta.apache[os].group }}"
+    mode: 0640
+  when: inventory_hostname in groups['controller']
+
 - name: stop glance services before db sync
   service: name={{ item.name }} state=stopped
   with_items:

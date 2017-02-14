@@ -4,3 +4,4 @@ dependencies:
     service: apache
     logdata: "{{ apache.logs }}"
     when: logging.enabled|default('True')|bool
+  - role: openstack-meta

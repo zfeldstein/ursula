@@ -474,22 +474,18 @@ TIME_ZONE = "UTC"
 # Having matching policy files on the Horizon and Keystone servers is essential
 # for normal operation. This holds true for all services and their policy files.
 POLICY_FILES = {
-{% if policy_for_horizon|default('False')|bool %}
     'identity': '/etc/openstack-dashboard/keystone_policy.json',
-{% else %}
-    'identity': '/etc/keystone/policy.json',
-{% endif %}
-    'compute': '/etc/nova/policy.json',
+    'compute': '/etc/openstack-dashboard/nova_policy.json',
 {% if cinder.enabled|default('False')|bool %}
-    'volume': '/etc/cinder/policy.json',
+    'volume': '/etc/openstack-dashboard/cinder_policy.json',
 {% endif %}
-    'image': '/etc/glance/policy.json',
+    'image': '/etc/openstack-dashboard/glance_policy.json',
 {% if heat.enabled|default('False')|bool %}
-    'orchestration': '/etc/heat/policy.json',
+    'orchestration': '/etc/openstack-dashboard/heat_policy.json',
 {% endif %}
-    'network': '/etc/neutron/policy.json',
+    'network': '/etc/openstack-dashboard/neutron_policy.json',
 {% if ceilometer.enabled|default('False')|bool -%}
-    'telemetry': '/etc/ceilometer/policy.json',
+    'telemetry': '/etc/openstack-dashboard/ceilometer_policy.json',
 {% endif -%}
 }
 
