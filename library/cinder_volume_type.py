@@ -107,7 +107,7 @@ def _get_tenant_id(module, **kwargs):
     try:
         keystone = ksclient.Client(username=kwargs.get('login_username'),
                                    password=kwargs.get('login_password'),
-                                   insecure=True,
+                                   insecure=kwargs.get('insecure'),
                                    auth_url=kwargs.get('auth_url'))
         for tenant in keystone.tenants.list():
             if tenant.name == kwargs.get('login_tenant_name'):
@@ -122,7 +122,7 @@ def _get_cinderclient(module, **kwargs):
     tenant_id = _get_tenant_id(module, **kwargs)
     try:
         cinderclient = client.Client(username=kwargs.get('login_username'),
-                                     insecure=True,
+                                     insecure=kwargs.get('insecure'),
                                      api_key=kwargs.get('login_password'),
                                      tenant_id=tenant_id,
                                      auth_url=kwargs.get('auth_url'))
@@ -214,6 +214,7 @@ def main():
             key_size=dict(default=None),
             control_location=dict(default=None),
             extra_specs=dict(default=None, type='dict'),
+            insecure=dict(default=False, type='bool'),
         )
     )
 
