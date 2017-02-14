@@ -10,22 +10,6 @@
   until: result|succeeded
   retries: 5
 
-#FIXME can we move this to common systen_tools?
-- block:
-  - name: install arping (ubuntu)
-    package:
-      name: iputils-arping
-
-  - name: install resolvconf (ubuntu)
-    package:
-      name: resolvconf
-  when: os == 'ubuntu'
-
-- name: install arping (rhel)
-  package:
-    name: iputils
-  when: os == 'rhel'
-
 - name: install packages for l3ha
   package: name=keepalived
   when: neutron.l3ha.enabled|bool

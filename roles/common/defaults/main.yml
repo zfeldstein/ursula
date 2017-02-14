@@ -42,6 +42,7 @@ common:
         - acl
         - auditd
         - build-essential
+        - cdpr
         - curl
         - dstat
         - ethtool
@@ -50,53 +51,55 @@ common:
         - iftop
         - iotop
         - iperf
+        - iputils-arping
+        - libpam-cracklib
+        - logrotate
         - ltrace
+        - lvm2
         - mtr
         - netcat
+        - ntp
+        - pciutils
         - pv
+        - resolvconf
         - ruby1.9.1
         - ruby1.9.1-dev
         - smem
         - socat
+        - sysstat
         - tree
         - vim
-        - cdpr
-        - sysstat
-        - logrotate
-        - ntp
         - vlan
-        - lvm2
-        - libpam-cracklib
-        - pciutils
     redhat:
       lm_sensors_package: lm_sensors
       snmp_package: net-snmp-utils
       packages:
         - acl
+        - bind-utils
+        - cracklib
         - curl
+        - cyrus-sasl-devel
         - dstat
         - ethtool
-        - net-tools
-        - bind-utils
-        - traceroute
-        - tcpdump
         - git
         - iotop
+        - iputils
+        - logrotate
         - ltrace
+        - lvm2
+        - mlocate
         - mtr
+        - net-tools
+        - ntp
         - nc
-        - ruby-devel
+        - traceroute
+        - tcpdump
         - ruby
+        - ruby-devel
         - socat
+        - sysstat
         - tree
         - vim
-        - sysstat
-        - logrotate
-        - ntp
-        - lvm2
-        - cracklib
-        - mlocate
-        - cyrus-sasl-devel
   python:
     base_venv: "/opt/openstack/base"
     debian:
