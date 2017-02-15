@@ -14,3 +14,14 @@
             group={{ item.group|default("root") }} mode=0600
   with_items: "{{ common.ssh_private_keys }}"
 
+- name: find ssh private  key files
+  find:
+    path: "/etc/ssh"
+    contains: "^-+BEGIN.*PRIVATE.*KEY-+$"
+  register: result
+
+- name: set mode on the ssh private key files
+  file:
+    path: "{{ item.path }}"
+    mode: 0600
+  with_items: "{{ result.files }}"

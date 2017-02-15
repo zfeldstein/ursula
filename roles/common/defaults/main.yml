@@ -172,6 +172,12 @@ common:
     - { name: net.ipv4.tcp_syncookies }
     - { name: net.ipv4.tcp_synack_retries }
 
+  compliance:
+    rmusers:
+      - ftp
+      - games
+      - gopher
+
 # Below is a ucarp config example:
 network:
   ucarp:

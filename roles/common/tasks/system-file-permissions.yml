@@ -5,6 +5,5 @@
 - name: Set permissions for shadow
   file: path=/etc/shadow state=file mode=600
 
-- name: Set ownership for games directory
-  file: path=/usr/games state=directory recurse=yes owner=games group=games
-
+- name: Remove default games directory
+  file: path=/usr/games state=absent
