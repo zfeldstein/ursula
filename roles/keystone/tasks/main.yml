@@ -145,6 +145,20 @@
   notify:
     - restart keystone services
 
+- name: set horizon keystone policy fact
+  set_fact: policy_for_horizon=True
+  when: 
+    - horizon is defined 
+    - horizon.customize|default('False')|bool
+
+- name: configure custom keystone policy
+  template:
+    src: "etc/keystone/policy.json"
+    dest: "/etc/openstack-dashboard/keystone_policy.json"
+    mode: 0640
+    owner: "root"
+    group: "{{ openstack_meta.apache[os].group }}"
+
 - include: k2k-idp.yml
   when: keystone.federation.enabled|bool and keystone.federation.idp.k2k.enabled|bool
 

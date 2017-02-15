@@ -73,6 +73,15 @@
   notify:
     - restart nova services
 
+- name: copy policy files to openstack-dashboard
+  template:
+    src: "etc/nova/policy.json"
+    dest: "/etc/openstack-dashboard/nova_policy.json"
+    owner: "root"
+    group: "{{ openstack_meta.apache[os].group }}"
+    mode: 0640
+  when: inventory_hostname in groups['controller']
+
 - name: nova sudoer
   template: |
     src=etc/sudoers.d/nova

@@ -25,6 +25,15 @@
     - ceilometer_api_audit_map.conf
   notify: restart ceilometer services
 
+- name: copy policy files to openstack-dashboard
+  template:
+    src: "etc/ceilometer/policy.json"
+    dest: "/etc/openstack-dashboard/ceilometer_policy.json"
+    owner: "root"
+    group: "{{ openstack_meta.apache[os].group }}"
+    mode: 0640
+  when: inventory_hostname in groups['controller']
+
 - include: logging.yml
   tags:
     - logrotate

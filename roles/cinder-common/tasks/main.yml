@@ -75,6 +75,15 @@
     - restart cinder services
     - restart cinder backup service
 
+- name: copy policy files to openstack-dashboard
+  template:
+    src: "etc/cinder/policy.json"
+    dest: "/etc/openstack-dashboard/cinder_policy.json"
+    owner: "root"
+    group: "{{ openstack_meta.apache[os].group }}"
+    mode: 0640
+  when: inventory_hostname in groups['controller']
+
 - name: cinder sudoer
   template: src=etc/sudoers.d/cinder dest=/etc/sudoers.d/cinder owner=root
             group=root mode=0440

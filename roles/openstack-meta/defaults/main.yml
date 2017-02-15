@@ -445,3 +445,12 @@ openstack_meta:
           config_dirs: /etc/heat
           config_files: /etc/heat/heat.conf
           restart: on-failure
+  apache:
+    ubuntu:
+     user: www-data
+     group: www-data
+     package_name: apache2
+    rhel:
+      user: apache
+      group: apache
+      package_name: httpd

@@ -1,16 +1,6 @@
 ---
-- set_fact:
-    apache_user: www-data
-    apache_group: www-data
-  when: os == 'ubuntu'
-
-- set_fact:
-    apache_user: apache
-    apache_group: apache
-  when: os == 'rhel'
-
 - name: install apache package
-  package: name="{{ apache.package_name[os] }}"
+  package: name="{{ openstack_meta.apache[os].package_name }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -97,3 +87,10 @@
   service:
     name: "{{ apache.service_name[os] }}"
     enabled: true
+
+- name: create horizon config directory
+  file: 
+    dest: "/etc/openstack-dashboard"
+    state: directory 
+    group: "{{ openstack_meta.apache[os].group }}"
+    mode: 0750
