@@ -1,10 +1,24 @@
 ---
 project_name: ceilometer
 ceilometer:
+  services:
+    ceilometer_api: "{{ openstack_meta.ceilometer.services.ceilometer_api[os] }}"
+    ceilometer_collector: "{{ openstack_meta.ceilometer.services.ceilometer_collector[os] }}"
+    ceilometer_notification: "{{ openstack_meta.ceilometer.services.ceilometer_notification[os] }}"
+    ceilometer_polling: "{{ openstack_meta.ceilometer.services.ceilometer_polling[os] }}"
+    ceilometer_polling_compute: "{{ openstack_meta.ceilometer.services.ceilometer_polling_compute[os] }}"
   enabled: False
   distro:
-    project_packages:
-      - openstack-ceilometer
+    controller:
+      project_packages:
+        - openstack-ceilometer-api
+        - openstack-ceilometer-collector
+        - openstack-ceilometer-notification
+        - openstack-ceilometer-polling
+    compute:
+      project_packages:
+        - openstack-ceilometer-polling
+        - openstack-ceilometer-compute
   source:
     rev: 'stable/newton'
     constrain: True

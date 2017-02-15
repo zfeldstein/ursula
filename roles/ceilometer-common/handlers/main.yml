@@ -1,9 +1,16 @@
 ---
 - name: restart ceilometer services
-  service: name={{ item }} state=restarted must_exist=false
+  service: name={{ item.name }} state=restarted must_exist=false
   when: restart|default('True')
   with_items:
-    - ceilometer-api
-    - ceilometer-collector
-    - ceilometer-agent-notification
-    - ceilometer-polling
+    - "{{ ceilometer.services.ceilometer_api }}"
+    - "{{ ceilometer.services.ceilometer_collector }}"
+    - "{{ ceilometer.services.ceilometer_notification }}"
+    - "{{ ceilometer.services.ceilometer_polling }}"
+
+- name: restart ceilometer data services
+  service: name={{ item.name }} state=restarted must_exist=false
+  when: restart|default('True')
+  with_items:
+    - "{{ ceilometer.services.ceilometer_polling }}"
+    - "{{ ceilometer.services.ceilometer_polling_compute }}"
