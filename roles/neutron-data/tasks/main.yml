@@ -86,11 +86,11 @@
     enabled: True
   when: neutron.plugin == 'ml2'
 
-#FIXME validate cron job on rhel
 - name: cleanup interface logs
   template: src=etc/cron.daily/cleanup-neutron-interfaces
             dest=/etc/cron.daily/cleanup-neutron-interfaces
             mode=0755 owner=root
+  when: os == 'ubuntu'
 
 - include: monitoring.yml
   tags:
