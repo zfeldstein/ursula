@@ -3,15 +3,19 @@
 
 # What ports, IPs and protocols we listen for
 Port 22
+
 # Use these options to restrict which interfaces/protocols sshd will bind to
 #ListenAddress ::
 #ListenAddress 0.0.0.0
+
 Protocol 2
+
 # HostKeys for protocol version 2
 HostKey /etc/ssh/ssh_host_rsa_key
 HostKey /etc/ssh/ssh_host_dsa_key
 HostKey /etc/ssh/ssh_host_ecdsa_key
 HostKey /etc/ssh/ssh_host_ed25519_key
+
 #Privilege Separation is turned on for security
 UsePrivilegeSeparation yes
 
@@ -25,11 +29,7 @@ LogLevel INFO
 
 # Authentication:
 LoginGraceTime 120
-{% if common.ssh.disable_root|bool %}
 PermitRootLogin no
-{% else %}
-PermitRootLogin without-password
-{% endif %}
 StrictModes yes
 
 RSAAuthentication yes
@@ -43,7 +43,7 @@ RhostsRSAAuthentication no
 # similar for protocol version 2
 HostbasedAuthentication no
 # Uncomment if you don't trust ~/.ssh/known_hosts for RhostsRSAAuthentication
-#IgnoreUserKnownHosts yes
+IgnoreUserKnownHosts yes
 
 # To enable empty passwords, change to yes (NOT RECOMMENDED)
 PermitEmptyPasswords no
@@ -56,7 +56,7 @@ ChallengeResponseAuthentication no
 PasswordAuthentication no
 
 # Kerberos options
-#KerberosAuthentication no
+KerberosAuthentication no
 #KerberosGetAFSToken no
 #KerberosOrLocalPasswd yes
 #KerberosTicketCleanup yes
@@ -77,7 +77,8 @@ MaxStartups {{ common.ssh.max_startups }}
 {% else %}
 MaxStartups 100
 {% endif %}
-#Banner /etc/issue.net
+
+Banner /etc/issue.net
 
 # Allow client to pass locale environment variables
 AcceptEnv LANG LC_*
@@ -89,7 +90,7 @@ Subsystem sftp /usr/libexec/openssh/sftp-server
 {% endif %}
 
 Ciphers aes128-ctr,aes192-ctr,aes256-ctr
-MACs hmac-sha2-256,hmac-sha2-512,hmac-sha1,hmac-ripemd160
+MACs hmac-sha2-256,hmac-sha2-512
 
 # Set this to 'yes' to enable PAM authentication, account processing,
 # and session processing. If this is enabled, PAM authentication will
@@ -113,3 +114,7 @@ GatewayPorts no
 {% if common.ssh.disable_dns|bool %}
 UseDNS no
 {% endif %}
+
+ClientAliveInterval 1800
+ClientAliveCountMax 0
+Compression delayed

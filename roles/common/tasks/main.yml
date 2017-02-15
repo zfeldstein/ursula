@@ -79,6 +79,8 @@
 - include: ssh.yml
   tags: ssh
 
+- include: remove-default-users.yml
+
 - include: networking.yml
 
 - include: password-policy.yml
