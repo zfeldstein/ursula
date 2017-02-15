@@ -1,26 +1,30 @@
 ---
+- name: Disable NetworkManager
+  service: name=NetworkManager state=stopped enabled=no
+  when: os == 'rhel'
+
 - block:
   - name: set network config dir path - ubuntu
     set_fact:
       network_dir_path: /etc/network/interfaces.d
     when: os == 'ubuntu'
-  
+
   - name: set network dir path - rhel
     set_fact:
       network_dir_path: /etc/sysconfig/network-scripts
     when: os == 'rhel'
-  tags: ['prereboot'] 
+  tags: ['prereboot']
 
-- block: 
+- block:
   - name: network interfaces file
-    copy: 
+    copy:
       content: "{{ network_interfaces }}"
       dest: /etc/network/interfaces
       force: yes
       owner: root
       group: root
       mode: 0644
-    when: 
+    when:
       - os == 'ubuntu'
 
   - name: create interfaces.d directory if multiple interface files
@@ -28,27 +32,27 @@
       state: directory
       path: "{{ network_dir_path }}"
       mode: 0755
-    when: 
+    when:
       - os == 'ubuntu'
-  
+
   - name: remove unnecessary network config
     file:
       path: "{{ network_dir_path }}/{{ item.filename }}"
       state: absent
-    when: 
+    when:
       - item.state is defined
       - item.state == 'absent'
     with_items: "{{ network_interfaces_d | default([]) }}"
-  
+
   - name: append network config
-    blockinfile: 
+    blockinfile:
       dest: "{{ network_dir_path }}/{{ item.filename }}"
       block: "{{ item.contents }}"
     when:
       - item.state is defined
       - item.state == 'append'
     with_items: "{{ network_interfaces_d | default([]) }}"
-  
+
   - name: copy network config
     copy:
       content: "{{ item.contents }}"
@@ -57,7 +61,7 @@
       owner: root
       group: root
       mode: 0644
-    when: 
+    when:
       - item.state is undefined or item.state == 'present'
     with_items: "{{ network_interfaces_d | default([]) }}"
 
