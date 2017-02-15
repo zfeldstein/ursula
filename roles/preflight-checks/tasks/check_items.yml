@@ -1,4 +1,9 @@
 ---
+- name: ensure ssl.cafile is defined
+  assert:
+    that: "ssl.cafile is defined"
+    msg: "ssl.cafile must be defined based on the operating system {{ os }}"
+
 - block:
   - name: check whether neutron-client is installed
     command: neutron --version

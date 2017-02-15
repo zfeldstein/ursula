@@ -47,7 +47,7 @@ ceilometer:
   logging:
     debug: False
     verbose: True
-  cafile: "{{ ssl.cafile|default('/etc/ssl/certs/ca-certificates.crt') }}"
+  cafile: "{{ ssl.cafile }}"
   monitoring:
     sensu_checks:
       check_ceilometer_api:
