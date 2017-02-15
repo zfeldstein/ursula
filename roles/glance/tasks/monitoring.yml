@@ -1,20 +1,11 @@
 ---
-- name: glance process check installation for non-distro installation
+- name: glance process check installation
   sensu_process_check: service={{ item }}
   with_items:
     - glance-api
     - glance-registry
   notify: restart sensu-client
-  when: openstack_install_method != 'distro'
   
-- name: glance process check installation for non-distro installation
-  sensu_process_check: service={{ item }}
-  with_items:
-    - openstack-glance-api
-    - openstack-glance-registry
-  notify: restart sensu-client
-  when: openstack_install_method == 'distro' and os == 'rhel'
-
 - name: glance-api check
   sensu_check: name=check-glance-api plugin=check-os-api.rb
                args="--service glance --criticality {{ glance.monitoring.sensu_checks.check_glance_api.criticality }}"
