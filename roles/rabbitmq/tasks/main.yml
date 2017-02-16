@@ -41,6 +41,26 @@
     - rabbitmq-server=3.6.6*
   when: upgrade | default('False') | bool
 
+- name: create systemd override dir
+  file:
+    dest: /etc/systemd/system/rabbitmq-server.service.d
+    state: directory
+  when: os == 'rhel' 
+
+- name: set systemd overrides
+  copy:
+    dest: /etc/systemd/system/rabbitmq-server.service.d/override.conf
+    content: "{{ rabbitmq.systemd.custom }}"
+    force: yes
+  register: override
+  when: os == 'rhel'
+
+- name: restart systemd
+  command: systemctl daemon-reload
+  when: override.changed and os == 'rhel'
+  notify: 
+    - restart rabbitmq
+
 - name: add rabbitmq environment configuration
   template: src=etc/rabbitmq/rabbitmq-env.conf
             dest=/etc/rabbitmq/rabbitmq-env.conf
