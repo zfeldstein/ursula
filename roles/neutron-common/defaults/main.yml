@@ -157,7 +157,7 @@ neutron:
   logging:
     debug: False
     verbose: True
-  cafile: "{{ ssl.cafile|default('/etc/ssl/certs/ca-certificates.crt') }}"
+  cafile: "{{ ssl.cafile }}"
   enable_external_interface: False
   monitoring:
     sensu_checks:

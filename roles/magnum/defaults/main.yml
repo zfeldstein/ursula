@@ -15,7 +15,7 @@ magnum:
       - { name: PyMySQL }
     system_dependencies: []
   package: ~
-  cafile: "{{ ssl.cafile|default('/etc/ssl/certs/ca-certificates.crt') }}"
+  cafile: "{{ ssl.cafile }}"
   logs:
     - paths:
       - /var/log/magnum/magnum-api.log

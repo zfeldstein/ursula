@@ -5,7 +5,7 @@ export OS_TENANT_NAME={{ monitoring.openstack.user.tenant }}
 {% if client.self_signed_cert and os == 'ubuntu' -%}
 export OS_CACERT=/opt/stack/ssl/openstack.crt
 {% else %}
-export OS_CACERT={{ ca_bundle }}
+export OS_CACERT={{ ssl.cafile }}
 {% endif -%}
 export OS_NO_CACHE=True
 export NOVACLIENT_UUID_CACHE_DIR=/tmp/sensu

@@ -23,15 +23,5 @@
     ssh_service: sshd
   when: os == 'rhel'
 
-- name: set ca_bundle fact for ubuntu
-  set_fact:
-    ca_bundle: /etc/ssl/certs/ca-certificates.crt
-  when: os == 'ubuntu'
-
-- name: set ca_bundle fact for rhel
-  set_fact:
-    ca_bundle: /etc/pki/ca-trust/extracted/openssl/ca-bundle.trust.crt
-  when: os == 'rhel'
-
 - include: check_items.yml
   tags: ['precheck']
