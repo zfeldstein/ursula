@@ -389,7 +389,7 @@
   roles:
     - role: magnum
       tags: ['openstack', 'magnum', 'control']
-      when: magnum.enabled|bool
+      when: magnum.enabled|bool and openstack_install_method != 'distro'
 
 - name: ironic control plane
   hosts: controller
@@ -397,7 +397,7 @@
   roles:
     - role: ironic-control
       tags: ['openstack', 'ironic', 'control']
-      when: ironic.enabled|bool
+      when: ironic.enabled|bool and openstack_install_method != 'distro'
   environment: "{{ env_vars|default({}) }}"
 
 - name: ironic data plane
@@ -406,7 +406,7 @@
   roles:
     - role: ironic-data
       tags: ['openstack', 'ironic', 'data']
-      when: ironic.enabled|bool
+      when: ironic.enabled|bool and openstack_install_method != 'distro'
   environment: "{{ env_vars|default({}) }}"
 
 - name: openstack base setup
