@@ -14,5 +14,4 @@
   with_items: "{{ rhn_subscription.repos.disable }}"
 
 - name: enable desire redhat repositories
-  command: subscription-manager repos --enable={{ item }}
-  with_items: "{{ rhn_subscription.repos.enable }}"
+  command: subscription-manager repos --enable={{ rhn_subscription.repos.enable | join(' --enable=') }}
