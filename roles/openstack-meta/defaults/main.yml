@@ -454,3 +454,143 @@ openstack_meta:
       user: apache
       group: apache
       package_name: httpd
+  aodh:
+    services:
+      aodh_api:
+        ubuntu:
+          name: aodh-api
+          desc: Aodh API Service
+          user: aodh
+          cmd: /usr/local/bin/aodh-api
+          config_dirs: /etc/aodh
+        rhel:
+          name: openstack-aodh-api
+          desc: Aodh API Service
+          type: simple
+          user: aodh
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}aodh-api"
+          restart: on-failure
+      aodh_evaluator:
+        ubuntu:
+          name: aodh-evaluator
+          desc: Aodh Evaluator Service
+          user: aodh
+          cmd: /usr/local/bin/aodh-evaluator
+          config_dirs: /etc/aodh
+        rhel:
+          name: openstack-aodh-evaluator
+          desc: Aodh Evaluator Service
+          type: simple
+          user: aodh
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}aodh-evaluator"
+          restart: on-failure
+      aodh_listener:
+        ubuntu:
+          name: aodh-listener
+          desc: Aodh Listener Service
+          user: aodh
+          cmd: /usr/local/bin/aodh-listener
+          config_dirs: /etc/aodh
+        rhel:
+          name: openstack-aodh-listener
+          desc: Aodh Listener Service
+          type: simple
+          user: aodh
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}aodh-listener"
+          restart: on-failure
+      aodh_notifier:
+        ubuntu:
+          name: aodh-notifier
+          desc: Aodh Notifier Service
+          user: aodh
+          cmd: /usr/local/bin/aodh-notifier
+          config_dirs: /etc/aodh
+        rhel:
+          name: openstack-aodh-notifier
+          desc: Aodh Notifier Service
+          type: simple
+          user: aodh
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}aodh-notifier"
+          restart: on-failure
+      aodh_expirer:
+        ubuntu:
+          name: aodh-expirer
+          desc: Aodh Expirer package
+          user: aodh
+          cmd: /usr/local/bin/aodh-expirer
+          config_dirs: /etc/aodh
+        rhel:
+          name: openstack-aodh-expirer
+          desc: Aodh Expirer package
+          type: simple
+          user: aodh
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}aodh-expirer"
+          restart: on-failure
+  ceilometer:
+    services:
+      ceilometer_api:
+        ubuntu:
+          name: ceilometer-api
+          desc: Ceilometer API Service
+          user: ceilometer
+          cmd: /usr/local/bin/ceilometer-api
+        rhel:
+          name: openstack-ceilometer-api
+          desc: Ceilometer API Service
+          type: simple
+          user: ceilometer
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}ceilometer-api"
+          restart: on-failure
+      ceilometer_collector:
+        ubuntu:
+          name: ceilometer-collector
+          desc: Ceilometer Collector Service
+          user: ceilometer
+          cmd: /usr/local/bin/ceilometer-collector
+        rhel:
+          name: openstack-ceilometer-collector
+          desc: Ceilometer Collector Service
+          type: simple
+          user: ceilometer
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}ceilometer-collector"
+          restart: on-failure
+      ceilometer_notification:
+        ubuntu:
+          name: ceilometer-agent-notification
+          desc: Ceilometer Notification Agent
+          user: ceilometer
+          cmd: /usr/local/bin/ceilometer-agent-notification
+        rhel:
+          name: openstack-ceilometer-notification
+          desc: Ceilometer Notification Agent
+          type: simple
+          user: ceilometer
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}ceilometer-agent-notification"
+          restart: on-failure
+      ceilometer_polling:
+        ubuntu:
+          name: ceilometer-polling
+          desc: Ceilometer Polling Agent
+          user: ceilometer
+          cmd: /usr/local/bin/ceilometer-polling
+        rhel:
+          name: openstack-ceilometer-polling
+          desc: Ceilometer Polling Agent
+          type: simple
+          user: ceilometer
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}ceilometer-polling"
+          restart: on-failure
+      ceilometer_polling_compute:
+        ubuntu:
+          name: ceilometer-polling
+          desc: Ceilometer Compute Metrics Polling Agent
+          user: ceilometer
+          cmd: /usr/local/bin/ceilometer-polling
+        rhel:
+          name: openstack-ceilometer-compute
+          desc: Ceilometer Compute Metrics Polling Agent
+          type: simple
+          user: ceilometer
+          cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}ceilometer-polling"
+          args: "--polling-namespaces compute"
+          restart: on-failure

@@ -1,5 +1,6 @@
 ---
 dependencies:
+  - role: openstack-meta
   - role: endpoints
   - role: monitoring-common
     when: monitoring.enabled|default(True)|bool
@@ -21,5 +22,13 @@ dependencies:
     when: openstack_install_method == 'package'
   - role: openstack-distro
     project_name: ceilometer
-    project_packages: "{{ ceilometer.distro.project_packages }}"
-    when: openstack_install_method == 'distro'
+    project_packages: "{{ ceilometer.distro.controller.project_packages }}"
+    when:
+      - openstack_install_method == 'distro'
+      - inventory_hostname in groups['controller']
+  - role: openstack-distro
+    project_name: ceilometer
+    project_packages: "{{ ceilometer.distro.compute.project_packages }}"
+    when:
+      - openstack_install_method == 'distro'
+      - inventory_hostname in groups['compute']

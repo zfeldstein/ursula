@@ -1,5 +1,5 @@
 ---
-- name: install mongodb packages
+- name: install mongodb packages (ubuntu)
   apt: pkg={{ item }} state=installed
   with_items:
     - mongodb-org-server={{ mongodb.version }}
@@ -7,15 +7,44 @@
   register: result
   until: result|succeeded
   retries: 5
+  when: os == 'ubuntu'
+
+- name: install mongodb packages (centos)
+  yum: pkg={{ item }} state=installed
+  with_items:
+    - mongodb-server
+    - mongodb
+  register: result
+  until: result|succeeded
+  retries: 5
+  when:
+    - os == 'rhel'
+    - openstack_install_method == 'source'
+
+- name: install mongodb packages (rhel osp)
+  yum: disablerepo=epel pkg={{ item }} state=installed
+  with_items:
+    - mongodb-server
+    - mongodb
+  register: result
+  until: result|succeeded
+  retries: 5
+  when:
+    - os == 'rhel'
+    - openstack_install_method == 'distro'
 
 - name: install mongodb config files
-  template: src=etc/mongodb/mongod.conf dest=/etc/mongod.conf owner=root group=mongodb mode=0640
+  template: src=etc/mongodb/mongod.conf
+            dest=/etc/mongod.conf
+            owner=root
+            group=mongodb
+            mode=0640
   notify: restart mongodb service
 
 - meta: flush_handlers
 
 - name: start mongodb service
-  service: name=mongod state=started
+  service: name=mongod state=started enabled=True
 
 - include: monitoring.yml
   tags:

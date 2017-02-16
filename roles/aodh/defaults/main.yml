@@ -2,9 +2,19 @@
 project_name: aodh
 aodh:
   debug: False
+  services:
+    aodh_api: "{{ openstack_meta.aodh.services.aodh_api[os] }}"
+    aodh_evaluator: "{{ openstack_meta.aodh.services.aodh_evaluator[os] }}"
+    aodh_listener: "{{ openstack_meta.aodh.services.aodh_listener[os] }}"
+    aodh_notifier: "{{ openstack_meta.aodh.services.aodh_notifier[os] }}"
+    aodh_expirer: "{{ openstack_meta.aodh.services.aodh_expirer[os] }}"
   distro:
     project_packages:
-      - openstack-aodh
+      - openstack-aodh-api
+      - openstack-aodh-evaluator
+      - openstack-aodh-listener
+      - openstack-aodh-notifier
+      - openstack-aodh-expirer
   source:
     rev: 'stable/newton'
     constrain: True

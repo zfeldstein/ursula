@@ -1,9 +1,9 @@
 ---
 - name: restart aodh services
-  service: name={{ item }} state=restarted must_exist=false
+  service: name={{ item.name }} state=restarted must_exist=false
   when: restart|default('True')
   with_items:
-    - aodh-api
-    - aodh-evaluator
-    - aodh-listener
-    - aodh-notifier
+    - "{{ aodh.services.aodh_api }}"
+    - "{{ aodh.services.aodh_evaluator }}"
+    - "{{ aodh.services.aodh_listener }}"
+    - "{{ aodh.services.aodh_notifier }}"
