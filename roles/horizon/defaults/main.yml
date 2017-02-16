@@ -15,7 +15,6 @@ horizon:
   distro:
     project_packages:
       - openstack-dashboard
-      - openstack-neutron-lbaas-ui
     python_post_dependencies: []
   source:
     python_post_dependencies: []
