@@ -1,5 +1,7 @@
 ---
 - name: keystone services
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   keystone_service: name={{ item.name }}
                     type={{ item.type }}
                     description='{{ item.description }}'

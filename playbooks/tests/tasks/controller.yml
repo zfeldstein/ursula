@@ -127,12 +127,10 @@
     when: cinder.enabled|bool
 
   - name: glance has the cirros image
-    shell: . /root/stackrc; glance image-list | grep cirros
+    shell: . /root/stackrc; openstack image list | grep cirros
 
   - name: cirros image is public
-    shell: . /root/stackrc; glance --os-image-api-version 1 image-show cirros |grep is_public |grep True
-    # Use glance version 1 API until we replace this with something more
-    # elegant
+    shell: . /root/stackrc; openstack image show cirros |grep visibility |grep public
 
   - name: nova has a working api
     shell: . /root/stackrc; nova list | grep ID

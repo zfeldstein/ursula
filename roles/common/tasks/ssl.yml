@@ -15,16 +15,6 @@
       src: "{{ item.src | default(omit) }}"
     with_items: "{{ ssl.extracacerts | default([]) }}"
     notify: refresh CAs
-
-  # ugly hack: some python http libs don't honor the system ca-certs, and ship with
-  # their own list, instead.
-  # pre-install these client libs, and force them to use the system cert list.
-  - name: force our ssl cert for python libs (ubuntu)
-    file: src={{ ssl.cafile }} dest={{ item }} owner=root
-          mode=0644 state=link force=yes
-    with_items:
-      - "{{ basevenv_lib_dir }}/requests/cacert.pem"
-    notify: refresh CAs
   when: os == 'ubuntu'
 
 - block:
@@ -44,30 +34,15 @@
       src: "{{ item.src | default(omit) }}"
     with_items: "{{ ssl.extracacerts | default([]) }}"
     notify: refresh rhel CAs
-
-  # ugly hack: some python http libs don't honor the system ca-certs, and ship with
-  # their own list, instead.
-  # pre-install these client libs, and force them to use the system cert list.
-  - name: force our ssl cert for python libs (centos)
-    file: src={{ ssl.cafile }} dest={{ item }} owner=root
-          mode=0644 state=link force=yes
-    with_items:
-      - "{{ basevenv_lib_dir }}/requests/cacert.pem"
-      - /usr/lib/python2.7/site-packages/requests/cacert.pem
-    notify: refresh rhel CAs
-    when:
-      - openstack_install_method == 'source'
-
-  - name: force our ssl cert for python libs (rhel))
-    file: src={{ ssl.cafile }} dest={{ item }} owner=root
-          mode=0644 state=link force=yes
-    with_items:
-      - "{{ basevenv_lib_dir }}/requests/cacert.pem"
-      - /usr/lib/python2.7/site-packages/requests/cacert.pem
-      - /etc/pki/tls/certs/ca-bundle.crt
-    notify: refresh rhel CAs
-    when: openstack_install_method == 'distro'
   when: os == 'rhel'
+
+# ugly hack: some python http libs don't honor the system ca-certs, and ship with
+# their own list, instead.
+# pre-install these client libs, and force them to use the system cert list.
+- name: force our ssl cert for python libs
+  file: src={{ ssl.cafile }} dest="{{ basevenv_lib_dir }}/requests/cacert.pem"
+        owner=root mode=0644
+        state=link force=yes
 
 - name: ssl directory
   file: dest=/opt/stack/ssl state=directory

@@ -1,5 +1,7 @@
 ---
 - name: determine Neutron external interface name
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   os_network:
     name: external
     auth:
