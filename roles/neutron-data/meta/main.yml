@@ -7,3 +7,7 @@ dependencies:
     when: ansible_distribution_version == "12.04"
   - role: sensu-check
   - role: neutron-common
+  - role: openstack-firewall
+    rule_name: VXLAN
+    rules_type_input:
+      - { protocol: udp, port: 4789 }

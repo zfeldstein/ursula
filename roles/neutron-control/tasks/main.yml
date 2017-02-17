@@ -13,10 +13,6 @@
       envs: "{{ neutron.service.envs }}"
     with_items:
       - "{{ neutron.services.neutron_server }}"
-
-  - name: Permit access to Neutron (ubuntu)
-    ufw: rule=allow to_port={{ endpoints.neutron.port.haproxy_api }} proto=tcp
-    tags: firewall
   when: os == 'ubuntu'
 
 - block:
@@ -35,16 +31,6 @@
       kill_mode: "{{ item.kill_mode }}"
     with_items:
       - "{{ neutron.services.neutron_server }}"
-
-  - name: Permit access to neutron (rhel)
-    firewalld:
-      state: enabled
-      permanent: true
-      immediate: true
-      port: "{{ item }}/tcp"
-    with_items:
-      - "{{ endpoints.neutron.port.haproxy_api }}"
-    tags: firewall
   when: os == 'rhel'
 
 - name: stop neutron service before db sync

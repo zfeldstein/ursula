@@ -17,11 +17,6 @@
     until: result|succeeded
     retries: 5
 
-  - name: permit VXLAN traffic (ubuntu)
-    ufw: rule=allow to_port=4789 proto=udp
-    tags: firewall
-    when:  neutron.plugin == 'ml2' and 'vxlan' in neutron.tunnel_types
-
   - name: install neutron-linuxbridge-agent service (ubuntu)
     upstart_service:
       name: "{{ item.name }}"
@@ -34,32 +29,25 @@
     when: neutron.plugin == 'ml2'
   when: os == 'ubuntu'
 
-- block:
-  - name: permit VXLAN traffic (rhel)
-    firewalld:
-      state: enabled
-      permanent: true
-      port: 4789/udp
-    tags: firewall
-
-  - name: install neutron-linuxbridge-agent service (rhel package)
-    systemd_service:
-      name: "{{ item.name }}"
-      description: "{{ item.desc }}"
-      type: "{{ item.type }}"
-      user: "{{ item.user }}"
-      #envs: "{{ neutron.service.envs }}"
-      #FIXME added prestart to match up osp systemd
-      #prestart_script: "{{ item.prestart_script }}"
-      cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
-      config_files: "{{ item.config_files }}"
-      restart: "{{ item.restart }}"
-      kill_mode: "{{ item.kill_mode }}"
-    with_items:
-      - "{{ neutron.services.neutron_linuxbridge_agent }}"
-    when: neutron.plugin == 'ml2'
-  when: os == 'rhel'
+- name: install neutron-linuxbridge-agent service (rhel package)
+  systemd_service:
+    name: "{{ item.name }}"
+    description: "{{ item.desc }}"
+    type: "{{ item.type }}"
+    user: "{{ item.user }}"
+    #envs: "{{ neutron.service.envs }}"
+    #FIXME added prestart to match up osp systemd
+    #prestart_script: "{{ item.prestart_script }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+    config_files: "{{ item.config_files }}"
+    restart: "{{ item.restart }}"
+    kill_mode: "{{ item.kill_mode }}"
+  with_items:
+    - "{{ neutron.services.neutron_linuxbridge_agent }}"
+  when:
+    - os == 'rhel'
+    - neutron.plugin == 'ml2'
 
 - name: ml2 dataplane config
   template: src=etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini

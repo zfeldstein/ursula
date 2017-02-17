@@ -21,7 +21,8 @@ common:
   ssh:
     allow_from:
       - 0.0.0.0/0
-      - ::/0
+    # FIXME Commenting for now, need to split out iptables rules for ipv6
+    #  - ::/0
     disable_root: False
     disable_dns: True
   pip_version: 8.0.2

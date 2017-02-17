@@ -6,3 +6,7 @@ dependencies:
   - role: sensu-check
   - role: collectd-plugin
     when: collectd is defined and collectd.enabled|bool
+  - role: openstack-firewall
+    rule_name: neutron
+    rules_type_input:
+      - { protocol: tcp, port: "{{ endpoints.neutron.port.haproxy_api }}" }

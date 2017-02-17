@@ -45,18 +45,9 @@
     uwsgi_path: "/usr/sbin/uwsgi"
   when: openstack_install_method == 'distro'
 
-- block:
-  - name: install keystone uwsgi service (ubuntu)
-    template: src=etc/init/keystone.conf
-              dest=/etc/init/keystone.conf mode=0644
-
-  - name: permit access to keystone (ubuntu)
-    ufw: rule=allow to_port={{ item }} proto=tcp
-    tags: firewall
-    with_items:
-      - "{{ endpoints.keystone.port.haproxy_api }}"
-      - "{{ endpoints.keystone_admin.port.haproxy_api }}"
-      - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
+- name: install keystone uwsgi service (ubuntu)
+  template: src=etc/init/keystone.conf
+            dest=/etc/init/keystone.conf mode=0644
   when: os == 'ubuntu'
 
 - block:
@@ -72,18 +63,6 @@
       restart: "{{ item.restart }}"
     with_items:
       - "{{ openstack_meta.keystone.services.keystone_api[os] }}"
-
-  - name: Permit access to keystone (rhel)
-    firewalld:
-      state: enabled
-      permanent: true
-      immediate: true
-      port: "{{ item }}/tcp"
-    with_items:
-      - "{{ endpoints.keystone.port.haproxy_api }}"
-      - "{{ endpoints.keystone_admin.port.haproxy_api }}"
-      - "{{ endpoints.keystone_legacy.port.haproxy_api }}"
-    tags: firewall
 
   - name: Configure tmpfiles.d for creation of /run/uwsgi on reboot
     template:

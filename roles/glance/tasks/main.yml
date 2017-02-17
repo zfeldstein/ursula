@@ -56,49 +56,29 @@
     etype: user
     recursive: yes
 
-- block:
-  - name: permit access to glance (ubuntu)
-    ufw: rule=allow to_port={{ item }} proto=tcp
-    tags: firewall
-    with_items:
-      - "{{ endpoints.glance.port.haproxy_api }}"
-      - "{{ endpoints.glance.port.backend_api }}"
-
-  - name: install glance services (ubuntu)
-    upstart_service:
-      name: "{{ item.name }}"
-      user: "{{ item.user }}"
-      cmd: "{{ item.cmd }}"
-    with_items:
-      - "{{ glance.services.glance_api }}"
-      - "{{ glance.services.glance_registry }}"
+- name: install glance services (ubuntu)
+  upstart_service:
+    name: "{{ item.name }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+  with_items:
+    - "{{ glance.services.glance_api }}"
+    - "{{ glance.services.glance_registry }}"
   when: os == 'ubuntu'
 
-- block:
-  - name: Permit access to glance (rhel)
-    firewalld:
-      state: enabled
-      permanent: true
-      immediate: true
-      port: "{{ item }}/tcp"
-    with_items:
-      - "{{ endpoints.glance.port.haproxy_api }}"
-      - "{{ endpoints.glance.port.backend_api }}"
-    tags: firewall
-
-  - name: install glance services (rhel)
-    systemd_service:
-      name: "{{ item.name }}"
-      description: "{{ item.desc }}"
-      type: "{{ item.type }}"
-      user: "{{ item.user }}"
-      cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
-      config_files: "{{ item.config_files }}"
-      restart: "{{ item.restart }}"
-    with_items:
-      - "{{ glance.services.glance_api }}"
-      - "{{ glance.services.glance_registry }}"
+- name: install glance services (rhel)
+  systemd_service:
+    name: "{{ item.name }}"
+    description: "{{ item.desc }}"
+    type: "{{ item.type }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+    config_files: "{{ item.config_files }}"
+    restart: "{{ item.restart }}"
+  with_items:
+    - "{{ glance.services.glance_api }}"
+    - "{{ glance.services.glance_registry }}"
   when: os == 'rhel'
 
 - name: glance config

@@ -1,7 +1,7 @@
 ---
 - name: install ceilometer polling agent
   upstart_service:
-    name: "{{ item.nam }}"
+    name: "{{ item.name }}"
     user: "{{ item.user }}"
     cmd: "{{ item.cmd }}"
   with_items:

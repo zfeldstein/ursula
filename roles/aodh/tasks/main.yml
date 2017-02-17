@@ -13,33 +13,20 @@
   file: dest=/var/cache/aodh state=directory mode=0700
         owner=aodh group=aodh
 
-- block:
-  - name: permit access to aodh
-    ufw: rule=allow to_port={{ endpoints.aodh.port.haproxy_api }} proto=tcp
-    tags: firewall
-
-  - name: install aodh services
-    upstart_service:
-      name: "{{ item.nam }}"
-      user: "{{ item.user }}"
-      cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
-    with_items:
-      - "{{ aodh.services.aodh_api}}"
-      - "{{ aodh.services.aodh_evaluator }}"
-      - "{{ aodh.services.aodh_listener }}"
-      - "{{ aodh.services.aodh_notifier }}"
+- name: install aodh services
+  upstart_service:
+    name: "{{ item.name }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+  with_items:
+    - "{{ aodh.services.aodh_api }}"
+    - "{{ aodh.services.aodh_evaluator }}"
+    - "{{ aodh.services.aodh_listener }}"
+    - "{{ aodh.services.aodh_notifier }}"
   when: os == 'ubuntu'
 
 - block:
-  - name: permit access to aodh
-    firewalld:
-      port: "{{ endpoints.aodh.port.haproxy_api }}/tcp"
-      permanent: true
-      immediate: true
-      state: enabled
-    tags: firewall
-
   - name: install aodh services (rhel)
     systemd_service:
       name: "{{ item.name }}"
@@ -50,7 +37,7 @@
       args: "{{ (item.name == 'openstack-aodh-api') | ternary('--port %s' % endpoints.aodh.port.backend_api, '') }}"
       restart: "{{ item.restart }}"
     with_items:
-      - "{{ aodh.services.aodh_api}}"
+      - "{{ aodh.services.aodh_api }}"
       - "{{ aodh.services.aodh_evaluator }}"
       - "{{ aodh.services.aodh_listener }}"
       - "{{ aodh.services.aodh_notifier }}"

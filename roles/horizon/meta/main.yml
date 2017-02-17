@@ -27,3 +27,8 @@ dependencies:
     when: openstack_install_method == 'distro'
   - role: apache
   - role: keystone-defaults
+  - role: openstack-firewall
+    rule_name: horizon
+    rules_type_input:
+      - { protocol: tcp, port: 80 }
+      - { protocol: tcp, port: 443 }

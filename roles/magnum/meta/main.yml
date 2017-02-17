@@ -29,3 +29,7 @@ dependencies:
     project_name: magnum
     project_packages: "{{ magnum.distro.project_packages }}"
     when: openstack_install_method == 'distro'
+  - role: openstack-firewall
+    rule_name: magnum
+    rules_type_input:
+      - { protocol: tcp, port: "{{ endpoints.magnum.port.haproxy_api }}" }
