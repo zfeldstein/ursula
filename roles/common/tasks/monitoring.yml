@@ -69,6 +69,16 @@
               line=". {{ common.python.base_venv }}/bin/activate"
   notify: restart sensu-client
 
+- name: ensure sensu-client path enabled on redhat
+  template: 
+    dest: /etc/sysconfig/sensu-client
+    src: monitoring/sensu-client-path 
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart sensu-client
+  when: os == "rhel"
+
 - name: sensu client config
   template: src=monitoring/config.json dest=/etc/sensu/config.json owner=root
             group=root
