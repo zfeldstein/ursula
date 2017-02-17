@@ -4,6 +4,8 @@
 
   tasks:
     - name: cleanup test instance
+      environment:
+        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
       os_server:
         auth:
           auth_url: "{{ endpoints.auth_uri }}"
@@ -15,6 +17,8 @@
       failed_when: False
 
     - name: cleanup test security group
+      environment:
+        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
       os_security_group:
         auth:
           auth_url: "{{ endpoints.auth_uri }}"
@@ -26,6 +30,8 @@
       failed_when: False
 
     - name: cleanup test key-pair
+      environment:
+        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
       os_keypair:
         auth:
           auth_url: "{{ endpoints.auth_uri }}"
@@ -37,6 +43,8 @@
       failed_when: False
 
     - name: clean up test volume
+      environment:
+        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
       os_volume:
         auth:
           auth_url: "{{ endpoints.auth_uri }}"
