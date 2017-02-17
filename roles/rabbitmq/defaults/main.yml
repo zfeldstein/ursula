@@ -16,3 +16,8 @@ rabbitmq:
       rabbitmq_cluster:
         criticality: 'critical'
       timeout: 5
+  systemd:
+    custom: |
+      [Service]
+      LimitNOFILE=300000
+
