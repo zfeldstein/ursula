@@ -62,7 +62,7 @@
   when: os == 'rhel'
 
 - name: heat config
-  template: src=etc/heat/{{ item }} dest=/etc/heat/{{ item }} mode={{ 0644 if 'policy.json' in item else 0640 }} owner=heat group=heat
+  template: src=etc/heat/{{ item }} dest=/etc/heat/{{ item }} mode=0640 owner=root group=heat
   with_items:
     - heat.conf
     - policy.json
