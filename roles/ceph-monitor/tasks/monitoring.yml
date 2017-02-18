@@ -1,4 +1,42 @@
 ---
+- name: import rados module into base_venv (rhel)
+  file:
+    src: "{{ ceph.pylib_dir[os] }}{{ item }}"
+    dest: "/opt/openstack/base/lib/python2.7/site-packages/{{ item }}"
+    state: link
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - rados.so
+    - rbd.so
+  when: os == "rhel"
+
+- name: import rados module into base_venv (ubuntu)
+  file:
+    src: "{{ ceph.pylib_dir[os] }}{{ item }}"
+    dest: "/opt/openstack/base/lib/python2.7/site-packages/{{ item }}"
+    state: link
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - rados.x86_64-linux-gnu.so
+    - rbd.x86_64-linux-gnu.so
+  when: os == "ubuntu"
+
+- name: import other ceph modules into base_venv
+  file:
+    src: "{{ ceph.pylib_dir2[os] }}{{ item }}"
+    dest: "/opt/openstack/base/lib/python2.7/site-packages/{{ item }}"
+    state: link
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - ceph_argparse.py
+    - ceph_daemon.py
+
 - name: ceph status check
   sensu_check: name=check-ceph-status plugin=check-ceph.rb
                use_sudo=true args='--criticality {{ ceph.monitoring.sensu_checks.check_ceph_status.criticality }} {{ ceph.monitoring.sensu_checks.check_ceph_status.escalate_flags }} -o -f -p'

@@ -3,6 +3,9 @@ ceph:
   pylib_dir:
     rhel: /usr/lib64/python2.7/site-packages/
     ubuntu: /usr/lib/python2.7/dist-packages/
+  pylib_dir2:
+    rhel: /usr/lib/python2.7/site-packages/
+    ubuntu: /usr/lib/python2.7/dist-packages/
   enabled: false
   #disks:
   #  - sdb
