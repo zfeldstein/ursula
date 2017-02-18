@@ -27,6 +27,7 @@ glance:
   distro:
     project_packages:
       - openstack-glance
+    python_post_dependencies: []
   source:
     rev: 'stable/newton'
     constrain: True
@@ -35,6 +36,7 @@ glance:
       - { name: PyMySQL }
       - { name: python-swiftclient }
       - { name: "git+https://github.com/blueboxgroup/bbc-openstack-plugins.git#egg=bbc_openstack_plugins" }
+    python_post_dependencies: []
     system_dependencies:
         ubuntu:
         - libxml2-dev

@@ -12,6 +12,8 @@ horizon:
     enabled: True
     regex: '^(?=.*\d)(?=.*[a-z]).{8,}$'
     help_text: 'Password is not compliant. Password must contain lowercase letters, digits, and be at least 8 characters in length.'
+  glance:
+    allow_location: False  
   distro:
     project_packages:
       - openstack-dashboard
