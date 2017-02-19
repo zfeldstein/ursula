@@ -114,7 +114,7 @@ def main():
         changed = False
         service_path = None
         if not module.params['path']:
-            service_path = '/usr/lib/systemd/system/%s.service' % module.params['name']
+            service_path = '/etc/systemd/system/%s.service' % module.params['name']
         else:
             service_path = module.params['path']
 
