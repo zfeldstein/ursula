@@ -16,3 +16,21 @@ inspec:
         - check-dashboard-02
       attributes:
         horizon_config_group: apache
+    cinder:
+      required_controls:
+        - check-block-01
+        - check-block-02
+    glance:
+      required_controls: []
+    nova:
+      required_controls:
+        - check-compute-01
+        - check-compute-02
+    keystone:
+      required_controls:
+        - check-identity-01
+        - check-identity-02
+    neutron:
+      required_controls:
+        - check-neutron-01
+        - check-neutron-02
