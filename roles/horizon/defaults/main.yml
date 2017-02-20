@@ -10,8 +10,8 @@ horizon:
   session_engine: django.contrib.sessions.backends.cache
   password_validator:
     enabled: True
-    regex: '^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&+=()_]).{8,}$'
-    help_text: 'Password is not compliant. Password must contain uppercase, lowercase, special characters !@#$%%^&+=()_, digits, and be at least 8 characters in length.'
+    regex: '^(?=.*\d)(?=.*[a-z]).{8,}$'
+    help_text: 'Password is not compliant. Password must contain lowercase letters, digits, and be at least 8 characters in length.'
   distro:
     project_packages:
       - openstack-dashboard
