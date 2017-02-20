@@ -46,4 +46,5 @@
       - ifup neutron external interface
       - enable ip forwarding
       - enable ipv4 masquerade
+      - persist enable ipv4 masquerade
   when: os == 'rhel' and result.id is defined
