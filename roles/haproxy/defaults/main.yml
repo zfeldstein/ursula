@@ -8,7 +8,7 @@ haproxy:
     timeout_http_request: 30s
     timeout_http_keep_alive: 60s
     timeout_queue: 1m
-    timeout_connect: 10s
+    timeout_connect: 5s
     timeout_client: 300s
     timeout_server: 300s
     timeout_check: 10s
