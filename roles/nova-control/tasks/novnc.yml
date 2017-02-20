@@ -29,16 +29,3 @@
     file: src=/opt/stack/novnc/noVNC-0.5.1 dest=/usr/share/novnc state=link
     when: not sym.stat.exists
   when: nova.novnc_method == 'file'
-
-- name: Permit access to NoVNC (ubuntu)
-  ufw: rule=allow to_port={{ endpoints.novnc.port.haproxy_api }} proto=tcp
-  when: os == 'ubuntu'
-  tags: firewall
-
-- name: permit access to NoVNC (rhel)
-  firewalld:
-    state: enabled
-    permanent: true
-    port: "{{ endpoints.novnc.port.haproxy_api }}/udp"
-  when: os == 'rhel'
-  tags: firewall

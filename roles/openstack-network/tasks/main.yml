@@ -45,6 +45,5 @@
     notify:
       - ifup neutron external interface
       - enable ip forwarding
-      - enable masquerade on public
-      - enable ipv4 masquerade rule on public
+      - enable ipv4 masquerade
   when: os == 'rhel' and result.id is defined

@@ -29,3 +29,8 @@ dependencies:
     when: openstack_install_method == 'distro'
   - role: openstack-database
     database_name: heat
+  - role: openstack-firewall
+    rule_name: heat
+    rules_type_input:
+      - { protocol: tcp, port: "{{ endpoints.heat.port.haproxy_api }}" }
+      - { protocol: tcp, port: "{{ endpoints.heat_cfn.port.backend_api }}" }

@@ -1,7 +1,8 @@
 ---
 - name: Disable NetworkManager
   service: name=NetworkManager state=stopped enabled=no
-  when: ansible_distribution == 'RedHat'
+  failed_when: false
+  when: os == 'rhel'
 
 - block:
   - name: set network config dir path - ubuntu

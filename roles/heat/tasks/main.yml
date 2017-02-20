@@ -13,52 +13,31 @@
   file: dest=/var/cache/heat state=directory mode=0700
         owner=heat group=heat
 
-
-- block:
-  - name: permit access to heat
-    ufw: rule=allow to_port={{ item }} proto=tcp
-    tags: firewall
-    with_items:
-      - "{{ endpoints.heat.port.haproxy_api }}"
-      - "{{ endpoints.heat_cfn.port.haproxy_api }}"
-
-  - name: install heat services (ubuntu)
-    upstart_service:
-      name: "{{ item.name }}"
-      user: "{{ item.user }}"
-      cmd: "{{ item.cmd }}"
-    with_items:
-      - "{{ heat.services.heat_api }}"
-      - "{{ heat.services.heat_api_cfn }}"
-      - "{{ heat.services.heat_engine }}"
+- name: install heat services (ubuntu)
+  upstart_service:
+    name: "{{ item.name }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+  with_items:
+    - "{{ heat.services.heat_api }}"
+    - "{{ heat.services.heat_api_cfn }}"
+    - "{{ heat.services.heat_engine }}"
   when: os == 'ubuntu'
 
-- block:
-  - name: Permit access to heat
-    firewalld:
-      state: enabled
-      permanent: true
-      immediate: true
-      port: "{{ item }}/tcp"
-    with_items:
-      - "{{ endpoints.heat.port.haproxy_api }}"
-      - "{{ endpoints.heat_cfn.port.backend_api }}"
-    tags: firewall
-
-  - name: install heat services (rhel)
-    systemd_service:
-      name: "{{ item.name }}"
-      description: "{{ item.desc }}"
-      type: "{{ item.type }}"
-      user: "{{ item.user }}"
-      cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
-      config_files: "{{ item.config_files }}"
-      restart: "{{ item.restart }}"
-    with_items:
-      - "{{ heat.services.heat_api }}"
-      - "{{ heat.services.heat_api_cfn }}"
-      - "{{ heat.services.heat_engine }}"
+- name: install heat services (rhel)
+  systemd_service:
+    name: "{{ item.name }}"
+    description: "{{ item.desc }}"
+    type: "{{ item.type }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+    config_files: "{{ item.config_files }}"
+    restart: "{{ item.restart }}"
+  with_items:
+    - "{{ heat.services.heat_api }}"
+    - "{{ heat.services.heat_api_cfn }}"
+    - "{{ heat.services.heat_engine }}"
   when: os == 'rhel'
 
 - name: heat config

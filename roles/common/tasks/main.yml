@@ -99,7 +99,7 @@
   when: os == 'ubuntu'
   tags: firewall
 
-- include: firewalld.yml
+- include: iptables.yml
   when: os == 'rhel'
   tags: firewall
 

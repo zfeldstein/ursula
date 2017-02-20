@@ -1,42 +1,28 @@
 ---
-- block:
-  - name: install cinder controller services (ubuntu)
-    upstart_service:
-      name: "{{ item.name }}"
-      user: "{{ item.user }}"
-      cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
-    with_items:
-      - "{{ cinder.services.cinder_api }}"
-      - "{{ cinder.services.cinder_scheduler }}"
-
-  - name: Permit access to Cinder (ubuntu)
-    ufw: rule=allow to_port={{ endpoints.cinder.port.haproxy_api }} proto=tcp
-    tags: firewall
+- name: install cinder controller services (ubuntu)
+  upstart_service:
+    name: "{{ item.name }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+  with_items:
+    - "{{ cinder.services.cinder_api }}"
+    - "{{ cinder.services.cinder_scheduler }}"
   when: os == 'ubuntu'
 
-- block:
-  - name: install cinder controller services (rhel)
-    systemd_service:
-      name: "{{ item.name }}"
-      description: "{{ item.desc }}"
-      type: "{{ item.type }}"
-      user: "{{ item.user }}"
-      cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
-      config_files: "{{ item.config_files }}"
-      restart: "{{ item.restart }}"
-    with_items:
-      - "{{ cinder.services.cinder_api }}"
-      - "{{ cinder.services.cinder_scheduler }}"
-
-  - name: Permit access to Cinder (rhel)
-    firewalld:
-      state: enabled
-      permanent: true
-      immediate: true
-      port: "{{ endpoints.cinder.port.haproxy_api }}/tcp"
-    tags: firewall
+- name: install cinder controller services (rhel)
+  systemd_service:
+    name: "{{ item.name }}"
+    description: "{{ item.desc }}"
+    type: "{{ item.type }}"
+    user: "{{ item.user }}"
+    cmd: "{{ item.cmd }}"
+    config_dirs: "{{ item.config_dirs }}"
+    config_files: "{{ item.config_files }}"
+    restart: "{{ item.restart }}"
+  with_items:
+    - "{{ cinder.services.cinder_api }}"
+    - "{{ cinder.services.cinder_scheduler }}"
   when: os == 'rhel'
 
 - name: sync cinder database

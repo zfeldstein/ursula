@@ -23,3 +23,7 @@ dependencies:
     project_name: aodh
     project_packages: "{{ aodh.distro.project_packages }}"
     when: openstack_install_method == 'distro'
+  - role: openstack-firewall
+    rule_name: aodh
+    rules_type_input:
+      - { protocol: tcp, port: "{{ endpoints.aodh.port.haproxy_api }}" }
