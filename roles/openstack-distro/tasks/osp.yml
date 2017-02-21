@@ -36,3 +36,4 @@
   register: result
   until: result|succeeded
   retries: 5
+  no_log: true
