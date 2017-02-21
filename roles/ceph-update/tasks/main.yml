@@ -13,10 +13,6 @@
   - name: stop ceph mon
     service: name={{ ceph.mon_service[os] }} state=stopped
 
-  - name: correct ceph dir owner
-    file: path=/var/lib/ceph state=directory owner=ceph group=ceph recurse=yes
-    when: upgrade_ceph2jewel|bool
-
   - name: start ceph mons
     service: name={{ ceph.mon_service[os] }} state=started enabled=yes
   when: "'ceph_monitors' in group_names"
@@ -39,9 +35,6 @@
 
   - name: stop ceph osd
     service: name={{ ceph.osd_service[os] }} state=stopped
-
-  - include: ceph_owner.yml
-    when: upgrade_ceph2jewel|bool
 
   - name: start ceph osds
     service: name={{ ceph.osd_service[os] }} state=started enabled=yes
