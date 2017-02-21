@@ -56,11 +56,13 @@
   when: openstack_install_method == 'source'
 
 - name: custom horizon logo
-  get_url: url={{ item.url }}
-           dest={{ (openstack_install_method != 'distro') | ternary(
-           '{{horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/static/dashboard/{{ item.name }}',
-           '/usr/share/openstack-dashboard/openstack_dashboard/static/dashboard/{{ item.name }}') }}
-           force=True
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ (openstack_install_method != 'distro') |
+          ternary('%s/lib/python2.7/site-packages/openstack_dashboard/static/dashboard/%s'
+          % (horizon.horizon_lib_dir,item.name),'%s/openstack_dashboard/static/dashboard/%s'
+          % (horizon.rhel_lib_dir,item.name) ) }}"
+    force: True
   with_items:
     - { name: img/logo.png, url: "{{ horizon.logo_url|default('') }}"  }
     - { name: img/logo-splash.png, url: "{{ horizon.logo_url|default('') }}" }
