@@ -88,25 +88,43 @@
   when: (update_routes|default('false')|bool) and (not (ansible_default_ipv4.network ==  ( item.cidr | ipaddr('network') )))
   with_items: "{{ undercloud_cidr }}"
 
-- name: Check if interface has its own config file
-  stat: path=/etc/network/interfaces.d/{{ ansible_default_ipv4.interface }}.cfg
-  register: found_in_interfaces_d
-  when: (update_routes|default('false')|bool)
+- block:
+  - name: Check if interface has its own config file
+    stat: path=/etc/network/interfaces.d/{{ ansible_default_ipv4.interface }}.cfg
+    register: found_in_interfaces_d
+ 
+  - name: Set network config file
+    set_fact: nw_config_file="/etc/network/interfaces.d/{{ ansible_default_ipv4.interface }}.cfg"
+    when: found_in_interfaces_d.stat.exists is defined and found_in_interfaces_d.stat.exists
+ 
+  - name: Set network config file
+    set_fact: nw_config_file="/etc/network/interfaces"
+    when: not found_in_interfaces_d.stat.exists|bool
+ 
+  #Check if the static routes are present in interface configuration file, so that they are persistant across reboots.
+  - name: Check for static routes in {{ nw_config_file }}
+    command: "grep -h 'ip route add {{ item.cidr }} via {{ nw_gw }}' {{ nw_config_file }}"
+    with_items: "{{ undercloud_cidr }}"
+    changed_when: False
+    when: ansible_default_ipv4.network  != ( item.cidr | ipaddr('network'))
+  when: os == 'ubuntu' and (update_routes|default('false')|bool)
+ 
+- block:
+  - name: Check if route configuration exists
+    stat: path=/etc/sysconfig/network-scripts/route-{{ ansible_default_ipv4.interface }}.cfg
+    register: found_in_routes
 
-- name: Set network config file
-  set_fact: nw_config_file="/etc/network/interfaces.d/{{ ansible_default_ipv4.interface }}.cfg"
-  when: (update_routes|default('false')|bool) and found_in_interfaces_d.stat.exists is defined and found_in_interfaces_d.stat.exists
+  - name: Set routes config file
+    set_fact: route_config_file="/etc/sysconfig/network-scripts/route-{{ ansible_default_ipv4.interface }}.cfg"
+    when: found_in_routes.stat.exists is defined and found_in_routes.stat.exists
 
-- name: Set network config file
-  set_fact: nw_config_file="/etc/network/interfaces"
-  when: (update_routes|default('false')|bool) and ( not found_in_interfaces_d.stat.exists|bool )
-
-#Check if the static routes are present in interface configuration file, so that they are persistant across reboots.
-- name: Check for static routes in {{ nw_config_file }}
-  command: "grep -h 'ip route add {{ item.cidr }} via {{ nw_gw }}' {{ nw_config_file }}"
-  with_items: "{{ undercloud_cidr }}"
-  changed_when: False
-  when: (update_routes|default('false')|bool) and (not ( ansible_default_ipv4.network  == ( item.cidr | ipaddr('network') )))
+  #Check if the static routes are present in routes configuration file, so that they are persistant across reboots.
+  - name: Check for static routes in {{ route_config_file }}
+    command: "grep -h '{{ item.cidr }} via {{ nw_gw }}' {{ route_config_file }}"
+    with_items: "{{ undercloud_cidr }}"
+    changed_when: False
+    when: ansible_default_ipv4.network  != ( item.cidr | ipaddr('network'))
+  when: os == 'rhel' and (update_routes|default('false')|bool)
 
 - name: hosts file
   template: src=etc/hosts dest=/etc/hosts owner=root group=root mode=0644
