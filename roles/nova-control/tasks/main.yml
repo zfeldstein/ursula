@@ -1,5 +1,6 @@
 ---
 - include: novnc.yml
+  when: openstack_install_method != 'distro'
   tags: novnc
 
 - block:
