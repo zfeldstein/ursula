@@ -67,6 +67,13 @@
     mode: 0644
   when: inventory_hostname in groups['controller'] or  inventory_hostname in groups['compute'] or inventory_hostname in groups['cinder_volume']
 
+- name: rhel control files
+  template: 
+    src: etc/inspec/host-controls/controls/rhel7-stigs.rb
+    dest: /etc/inspec/host-controls/controls/
+    mode: 0644
+  when: os == 'rhel'
+
 - name: remove inspec lock file so we can upgrade
   file:
     dest: /etc/inspec/host-controls/inspec.lock
