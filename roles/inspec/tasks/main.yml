@@ -12,7 +12,6 @@
     - /etc/inspec
     - /etc/inspec/host-controls
     - /etc/inspec/host-controls/controls
-    - /etc/inspec/host-controls/controls/controller
     - /etc/inspec/host-controls/libraries
 
 - name: inspec dependency profile directories
@@ -61,13 +60,12 @@
     dest: /etc/inspec/host-controls/inspec.yml
     mode: 0644
 
-- name: inspec controller control files
+- name: inspec openstack control files
   template:
-    src: '{{ item }}'
-    dest: /etc/inspec/host-controls/controls/controller/
+    src: etc/inspec/host-controls/controls/openstack-security.rb
+    dest: /etc/inspec/host-controls/controls/
     mode: 0644
-  with_fileglob: ../templates/etc/inspec/host-controls/controls/controller/*
-  when: inventory_hostname in groups['controller']
+  when: inventory_hostname in groups['controller'] or  inventory_hostname in groups['compute'] or inventory_hostname in groups['cinder_volume']
 
 - name: remove inspec lock file so we can upgrade
   file:
@@ -82,7 +80,7 @@
 
 - name: inspec sensu hook
   sensu_check: name=inspec-check plugin=check-inspec.rb
-               args='/etc/inspec/host-controls --attrs /etc/inspec/host-controls/attributes.yml' use_sudo=true
+               args='--controls /etc/inspec/host-controls --attrs /etc/inspec/host-controls/attributes.yml' use_sudo=true
                interval={{ inspec.interval }}
   notify: restart sensu-client
   when: inspec.enabled|default(True)|bool
