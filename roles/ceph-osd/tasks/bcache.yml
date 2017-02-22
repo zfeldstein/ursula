@@ -1,5 +1,4 @@
 ---
-# Create hybrid bucket
 - name: Create root hybrid-bucket
   shell: ceph osd crush add-bucket {{ hybrid_pool }} root
   register: result
