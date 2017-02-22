@@ -65,10 +65,10 @@
     src: etc/inspec/host-controls/controls/openstack-security.rb
     dest: /etc/inspec/host-controls/controls/
     mode: 0644
-  when: inventory_hostname in groups['controller'] or  inventory_hostname in groups['compute'] or inventory_hostname in groups['cinder_volume']
+  when: inventory_hostname in groups['controller'] or  inventory_hostname in groups['compute'] or inventory_hostname in groups['cinder_volume']|default([])
 
 - name: rhel control files
-  template: 
+  template:
     src: etc/inspec/host-controls/controls/rhel7-stigs.rb
     dest: /etc/inspec/host-controls/controls/
     mode: 0644
