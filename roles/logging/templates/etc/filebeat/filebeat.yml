@@ -5,7 +5,7 @@ output:
     hosts:
       - "{{ logging.forward.host }}:{{ logging.forward.port }}"
 {% if logging.forward.tls.enabled|bool and logging.forward.tls.ca_cert %}
-    tls:
+    ssl:
       certificate_authorities:
         - "/usr/local/share/ca-certificates/logging-forward.crt"
 {% endif %}
