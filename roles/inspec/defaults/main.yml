@@ -17,6 +17,15 @@ inspec:
       required_controls:
         - check-dashboard-01
         - check-dashboard-02
+        - check-dashboard-03
+        - check-dashboard-04
+        - check-dashboard-05
+        - check-dashboard-06
+        - check-dashboard-07
+        - check-dashboard-08
+        - check-dashboard-09
+        - check-dashboard-10
+        - check-dashboard-11
       attributes:
         horizon_config_group: apache
     cinder:
