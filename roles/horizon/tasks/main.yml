@@ -15,7 +15,7 @@
           state=absent
 
   - name: remove _1480_project_loadbalancersv2_panel.pyc
-    file: path=/usr/share/openstack-dashboard/openstack_dashboard/local/enabled/_1480_project_loadbalancersv2_panel.py
+    file: path=/usr/share/openstack-dashboard/openstack_dashboard/local/enabled/_1480_project_loadbalancersv2_panel.pyc
           state=absent
   when: openstack_install_method == 'distro'
 
