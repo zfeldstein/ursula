@@ -20,4 +20,10 @@ rabbitmq:
     custom: |
       [Service]
       LimitNOFILE=300000
+  logs:
+    - paths:
+        - /var/log/rabbitmq/*.log
+      fields:
+        type: rabbitmq
+        tags: rabbitmq
 

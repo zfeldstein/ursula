@@ -84,6 +84,11 @@ cinder:
       type: openstack
       tags: cinder,cinder-scheduler
   - paths:
+      - /var/log/cinder/cinder-volume.log
+    fields:
+      type: openstack
+      tags: cinder,cinder-volume
+  - paths:
       - /var/log/upstart/tgt.log
     fields:
       type: openstack

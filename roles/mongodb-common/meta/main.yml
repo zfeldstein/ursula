@@ -3,6 +3,10 @@ dependencies:
   - role: endpoints
   - role: monitoring-common
     when: monitoring.enabled|default(True)|bool
+  - role: logging-config
+    when: logging.enabled|default(True)|bool
+    service: mongodb
+    logdata: "{{ mongodb.logs }}"
   - role: apt-repos
     repos:
       - repo: 'deb {{ apt_repos.mongodb.repo }} {{ ansible_distribution_release }}/mongodb-org/3.0 multiverse'

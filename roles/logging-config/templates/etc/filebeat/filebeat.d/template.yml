@@ -1,4 +1,11 @@
 # {{ ansible_managed }}
+{% for item in logdata %}
+{%   if item.fields and logging.follow.global_fields %}
+{%     set _dummy = item.fields.update(logging.follow.global_fields) %}
+{%   elif logging.follow.global_fields %}
+{%     set _dummy = item.setdefault('fields', logging.follow.global_fields) %}
+{%   endif %}
+{% endfor -%}
 ---
 filebeat:
   prospectors:

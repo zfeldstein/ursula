@@ -165,7 +165,7 @@ ceph:
         type: openstack
         tags: ceph,ceph-osd
     - paths:
-        - /var/log/ceph/ceph-audit.log
+        - /var/log/ceph/ceph.audit.log
       fields:
         type: openstack
         tags: ceph,ceph-audit,archive

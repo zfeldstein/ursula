@@ -33,3 +33,5 @@
       - reload rsyslog >/dev/null 2>&1 || true
       - endscript
       - delaycompress
+  when: openstack_install_method != 'distro'
+

@@ -17,6 +17,10 @@ dependencies:
     when: openstack_install_method == 'package'
   - role: monitoring-common
     when: monitoring.enabled|default(True)|bool
+  - role: logging-config
+    service: aodh
+    logdata: "{{ aodh.logs }}"
+    when: logging.enabled|default('True')|bool
   - role: openstack-database
     database_name: aodh
   - role: openstack-distro

@@ -71,6 +71,11 @@ keystone:
       fields:
         type: openstack
         tags: keystone,keystone-manage
+    - paths:
+        - /var/log/keystone/keystone.log
+      fields:
+        type: openstack
+        tags: keystone,keystone-log
   logging:
     debug: False
     verbose: True

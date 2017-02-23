@@ -97,7 +97,6 @@
   tags:
     - logrotate
     - logging
-  when: logging.enabled|default('True')|bool
 
 - name: include swift warning in message of the day
   template: src=etc/update-motd.d/99-swift-motd dest=/etc/update-motd.d/99-swift-motd mode=0755

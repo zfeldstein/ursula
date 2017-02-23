@@ -153,8 +153,8 @@ common:
     - paths:
         - /var/log/audit/audit.log
       fields:
-      type: syslog
-      tags: audit,common
+        type: syslog
+        tags: audit,common
   logging:
     debug: False
     verbose: True

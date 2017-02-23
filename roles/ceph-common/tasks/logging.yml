@@ -1,11 +1,20 @@
 ---
-- name: set up log rotation for ceph
+- name: remove duplicated logrotate conf for ubuntu 
+  file: path=/etc/logrotate.d/ceph.logrotate state=absent
+  when: openstack_install_method != 'distro'
+  
+- name: update with latest community version of logrotate conf (su root ceph) for ubuntu
   logrotate: name=ceph path=/var/log/ceph/*.log
   args:
     options:
-      - daily
-      - missingok
       - rotate 7
+      - daily
       - compress
+      - sharedscripts
+      - postrotate
+      -     killall -q -1 ceph-mon ceph-mds ceph-osd ceph-fuse radosgw || true
+      - endscript
+      - missingok
       - notifempty
-      - delaycompress
+      - su root ceph
+  when: openstack_install_method != 'distro'
