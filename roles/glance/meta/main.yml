@@ -14,6 +14,7 @@ dependencies:
     alternatives: "{{ glance.alternatives }}"
     system_dependencies: "{{ glance.source.system_dependencies }}"
     python_dependencies: "{{ glance.source.python_dependencies }}"
+    python_post_dependencies: "{{ glance.source.python_post_dependencies }}"
     constrain: "{{ glance.source.constrain }}"
     upper_constraints: "{{ glance.source.upper_constraints }}"
     when: openstack_install_method == 'source'
@@ -30,6 +31,7 @@ dependencies:
   - role: openstack-distro
     project_name: glance
     project_packages: "{{ glance.distro.project_packages }}"
+    python_post_dependencies: "{{ glance.distro.python_post_dependencies }}"
     when: openstack_install_method == 'distro'
   - role: openstack-firewall
     rule_name: glance
