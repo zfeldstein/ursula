@@ -8,6 +8,9 @@ openstack_install_method: 'source'
 basevenv: "/opt/openstack/base"
 basevenv_lib_dir: "{{ basevenv }}/lib/python2.7/site-packages"
 
+hostname_fqdn: "{{ ansible_fqdn }}"
+hostname_short: "{{ hostname_fqdn.split('.')|first }}"
+
 primary_interface: 'ansible_eth0'
 primary_ip: "{{ hostvars[inventory_hostname][primary_interface]['ipv4']['address'] }}"
 
