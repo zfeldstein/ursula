@@ -15,6 +15,7 @@
 
 - name: preflight checks
   hosts: all:!vyatta-*
+  any_errors_fatal: true
   roles:
     - role: preflight-checks
       tags: ['always']
