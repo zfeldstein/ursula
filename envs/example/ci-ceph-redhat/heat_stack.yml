@@ -13,6 +13,10 @@ parameters:
     type: string
     description: Flavor to use for servers
     default: m1.large
+  second_flavor:
+    type: string
+    description: Flavor to use for servers
+    default: m1.medium
   storage_flavor:
     type: string
     description: Flavor to use for servers
@@ -218,7 +222,7 @@ resources:
     properties:
       name: { get_param: cpm1_name }
       image: { get_param: image }
-      flavor: { get_param: flavor }
+      flavor: { get_param: second_flavor }
       key_name: { get_resource: ssh_keypair }
       user_data_format: RAW
       security_groups: [{ get_resource: server_security_group }]
@@ -232,7 +236,7 @@ resources:
     properties:
       name: { get_param: cpm2_name }
       image: { get_param: image }
-      flavor: { get_param: flavor }
+      flavor: { get_param: second_flavor }
       key_name: { get_resource: ssh_keypair }
       user_data_format: RAW
       security_groups: [{ get_resource: server_security_group }]
@@ -246,7 +250,7 @@ resources:
     properties:
       name: { get_param: cpm3_name }
       image: { get_param: image }
-      flavor: { get_param: flavor }
+      flavor: { get_param: second_flavor }
       key_name: { get_resource: ssh_keypair }
       user_data_format: RAW
       security_groups: [{ get_resource: server_security_group }]
