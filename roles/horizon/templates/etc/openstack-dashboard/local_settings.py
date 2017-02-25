@@ -108,7 +108,7 @@ HORIZON_CONFIG["password_validator"] = {
 
 # Setting this to True will disable the reveal button for password fields,
 # including on the login form.
-#HORIZON_CONFIG["disable_password_reveal"] = False
+HORIZON_CONFIG["disable_password_reveal"] = True
 
 {% if horizon.customize %}
 HORIZON_CONFIG["customization_module"] = "horizon-customization.horizon_customization"
@@ -446,7 +446,7 @@ TIME_ZONE = "UTC"
 # Set this to True to display an 'Admin Password' field on the Change Password
 # form to verify that it is indeed the admin logged-in who wants to change
 # the password.
-#ENFORCE_PASSWORD_CHECK = False
+ENFORCE_PASSWORD_CHECK = True
 
 # Modules that provide /auth routes that can be used to handle different types
 # of user authentication. Add auth plugins that require extra route handling to
