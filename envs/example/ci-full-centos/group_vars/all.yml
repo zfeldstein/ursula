@@ -17,6 +17,8 @@ neutron:
 keystone:
   uwsgi:
     method: port
+  source:
+    upper_constraints: ~
 
 common:
   hwraid:

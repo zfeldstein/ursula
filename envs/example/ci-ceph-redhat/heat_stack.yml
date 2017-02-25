@@ -33,6 +33,10 @@ parameters:
     type: string
     description: Name of the security group to use for servers
     default: ceph_rhel_ursula
+  az:
+    type: string
+    description: Name of availability-zone to use for servers
+    default: dev_compute_standard
   controller-0_name:
     type: string
     description: Name of controller-0 server
@@ -100,6 +104,26 @@ resources:
           port_range_max: 5000
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
+          port_range_min: 5001
+          port_range_max: 5001
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 4789
+          port_range_max: 4789
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8004
+          port_range_max: 8004
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8001
+          port_range_max: 8001
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8042
+          port_range_max: 8042
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
           port_range_min: 6080
           port_range_max: 6080
         - remote_ip_prefix: 0.0.0.0/0
@@ -132,6 +156,14 @@ resources:
           remote_mode: 'remote_group_id'
         - ethertype: 'IPv6'
           remote_mode: 'remote_group_id'
+        - ethertype: 'IPv4'
+          remote_mode: 'remote_group_id'
+          protocol: tcp
+        - ethertype: 'IPv4'
+          remote_mode: 'remote_group_id'
+          protocol: udp
+        - ethertype: 'IPv4'
+          remote_mode: 'remote_group_id'
 
   ssh_keypair:
     type: OS::Nova::KeyPair
@@ -150,7 +182,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   controller-1:
@@ -164,7 +196,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   compute-0:
@@ -178,7 +210,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   cpm1:
@@ -192,7 +224,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   cpm2:
@@ -206,7 +238,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   cpm3:
@@ -220,7 +252,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   ceph1:
@@ -234,7 +266,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   ceph2:
@@ -248,7 +280,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   ceph3:
@@ -262,7 +294,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: dev_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
 
