@@ -16,10 +16,12 @@ require_controls 'inspec-openstack-security' do
 {% endfor %}
 {% endif %}
 
-{% if inventory_hostname in groups['controller'] or inventory_hostname in groups['cinder_volume'] %}
+{% if inventory_hostname in groups['controller'] or inventory_hostname in groups['cinder_volume']|default([]) %}
+{% if cinder.enabled|default('False')|bool %}
 {% for control in inspec.openstack.cinder.required_controls %}
     control '{{ control }}'
 {% endfor %}
+{% endif %}
 {% endif %}
 
 {% if inventory_hostname in groups['controller'] or inventory_hostname in groups['compute'] %}
