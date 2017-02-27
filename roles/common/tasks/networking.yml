@@ -78,7 +78,7 @@
 #Set gateway for each undercloud_cidr subnet. gateway is a member of undercloud_cidr list for every subnet.
 #Each host can belong to only one undercloud_cidr, so there will be only one nw_gw set per host.
 - name: set gateway address for multi subnet
-  set_fact: nw_gw="{{ item.gateway }}"
+  set_fact: nw_gw={{ item.gateway }}
   when: (update_routes|default('false')|bool) and ((ansible_default_ipv4.network ==  ( item.cidr | ipaddr('network') )))
   with_items: "{{ undercloud_cidr }}"
 
@@ -94,7 +94,7 @@
     register: found_in_interfaces_d
  
   - name: Set network config file
-    set_fact: nw_config_file="/etc/network/interfaces.d/{{ ansible_default_ipv4.interface }}.cfg"
+    set_fact: nw_config_file=/etc/network/interfaces.d/{{ ansible_default_ipv4.interface }}.cfg
     when: found_in_interfaces_d.stat.exists is defined and found_in_interfaces_d.stat.exists
  
   - name: Set network config file
@@ -108,14 +108,14 @@
     changed_when: False
     when: ansible_default_ipv4.network  != ( item.cidr | ipaddr('network'))
   when: os == 'ubuntu' and (update_routes|default('false')|bool)
- 
+
 - block:
   - name: Check if route configuration exists
-    stat: path=/etc/sysconfig/network-scripts/route-{{ ansible_default_ipv4.interface }}.cfg
+    stat: path=/etc/sysconfig/network-scripts/route-{{ ansible_default_ipv4.interface }}
     register: found_in_routes
 
   - name: Set routes config file
-    set_fact: route_config_file="/etc/sysconfig/network-scripts/route-{{ ansible_default_ipv4.interface }}.cfg"
+    set_fact: route_config_file=/etc/sysconfig/network-scripts/route-{{ ansible_default_ipv4.interface }}
     when: found_in_routes.stat.exists is defined and found_in_routes.stat.exists
 
   #Check if the static routes are present in routes configuration file, so that they are persistant across reboots.
