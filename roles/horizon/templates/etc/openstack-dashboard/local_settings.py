@@ -363,7 +363,7 @@ OPENSTACK_HEAT_STACK = {
 }
 
 # Enables upload from remote location
-IMAGES_ALLOW_LOCATION = "{{ horizon.glance.allow_location }}"
+IMAGES_ALLOW_LOCATION = {{ horizon.glance.allow_location }}
 HORIZON_IMAGES_UPLOAD_MODE = 'legacy'
 
 # The OPENSTACK_IMAGE_BACKEND settings can be used to customize features
