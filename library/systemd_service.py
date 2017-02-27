@@ -67,6 +67,9 @@ ExecStartPre={{ prestart_script }}
 {% if kill_mode -%}
 KillMode={{ kill_mode }}
 {% endif %}
+{% if kill_signal -%}
+KillSignal={{ kill_signal }}
+{% endif %}
 #ExecStop=
 #ExecStopPost=
 #ExecReload=
@@ -99,6 +102,7 @@ def main():
             notify_access=dict(default=None, choices=['none', 'main', 'all']),
             config_dirs=dict(default=None),
             config_files=dict(default=None),
+            kill_signal=dict(default=None),
             state=dict(default='present', choices=['present', 'absent']),
             prestart_script=dict(default=None),
             timeout_start_secs=dict(default='120'),

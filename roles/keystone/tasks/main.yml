@@ -61,6 +61,7 @@
       type: "{{ item.type }}"
       notify_access: "{{ item.notify_access }}"
       restart: "{{ item.restart }}"
+      kill_signal: "SIGQUIT"
     with_items:
       - "{{ openstack_meta.keystone.services.keystone_api[os] }}"
 
