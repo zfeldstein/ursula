@@ -56,7 +56,6 @@
   tags:
     - logrotate
     - logging
-  when: logging.enabled|default('True')|bool
 
 - include: serverspec.yml
   tags:

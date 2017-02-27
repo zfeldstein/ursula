@@ -9,3 +9,5 @@
       - compress
       - notifempty
       - delaycompress
+  when: openstack_install_method != 'distro'
+  

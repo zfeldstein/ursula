@@ -9,3 +9,5 @@
       - compress
       - minsize 100k
       - copytruncate
+  when: openstack_install_method != 'distro'
+ 

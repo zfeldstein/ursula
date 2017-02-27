@@ -94,3 +94,8 @@
     state: directory 
     group: "{{ openstack_meta.apache[os].group }}"
     mode: 0750
+
+- include: logging.yml
+  tags:
+    - logrotate
+    - logging

@@ -154,6 +154,11 @@ neutron:
       fields:
         type: openstack
         tags: neutron,neutron-lbaasv2-agent
+    - paths:
+        - /var/log/neutron/neutron-linuxbridge-agent.log
+      fields:
+        type: openstack
+        tags: neutron,neutron-linuxbridge-agent        
   logging:
     debug: False
     verbose: True

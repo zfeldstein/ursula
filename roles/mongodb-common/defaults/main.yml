@@ -10,4 +10,10 @@ mongodb:
     verbose: True
   cafile: "{{ ssl.cafile }}"
   endpoint_addr: "{{ hostvars[groups['mongo_db'][0]][primary_interface]['ipv4']['address'] }}"
+  logs:
+    - paths:
+        - /var/log/mongodb/mongod.log
+      fields:
+        type: mongodb
+        tags: mongodb
   
