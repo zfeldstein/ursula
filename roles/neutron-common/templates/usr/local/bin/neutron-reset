@@ -38,8 +38,7 @@ class Interface(object):
 
         output = subprocess.check_output(cmd)
 
-        pattern = re.compile(r'^\d+: ([^:]+): ')
-
+        pattern = re.compile(r'^\d+: ([^:@]+)')
         for line in output.splitlines():
             match = pattern.match(line)
             if match:
@@ -228,10 +227,13 @@ class Namespace(object):
     @classmethod
     def enumerate(cls):
         output = subprocess.check_output(['ip', 'netns', 'list'])
+        pattern = re.compile(r'^([^\s]+)')
 
         for ns in output.splitlines():
-            if ns.startswith(('qdhcp-', 'qrouter-')):
-                yield cls(ns)
+            match = pattern.match(ns)
+            if match:
+                if ns.startswith(('qdhcp-', 'qrouter-')):
+                    yield cls(match.group(1))
 
     def processes(self):
         cmd = ['ip', 'netns', 'pids', self.namespace]
