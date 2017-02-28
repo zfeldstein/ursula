@@ -152,12 +152,32 @@
   set_fact: ursula_revision={{ ursula_git_describe.stdout }}
 
 # run this last so we only update if run was successful
-- name: drop an motd with ursula metadata
-  template: src=etc/update-motd.d/90-ursula-motd dest=/etc/update-motd.d/90-ursula-motd mode=0755
+- name: drop an motd with ursula metadata for ubuntu
+  template:
+    src: etc/update-motd.d/90-ursula-motd
+    dest: /etc/update-motd.d/90-ursula-motd 
+    mode: 0755
   when: os == 'ubuntu'
 
+- block:
+  - name: drop an motd with ursula metadata for rhel
+    template:
+      src: etc/update-motd.d/90-ursula-motd
+      dest: /etc/90-ursula-motd
+      mode: 0755
+
+  - name: run the ursula-motd script from profile.d
+    template:
+      src: etc/profile.d/ursula-motd.sh
+      dest: /etc/profile.d/ursula-motd.sh
+      mode: 644
+  when: os == 'rhel'
+
 - name: drop ursula release file
-  template: src=etc/ursula-release dest=/etc/ursula-release mode=0640
+  template:
+    src: etc/ursula-release
+    dest: /etc/ursula-release
+    mode: 0644
 
 - name: include stack name in /etc/issue
   lineinfile: dest=/etc/issue regexp="^{{ stack_env }} OpenStack Node" line="{{ stack_env }} OpenStack Node"
