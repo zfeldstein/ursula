@@ -188,7 +188,6 @@
   service: name=shibd state=started enabled=true
   when: keystone.federation.enabled|bool and keystone.federation.sp.saml.enabled|bool
 
-# FIXME adjust template for /us/bin on rhel
 - name: add cron job to clean up expired tokens
   template:
     src: etc/cron.d/drop-expired-keystone-tokens
