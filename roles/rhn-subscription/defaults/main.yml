@@ -4,6 +4,7 @@ rhn_subscription:
   password: ~
   pool_names_regex: "^(Red Hat OpenStack Platform)"
   repos:
+    refresh: false
     enable:
       - rhel-7-server-rpms
       - rhel-7-server-rh-common-rpms
