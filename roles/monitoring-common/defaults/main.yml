@@ -32,7 +32,7 @@ monitoring:
     criticality: 'critical'
   graphite:
     cluster_prefix: "stats.bbc.{{ stack_env }}.openstack"
-    host_prefix: "stats.bbc.{{ stack_env }}.{{ ansible_nodename|regex_replace('\\\\.*$', '') }}"
+    host_prefix: "stats.bbc.{{ stack_env }}.{{ hostname_short|default(ansible_nodename|regex_replace('\\\\.*$', '')) }}"
   rabbit:
     host: 172.16.0.103
     port: 5671
