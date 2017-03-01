@@ -1,4 +1,9 @@
 ---
+- name: gather current rhn subscription status
+  command: subscription-manager status
+  failed_when: false
+  changed_when: false
+  register: osp_rhn
 
 - name: register with RHN
   redhat_subscription:
@@ -7,11 +12,18 @@
     password: "{{ rhn_subscription.password }}"
     pool: "{{ rhn_subscription.pool_names_regex }}"
     autosubscribe: False
+  register: subscription
+  when: not osp_rhn.stdout | search("Current")
 
-- name: disable all redhat repositories
-  command: subscription-manager repos --disable={{ item }}
-  ignore_errors: True
-  with_items: "{{ rhn_subscription.repos.disable }}"
+- block:
+  - name: disable all redhat repositories
+    command: subscription-manager repos --disable={{ item }}
+    ignore_errors: True
+    with_items: "{{ rhn_subscription.repos.disable }}"
 
-- name: enable desire redhat repositories
-  command: subscription-manager repos --enable={{ rhn_subscription.repos.enable | join(' --enable=') }}
+  - name: enable desire redhat repositories
+    command: subscription-manager repos --enable={{ rhn_subscription.repos.enable | join(' --enable=') }}
+    register: result
+    until: result|succeeded
+    retries: 3
+  when: subscription.changed or rhn_subscription.repos.refresh|bool
