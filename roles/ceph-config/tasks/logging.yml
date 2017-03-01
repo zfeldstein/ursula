@@ -1,20 +1,12 @@
 ---
-- name: remove duplicated logrotate conf for ubuntu 
-  file: path=/etc/logrotate.d/ceph.logrotate state=absent
-  when: openstack_install_method != 'distro'
-  
-- name: update with latest community version of logrotate conf (su root ceph) for ubuntu
-  logrotate: name=ceph path=/var/log/ceph/*.log
-  args:
-    options:
-      - rotate 7
-      - daily
-      - compress
-      - sharedscripts
-      - postrotate
-      -     killall -q -1 ceph-mon ceph-mds ceph-osd ceph-fuse radosgw || true
-      - endscript
-      - missingok
-      - notifempty
-      - su root ceph
-  when: openstack_install_method != 'distro'
+# these two tasks are used to removed duplicated
+# logrotate config file which created in previous
+# version(on ubuntu). We won't need these 2 tasks
+# when we have run these tasks on all envs at lest once
+- name: check if ceph.conf exists
+  stat: path=/etc/logrotate.d/ceph.logrotate
+  register: result
+
+- name: remove /etc/logrotate.d/ceph
+  file: path=/etc/logrotate.d/ceph state=absent
+  when: result.stat.exists
