@@ -24,8 +24,8 @@ dependencies:
     when: openstack_install_method == 'package'
   - role: collectd-plugin
     when: collectd is defined and collectd.enabled|bool
-  - role: ceph-common
-    when: ceph.enabled|bool
+  - role: ceph-defaults
+    when: ceph.enabled
   - role: openstack-database
     database_name: glance
   - role: openstack-distro

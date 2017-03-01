@@ -23,8 +23,8 @@ dependencies:
     rootwrap: True
     alternatives: "{{ cinder.alternatives }}"
     when: openstack_install_method == 'package'
-  - role: ceph-common
-    when: ceph.enabled|bool
+  - role: ceph-defaults
+    when: ceph.enabled
   - role: openstack-distro
     project_name: cinder
     project_packages: "{{ cinder.distro.project_packages }}"

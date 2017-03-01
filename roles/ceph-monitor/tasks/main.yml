@@ -1,4 +1,18 @@
 ---
+- name: install dependencies
+  package: name={{ item }} state=present
+  with_items: "{{ ceph.depend_pkgs }}"
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install ceph monitor
+  package: name=ceph-mon{{ ceph.pkg_version_connector[os] }}{{ ceph.version[os] }}
+           state=present
+  register: result
+  until: result|succeeded
+  retries: 5
+
 - name: create monitor initial keyring
   command: ceph-authtool /var/lib/ceph/tmp/keyring.mon.{{ ansible_hostname }}
            --create-keyring --name=mon. --gen-key --cap mon 'allow *'
@@ -91,6 +105,8 @@
 - name: update openstack ceph user caps
   command: ceph auth caps {{ item.name }} {{ item.value }}
   with_items: "{{ ceph.openstack_keys }}"
+
+- include: restart_flags.yml
 
 - include: monitoring.yml
   tags:

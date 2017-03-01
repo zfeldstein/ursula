@@ -39,8 +39,9 @@
     msg: "Triggering service restart for upgrade"
   changed_when: True
   notify: restart cinder services
+  tags: ['ceph', 'ceph-client']
   when: (code_has_changed | default('False') | bool and upgrade | default('False') | bool) or
-        (ceph.enabled|default('False')|bool and upgrade_ceph | bool)
+        (ceph.enabled and cephclient_upgraded|default(false))
 
 - meta: flush_handlers
 

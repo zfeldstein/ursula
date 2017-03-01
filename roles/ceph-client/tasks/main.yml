@@ -1,0 +1,12 @@
+---
+- name: install ceph client
+  package: name=ceph-common{{ ceph.pkg_version_connector[os] }}{{ ceph.client_version[os] }}
+           state=present
+  register: result_cephclient
+  until: result_cephclient|succeeded
+  retries: 5
+
+# set flag for ceph client upgrade
+- name: set upgrade flag true
+  set_fact:
+    cephclient_upgraded: result_cephclient.changed

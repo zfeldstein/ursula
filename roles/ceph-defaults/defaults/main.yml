@@ -16,6 +16,9 @@ ceph:
   version:
     ubuntu: 10.2.3~bbc1
     rhel: 10.2.3
+  client_version:
+    ubuntu: 10.2.3-0ubuntu0.16.04.2~cloud0
+    rhel: 10.2.3
 
   openstack_keys:
     - { name: client.glance, value: "mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx'" }

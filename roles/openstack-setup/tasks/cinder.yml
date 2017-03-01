@@ -10,7 +10,7 @@
                       extra_specs="volume_backend_name={{ item.key }}"
                       insecure={{ insecure|default(omit) }}
   when:
-    - ceph.enabled | default('False') | bool
+    - ceph.enabled
     - item.value.enabled
   with_dict: "{{ ceph_pools | default({}) }}"
   run_once: true

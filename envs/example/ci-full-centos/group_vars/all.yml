@@ -4,7 +4,6 @@ undercloud_cidr:
   - cidr: 192.168.0.0/22
 state_path_base: /opt/stack/data
 
-
 etc_hosts:
   - name: "{{ fqdn }}"
     ip: "{{ floating_ip }}"

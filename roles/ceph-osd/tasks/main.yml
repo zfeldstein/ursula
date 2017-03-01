@@ -16,7 +16,16 @@
 
 - name: install dependencies
   package: name={{ item }} state=present
-  with_items: "{{ ceph.osd_dep_pkgs }}"
+  with_items:
+    - "{{ ceph.depend_pkgs }}"
+    - "{{ ceph.osd_dep_pkgs }}"
+  register: result
+  until: result|succeeded
+  retries: 5
+
+- name: install ceph osd
+  package: name=ceph-osd{{ ceph.pkg_version_connector[os] }}{{ ceph.version[os] }}
+           state=present
   register: result
   until: result|succeeded
   retries: 5
@@ -55,6 +64,8 @@
 
 - include: bcache.yml
   when: "'ceph_osds_hybrid' in group_names"
+
+- include: ../../ceph-monitor/tasks/restart_flags.yml
 
 - include: system_tuning.yml
   tags: ceph-osd

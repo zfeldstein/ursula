@@ -1,5 +1,7 @@
 ---
 dependencies:
+  # import ceph-defaults if any, we need ceph.client_version even ceph is not enabled
+  - role: ceph-defaults
   - role: openstack-meta
   - role: endpoints
   - role: apt-repos
