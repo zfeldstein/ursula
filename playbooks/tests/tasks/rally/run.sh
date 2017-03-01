@@ -1,4 +1,21 @@
 #!/bin/bash -xe
+HELP() {
+    echo "Usage: ./`basename $0` -e <cinder_enabled> -t <build_tag>"
+    exit 1
+}
+while getopts 'e:t:h' OPT; do
+    case $OPT in
+        e)
+            CINDER_ENABLED="$OPTARG";;
+        t)
+            BUILD_TAG="$OPTARG";;
+        h)
+            HELP;;
+        ?)
+            echo "unkonw argument!"
+            HELP;;
+    esac
+done
 
 source /root/stackrc
 
@@ -20,7 +37,8 @@ install_rally() {
     fi
 }
 
-BUILD_TAG=${1:-master}
+CINDER_ENABLED=${CINDER_ENABLED:-False}
+BUILD_TAG=${BUILD_TAG:-master}
 RALLY=rally/bin/rally
 RALLY_INSTALL_URL=https://raw.githubusercontent.com/openstack/rally/master/install_rally.sh
 RALLY_FILE=bbc-cloud-validate
@@ -41,4 +59,7 @@ EOF
 
 ${RALLY} deployment create --fromenv --name=${BUILD_TAG}
 ${RALLY} task start bbc-cloud-validate.yml --task-args-file rally_args.yaml
+if [[ ${CINDER_ENABLED} == "True" ]]; then
+    ${RALLY} task start bbc-cloud-validate-ceph.yml --task-args-file rally_args.yaml
+fi
 ${RALLY} task report --out=rally_report.html
