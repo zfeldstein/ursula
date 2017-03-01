@@ -14,5 +14,11 @@ filebeat:
   config_dir: "{{ logging.forward.config_dir }}"
 {% if logging.follow.logs | length > 0 %}
   prospectors:
-    {{ logging.follow.logs | to_yaml( indent=2, default_flow_style=False ) | indent ( width=4 ) }}
+{% for log in logging.follow.logs %}
+    - fields_under_root: true
+      paths: {{ log.paths | to_yaml }}
+{%- if log.fields is defined %}{% set _dummy = log.fields.update(logging.follow.global_fields) %}{% endif %}
+      fields: {{ log.fields | default(logging.follow.global_fields) | to_yaml  }}
+{% endfor %}
 {% endif %}
+
