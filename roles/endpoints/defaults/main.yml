@@ -188,7 +188,7 @@ endpoints:
       backend_api: 9777
       haproxy_api: 8777
     haproxy:
-      health_check: 'httpchk GET /healthcheck'
+      health_check: 'tcp-check /'
       balance: 'source'
       prefer_primary_backend: False
   ironic:
@@ -240,6 +240,6 @@ endpoints:
       backend_api: 8043
       haproxy_api: 8042
     haproxy:
-      health_check: 'httpchk GET /healthcheck'
+      health_check: 'tcp-check /'
       balance: 'source'
       prefer_primary_backend: False
