@@ -9,10 +9,12 @@
     command: neutron --version
     register: result_neutron_installed
     failed_when: false
+    changed_when: false
 
   - name: check whether neutron endpoint exists
     shell: . /root/stackrc; openstack endpoint list | grep neutron
     failed_when: false
+    changed_when: false
     register: result_neutron_endpoint
 
   - include: neutron.yml

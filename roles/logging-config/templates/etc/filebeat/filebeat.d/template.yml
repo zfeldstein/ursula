@@ -1,12 +1,13 @@
 # {{ ansible_managed }}
-{% for item in logdata %}
-{%   if item.fields and logging.follow.global_fields %}
-{%     set _dummy = item.fields.update(logging.follow.global_fields) %}
-{%   elif logging.follow.global_fields %}
-{%     set _dummy = item.setdefault('fields', logging.follow.global_fields) %}
-{%   endif %}
-{% endfor -%}
 ---
 filebeat:
+{% if logdata | length > 0 %}
   prospectors:
-    {{ logdata | to_yaml( indent=2, default_flow_style=False ) | indent ( width=4 ) }}
+{% for log in logdata %}
+    - fields_under_root: true
+      paths: {{ log.paths | to_yaml }}
+{%- if log.fields is defined %}{% set _dummy = log.fields.update(logging.follow.global_fields) %}{% endif %}
+      fields: {{ log.fields | default(logging.follow.global_fields) | to_yaml  }}
+{% endfor %}
+{% endif %}
+
