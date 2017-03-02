@@ -38,17 +38,7 @@ horizon:
         - mod_proxy_uwsgi
   logs:
     - paths:
-        - /var/log/apache2/access.log
-      fields:
-        type: openstack
-        tags: horizon
-    - paths:
-        - /var/log/apache2/error.log
-      fields:
-        type: openstack
-        tags: horizon
-    - paths:
-        - /var/log/apache2/other_vhosts_access.log
+        - /var/log/horizon/*.log
       fields:
         type: openstack
         tags: horizon

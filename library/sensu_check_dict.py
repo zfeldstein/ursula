@@ -20,9 +20,17 @@
 
 import os
 import traceback
+import socket
 
 from hashlib import md5
 from jinja2 import Environment
+
+def validIP(ip):
+  try:
+    socket.inet_aton(ip)
+    return True
+  except socket.error:
+    return False
 
 def main():
 
@@ -32,7 +40,7 @@ def main():
             check_dir=dict(default='/etc/sensu/conf.d/checks', required=False),
             state=dict(default='present', required=False, choices=['present','absent']),
             check=dict(type='dict', required=True),
-            ucarp_node_only=dict(default=False, required=False, type='bool')
+            only_on_ip=dict(default=None, required=False)
         )
     )
 
@@ -46,12 +54,11 @@ def main():
                 }
             })
 
-            if module.params['ucarp_node_only']:
-                check['checks'][module.params['name']]['command']=             \
-                         'if ip a | grep ucarp > /dev/null 2>&1; then '        \
-                         + check['checks'][module.params['name']]['command']   \
-                         + '; fi'
-
+            if module.params['only_on_ip'] is not None and validIP(module.params['only_on_ip']):
+                check['checks'][module.params['name']]['command'] =                   \
+				               "/etc/sensu/plugins/execute-on-ip.sh -i %s -c '%s'"    \
+							   % ( module.params['only_on_ip'], check['checks'][module.params['name']]['command'] )
+	
             if os.path.isfile(check_path):
                 with open(check_path) as fh:
                     if json.load(fh) == check:

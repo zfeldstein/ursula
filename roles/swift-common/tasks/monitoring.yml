@@ -46,7 +46,7 @@
 - name: ucarp failover alert
   sensu_check: name=check-ucarp-failover plugin=check-log.rb use_sudo=true
                auto_resolve=false interval=20 occurrences=1
-               args="-f /var/log/syslog -q 'ucarp.+[Ss]witching to state' --silent"
+               args="-f {{ ( ursula_os == 'ubuntu' )| ternary('/var/log/syslog', '/var/log/messages') }} -q 'ucarp.+[Ss]witching to state' --silent"
   notify: restart sensu-client
 
 - name: ucarp processes check
@@ -56,11 +56,13 @@
 
 - name: swift sla metrics
   sensu_metrics_check: name=swift-sla-metrics plugin=metrics-os-api.py
-                       args='-S swift --scheme {{ monitoring.graphite.host_prefix }}'
+                       args='-S swift --scheme {{ monitoring.graphite.cluster_prefix }}'
+                       only_on_ip="{{ swift_undercloud_floating_ip | default( swift_floating_ip ) }}"
   notify: restart sensu-client
 
 - name: swift usage metrics
   sensu_metrics_check:
     name: swift-usage-metrics
     plugin: metrics-swift.py
-    args: "--ip-addr={{ primary_ip }}"
+    args: "--ip-addr={{ primary_ip }} --scheme {{ monitoring.graphite.host_prefix }}"
+

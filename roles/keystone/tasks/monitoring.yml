@@ -15,6 +15,7 @@
 - name: keystone-api check
   sensu_check: name=check-keystone-api plugin=check-os-api.rb
                args="--service keystone --criticality {{ keystone.monitoring.sensu_checks.check_keystone_api.criticality }}"
+               only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
 
 - name: keystone token buildup check
@@ -33,11 +34,14 @@
 
 - name: keystone sla metrics
   sensu_metrics_check: name=keystone-sla-metrics plugin=metrics-os-api.py
-                       args='-S keystone --scheme {{ monitoring.graphite.host_prefix }}'
+                       args='-S keystone --scheme {{ monitoring.graphite.cluster_prefix }}'
+                       only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
 
 - name: keystone identity metrics
   sensu_metrics_check:
     name: identity-metrics
     plugin: metrics-keystone.py
+    args: "--scheme {{ monitoring.graphite.cluster_prefix }}"
+    only_on_ip: "{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
