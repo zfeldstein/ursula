@@ -69,6 +69,7 @@ nova:
   distro:
     controller:
       project_packages:
+        - openstack-selinux
         - openstack-nova-api
         - openstack-nova-conductor
         - openstack-nova-scheduler
@@ -76,6 +77,7 @@ nova:
         - openstack-nova-console
     compute:
       project_packages:
+        - openstack-selinux
         - openstack-nova-compute
   source:
     rev: 'stable/newton'

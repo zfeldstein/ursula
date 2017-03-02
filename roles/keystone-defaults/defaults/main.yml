@@ -17,6 +17,7 @@ keystone:
       package: /opt/openstack/current/keystone
   distro:
     project_packages:
+      - openstack-selinux
       - openstack-keystone
     python_post_dependencies: []
   # Example for distro/source:

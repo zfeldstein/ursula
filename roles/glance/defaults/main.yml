@@ -26,6 +26,7 @@ glance:
   store_file: False
   distro:
     project_packages:
+      - openstack-selinux
       - openstack-glance
     python_post_dependencies: []
   source:

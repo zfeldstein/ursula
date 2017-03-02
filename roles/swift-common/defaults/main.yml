@@ -9,6 +9,7 @@ swift:
   allow_versions: True
   distro:
     project_packages:
+      - openstack-selinux
       - openstack-swift
   source:
     rev: 'stable/newton'

@@ -10,6 +10,7 @@ heat:
     heat_engine: "{{ openstack_meta.heat.services.heat_engine[ursula_os] }}"
   distro:
     project_packages:
+      - openstack-selinux
       - openstack-heat-api
       - openstack-heat-api-cfn
       - openstack-heat-engine
