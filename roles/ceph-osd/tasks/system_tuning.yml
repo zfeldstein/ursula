@@ -8,7 +8,7 @@
 - block:
   - name: install dependencies
     package: name={{ item }}
-    with_items: "{{ ceph.hugepage_pkgs[os] }}"
+    with_items: "{{ ceph.hugepage_pkgs[ursula_os] }}"
     register: result
     until: result|succeeded
     retries: 5
@@ -25,11 +25,11 @@
   
   - name: update grub config with changes(debian)
     command: update-grub
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'
   
   - name: update grub config with changes(redhat)
     command: grub2-mkconfig -o /boot/grub2/grub.cfg
-    when: os == 'rhel'
+    when: ursula_os == 'rhel'
   when: ceph.disable_transparent_hugepage
 
 - name: apply operating system tuning

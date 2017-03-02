@@ -7,7 +7,7 @@
   with_items:
     - "{{ ceilometer.services.ceilometer_polling }}"
   notify: restart ceilometer data services
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install ceilometer polling agent (rhel)
   systemd_service:
@@ -21,7 +21,7 @@
   with_items:
     - "{{ ceilometer.services.ceilometer_polling }}"
     - "{{ ceilometer.services.ceilometer_polling_compute }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: install libvirt-python in package venv
   command: "{{ 'ceilometer'|ursula_package_path(openstack_package_version) }}/bin/pip install libvirt-python"

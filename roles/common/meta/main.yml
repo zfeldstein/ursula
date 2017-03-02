@@ -5,23 +5,23 @@ dependencies:
     repos:
       - repo: 'deb {{ apt_repos.bbg_ubuntu.repo }} {{ ansible_lsb.codename }} main'
         key_url: '{{ apt_repos.bbg_ubuntu.key_url }}'
-    when: ansible_architecture != "ppc64le" and os == 'ubuntu'
+    when: ansible_architecture != "ppc64le" and ursula_os == 'ubuntu'
   - role: apt-repos
     repos:
       - repo: 'deb {{ apt_repos.hwraid.repo }} {{ ansible_lsb.codename }} main'
         key_url: '{{ apt_repos.hwraid.key_url }}'
-    when: common.hwraid.enabled|bool and os == 'ubuntu'
+    when: common.hwraid.enabled|bool and ursula_os == 'ubuntu'
   - role: apt-repos
     repos:
       - repo: 'deb {{ apt_repos.sensu.repo }} {{ apt_repos.sensu.distribution }} {{ apt_repos.sensu.components }}'
         key_url: '{{ apt_repos.sensu.key_url }}'
-    when: monitoring.enabled|default(True)|bool and os == 'ubuntu'
+    when: monitoring.enabled|default(True)|bool and ursula_os == 'ubuntu'
   - role: repos
     repo: sensu
-    when: monitoring.enabled|default(True)|bool and os == 'rhel'
+    when: monitoring.enabled|default(True)|bool and ursula_os == 'rhel'
   - role: repos
     repo: epel
-    when: os == 'rhel'
+    when: ursula_os == 'rhel'
   - role: docker
     when: docker.enabled is defined and docker.enabled|bool
   - role: monitoring-common

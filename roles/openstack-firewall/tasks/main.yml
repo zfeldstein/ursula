@@ -4,7 +4,7 @@
     ufw: rule=allow to_port={{ item.port }} proto={{ item.protocol }}
     with_items: "{{ rules_type_input | default([]) }}"
     tags: firewall
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - block:
   - name: Persist Permit access to {{ rule_name }}
@@ -34,4 +34,4 @@
       - "{{ rules_type_input | default([]) }}"
       - "{{ iptables_changed.results }}"
     tags: firewall
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'

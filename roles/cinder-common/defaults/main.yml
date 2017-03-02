@@ -2,10 +2,10 @@
 project_name: cinder
 cinder:
   services:
-    cinder_api: "{{ openstack_meta.cinder.services.cinder_api[os] }}"
-    cinder_scheduler: "{{ openstack_meta.cinder.services.cinder_scheduler[os] }}"
-    cinder_volume: "{{ openstack_meta.cinder.services.cinder_volume[os] }}"
-    cinder_backup: "{{ openstack_meta.cinder.services.cinder_backup[os] }}"
+    cinder_api: "{{ openstack_meta.cinder.services.cinder_api[ursula_os] }}"
+    cinder_scheduler: "{{ openstack_meta.cinder.services.cinder_scheduler[ursula_os] }}"
+    cinder_volume: "{{ openstack_meta.cinder.services.cinder_volume[ursula_os] }}"
+    cinder_backup: "{{ openstack_meta.cinder.services.cinder_backup[ursula_os] }}"
   enabled: True
   enabled_backends: [] # determined automatically by Ceph roles
   default_backend:

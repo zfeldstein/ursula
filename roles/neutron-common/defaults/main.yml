@@ -2,13 +2,13 @@
 project_name: neutron
 neutron:
   services:
-    neutron_server: "{{ openstack_meta.neutron.services.neutron_server[os] }}"
-    neutron_dhcp_agent: "{{ openstack_meta.neutron.services.neutron_dhcp_agent[os] }}"
-    neutron_l3_agent: "{{ openstack_meta.neutron.services.neutron_l3_agent[os] }}"
-    neutron_openvswitch_agent: "{{ openstack_meta.neutron.services.neutron_openvswitch_agent[os] }}"
-    neutron_linuxbridge_agent: "{{ openstack_meta.neutron.services.neutron_linuxbridge_agent[os] }}"
-    neutron_metadata_agent: "{{ openstack_meta.neutron.services.neutron_metadata_agent[os] }}"
-    neutron_lbaasv2_agent: "{{ openstack_meta.neutron.services.neutron_lbaasv2_agent[os] }}"
+    neutron_server: "{{ openstack_meta.neutron.services.neutron_server[ursula_os] }}"
+    neutron_dhcp_agent: "{{ openstack_meta.neutron.services.neutron_dhcp_agent[ursula_os] }}"
+    neutron_l3_agent: "{{ openstack_meta.neutron.services.neutron_l3_agent[ursula_os] }}"
+    neutron_openvswitch_agent: "{{ openstack_meta.neutron.services.neutron_openvswitch_agent[ursula_os] }}"
+    neutron_linuxbridge_agent: "{{ openstack_meta.neutron.services.neutron_linuxbridge_agent[ursula_os] }}"
+    neutron_metadata_agent: "{{ openstack_meta.neutron.services.neutron_metadata_agent[ursula_os] }}"
+    neutron_lbaasv2_agent: "{{ openstack_meta.neutron.services.neutron_lbaasv2_agent[ursula_os] }}"
   jellyroll: False
   enable_fatal_deprecations: True
   l2_population: False

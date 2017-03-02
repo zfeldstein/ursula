@@ -1,7 +1,7 @@
 ---
 - name: apache2 process check
   sensu_process_check: 
-    service: "{{ ( os == 'ubuntu' )| ternary('apache2', 'httpd') }}"
+    service: "{{ ( ursula_os == 'ubuntu' )| ternary('apache2', 'httpd') }}"
   notify: restart sensu-client
 
 - name: dashboard port check

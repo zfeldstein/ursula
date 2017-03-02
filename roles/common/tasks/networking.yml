@@ -2,18 +2,18 @@
 - name: Disable NetworkManager
   service: name=NetworkManager state=stopped enabled=no
   failed_when: false
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - block:
   - name: set network config dir path - ubuntu
     set_fact:
       network_dir_path: /etc/network/interfaces.d
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'
 
   - name: set network dir path - rhel
     set_fact:
       network_dir_path: /etc/sysconfig/network-scripts
-    when: os == 'rhel'
+    when: ursula_os == 'rhel'
   tags: ['prereboot']
 
 - block:
@@ -26,7 +26,7 @@
       group: root
       mode: 0644
     when:
-      - os == 'ubuntu'
+      - ursula_os == 'ubuntu'
 
   - name: create interfaces.d directory if multiple interface files
     file:
@@ -34,7 +34,7 @@
       path: "{{ network_dir_path }}"
       mode: 0755
     when:
-      - os == 'ubuntu'
+      - ursula_os == 'ubuntu'
 
   - name: remove unnecessary network config
     file:
@@ -71,7 +71,7 @@
 
 - include: ucarp.yml
   when:
-    - os == 'rhel'
+    - ursula_os == 'rhel'
     - network.ucarp.config|length > 0
   tags: ['prereboot']
 
@@ -107,7 +107,7 @@
     with_items: "{{ undercloud_cidr }}"
     changed_when: False
     when: ansible_default_ipv4.network  != ( item.cidr | ipaddr('network'))
-  when: os == 'ubuntu' and (update_routes|default('false')|bool)
+  when: ursula_os == 'ubuntu' and (update_routes|default('false')|bool)
 
 - block:
   - name: Check if route configuration exists
@@ -124,7 +124,7 @@
     with_items: "{{ undercloud_cidr }}"
     changed_when: False
     when: ansible_default_ipv4.network  != ( item.cidr | ipaddr('network'))
-  when: os == 'rhel' and (update_routes|default('false')|bool)
+  when: ursula_os == 'rhel' and (update_routes|default('false')|bool)
 
 - name: hosts file
   template: src=etc/hosts dest=/etc/hosts owner=root group=root mode=0644

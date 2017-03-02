@@ -19,7 +19,7 @@
   package: name={{ item }}
   with_items:
     - ack-grep
-  when: ansible_architecture != "ppc64le" and os == "ubuntu"
+  when: ansible_architecture != "ppc64le" and ursula_os == "ubuntu"
   register: result
   until: result|succeeded
   retries: 5
@@ -27,7 +27,7 @@
 - name: install selinux tooling
   package:
     name: policycoreutils-python
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -35,7 +35,7 @@
 - name: load vlan module
   lineinfile: dest=/etc/modules
               line="8021q"
-  when: os == 'ubuntu' and ansible_distribution_version == "14.04"
+  when: ursula_os == 'ubuntu' and ansible_distribution_version == "14.04"
 
 - name: install mcelog package
   package: name=mcelog

@@ -13,7 +13,7 @@ logging:
       cluster_name: "unknown"
     logs:
       - paths:
-          - "{{ ( os == 'ubuntu' )| ternary('/var/log/syslog', '/var/log/messages') }}"
+          - "{{ ( ursula_os == 'ubuntu' )| ternary('/var/log/syslog', '/var/log/messages') }}"
         fields:
           type: syslog
   syslog_forwarding:

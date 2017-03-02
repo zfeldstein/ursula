@@ -20,7 +20,7 @@
   register: result
   until: result|succeeded
   retries: 5
-  when: os == 'rhel' and openstack_install_method == 'distro'
+  when: ursula_os == 'rhel' and openstack_install_method == 'distro'
 
 - name: install openstack clients
   pip: name={{ item }}
@@ -30,7 +30,7 @@
   register: result
   until: result|succeeded
   retries: 5
-  when: (os == 'ubuntu') or (os == 'rhel' and openstack_install_method == 'source')
+  when: (ursula_os == 'ubuntu') or (ursula_os == 'rhel' and openstack_install_method == 'source')
 
 - name: fix ssl certs for requests for keystone-client on trusty
   file: src=/etc/ssl/certs/ca-certificates.crt

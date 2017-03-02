@@ -10,14 +10,14 @@
 
 - name: install perl which module - ubuntu
   package: name=libfile-which-perl
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
 
 - name: install perl which module - ubuntu
   package: name=perl-File-Which
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -77,7 +77,7 @@
     group: root
     mode: 0644
   notify: restart sensu-client
-  when: os == "rhel"
+  when: ursula_os == "rhel"
 
 - name: sensu client config
   template: src=monitoring/config.json dest=/etc/sensu/config.json owner=root
@@ -101,7 +101,7 @@
 
 - name: override sensu-client startup
   shell: update-rc.d sensu-client defaults
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install sensu plugin pip modules
   pip: name=sensu_plugin version=0.1.0

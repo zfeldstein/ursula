@@ -4,14 +4,14 @@
   tags: always
   tasks:
   - set_fact:
-      os: 'ubuntu'
+      ursula_os: 'ubuntu'
     when: ansible_distribution == 'Ubuntu'
   - set_fact:
-      os: 'rhel'
+      ursula_os: 'rhel'
     when: ansible_distribution in ['CentOS','RedHat']
   - debug:
       msg: "OS is {{ ansible_distribution }}"
-    failed_when: os is not defined
+    failed_when: ursula_os is not defined
 
 - name: Test basic things on all hosts
   hosts: all
@@ -30,4 +30,4 @@
 
   - name: Running 12.04.4 LTS or greater
     shell: bash -c '. /etc/os-release; echo -e "${VERSION}\n12.04.4" | sort -V | head -1 | egrep "^12.04.4"'
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'

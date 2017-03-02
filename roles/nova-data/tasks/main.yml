@@ -25,7 +25,7 @@
     dest: "{{ nova.state_path }}"
     state: directory
     owner: nova
-    group: "{{ (os == 'rhel' ) | ternary('qemu', 'nova') }}"
+    group: "{{ (ursula_os == 'rhel' ) | ternary('qemu', 'nova') }}"
     mode: 0755
 
 - name: nova instances directory
@@ -33,23 +33,23 @@
     dest: "{{ nova.state_path }}/instances"
     state: directory
     owner: nova
-    group: "{{ (os == 'rhel' ) | ternary('qemu', 'nova') }}"
+    group: "{{ (ursula_os == 'rhel' ) | ternary('qemu', 'nova') }}"
     mode: 0755
 
 - block:
   - name: nbd module - ubuntu
     lineinfile: dest=/etc/modules line="nbd"
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'
 
   - name: probe nbd - ubuntu
     modprobe: name=nbd state=present
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 #FIXME do we need this on rhosp?
 - name: install nbd package - rhel
   package:
     name: nbd
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - block:
   - name: check if SMT is enabled
@@ -85,7 +85,7 @@
     config_dirs: "{{ item.config_dirs }}"
   with_items:
     - "{{ nova.services.nova_compute }}"
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install nova-compute service (rhel)
   systemd_service:
@@ -102,7 +102,7 @@
     restart: "{{ item.restart }}"
   with_items:
     - "{{ nova.services.nova_compute }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: trigger restart on upgrades
   debug:

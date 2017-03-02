@@ -41,13 +41,13 @@
     dest: "/etc/openstack-dashboard/local_settings.py"
     mode: 0640
     owner: "root"
-    group: "{{ openstack_meta.apache[os].group }}"
+    group: "{{ openstack_meta.apache[ursula_os].group }}"
   notify:
     - reload apache
 
 - name: create static assets directory (source)
   file: dest="{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/{{ item }}"
-        owner="{{ openstack_meta.apache[os].user }}" group="{{ openstack_meta.apache[os].group }}" state=directory
+        owner="{{ openstack_meta.apache[ursula_os].user }}" group="{{ openstack_meta.apache[ursula_os].group }}" state=directory
   with_items:
     - static
     - static/dashboard
@@ -104,7 +104,7 @@
       path: "{{ horizon.horizon_lib_dir }}/lib/python2.7/site-packages/openstack_dashboard/local/enabled/_1481_project_ng_loadbalancersv2_panel.py"
       state: "{{ (neutron.lbaas.enabled | bool) | ternary('link', 'absent') }}"
     notify: reload apache
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 # RHEL OSP horizon config
 - block:
@@ -119,7 +119,7 @@
     command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled
     when:
       - horizon.customize|default('False')|bool
-      - os == 'rhel'
+      - ursula_os == 'rhel'
       - rcue.stat.exists == True
     notify: restart apache
 
@@ -129,13 +129,13 @@
     register: rcued
     when:
       - not horizon.customize|default('False')|bool
-      - os == 'rhel'
+      - ursula_os == 'rhel'
 
   - name: Enable OSP custom dashboard (rhel osp)
     command: mv /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.disabled /etc/openstack-dashboard/local_settings.d/_11_rcue_theme.py
     when:
       - not horizon.customize|default('False')|bool
-      - os == 'rhel'
+      - ursula_os == 'rhel'
       - rcued.stat.exists == True
     notify: restart apache
 
@@ -149,7 +149,7 @@
     file: src=/etc/openstack-dashboard/local_settings.py
           dest=/usr/share/openstack-dashboard/openstack_dashboard/local/local_settings.py
           owner=root
-          group="{{ openstack_meta.apache[os].user }}"
+          group="{{ openstack_meta.apache[ursula_os].user }}"
           mode=0644
           state=link
   when: openstack_install_method == 'distro'
@@ -158,7 +158,7 @@
   template: src=etc/apache2/sites-available/openstack_dashboard.conf
             dest=/etc/httpd/conf.d/openstack_dashboard.conf
   when:
-    - os == 'rhel'
+    - ursula_os == 'rhel'
     - openstack_install_method == 'source'
   notify:
     - reload apache
@@ -169,7 +169,7 @@
     file: src=/etc/openstack-dashboard/local_settings.py
           dest=/opt/openstack/current/horizon/lib/python2.7/site-packages/openstack_dashboard/local/local_settings.py
           owner=root
-          group="{{ openstack_meta.apache[os].user }}"
+          group="{{ openstack_meta.apache[ursula_os].user }}"
           mode=0644
           state=link
 
@@ -201,13 +201,13 @@
 - meta: flush_handlers
 
 - name: ensure apache started
-  service: name="{{ apache.service_name[os] }}" state=started
-  when: os == 'ubuntu'
+  service: name="{{ apache.service_name[ursula_os] }}" state=started
+  when: ursula_os == 'ubuntu'
 
 - meta: flush_handlers
 
 - name: ensure apache is enabled
-  service: name="{{ apache.service_name[os] }}" state=started enabled=true
+  service: name="{{ apache.service_name[ursula_os] }}" state=started enabled=true
 
 - include: monitoring.yml
   tags:

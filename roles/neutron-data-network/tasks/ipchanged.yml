@@ -11,7 +11,7 @@
 
 - name: install ipchanged configuraion
   template: src=etc/init/ipchanged.conf dest=/etc/init/ipchanged.conf mode=0644
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: ipchanged systemd service
   systemd_service:
@@ -19,7 +19,7 @@
     type: simple
     cmd: /usr/local/sbin/ipchanged
     wanted_by: multi-user.target
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: ipchanged dirs - undercloud
   file: dest=/etc/ipchanged/{{ item }} state=directory

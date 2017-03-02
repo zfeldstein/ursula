@@ -3,7 +3,7 @@
 # the name may be not rados.so and rbd.so on ubuntu
 - name: import rados module into glance
   file:
-    src: "{{ ceph.pylib_dir[os] }}{{ item }}"
+    src: "{{ ceph.pylib_dir[ursula_os] }}{{ item }}"
     dest: /opt/openstack/current/glance/lib/python2.7/site-packages/{{ item }}
     state: link
     owner: root

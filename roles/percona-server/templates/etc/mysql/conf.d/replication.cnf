@@ -1,6 +1,6 @@
 [mysqld]
 
-{% if os == 'ubuntu' %}
+{% if ursula_os == 'ubuntu' %}
 wsrep_provider = /usr/lib/libgalera_smm.so
 {% else %}
 wsrep_provider = /usr/lib64/libgalera_smm.so

@@ -99,11 +99,11 @@
   with_items: "{{ common.os_tuning_params_clean }}"
 
 - include: ufw.yml
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   tags: firewall
 
 - include: iptables.yml
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   tags: firewall
 
 - include: ntp.yml
@@ -112,7 +112,7 @@
 # Include serial console before kernel-tuning to build serial_console_cmdline
 - include: serial-console.yml tty={{ common.serial_console.name }}
                               baud_rate={{ common.serial_console.baud_rate }}
-  when: common.serial_console.enabled | bool and os == 'ubuntu'
+  when: common.serial_console.enabled | bool and ursula_os == 'ubuntu'
   tags: ['prereboot']
 
 - include: ipmi.yml
@@ -121,7 +121,7 @@
 
 - include: kernel-tuning.yml
   tags: ['prereboot']
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - include: disable-swap.yml
 
@@ -157,7 +157,7 @@
     src: etc/update-motd.d/90-ursula-motd
     dest: /etc/update-motd.d/90-ursula-motd 
     mode: 0755
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - block:
   - name: drop an motd with ursula metadata for rhel
@@ -171,7 +171,7 @@
       src: etc/profile.d/ursula-motd.sh
       dest: /etc/profile.d/ursula-motd.sh
       mode: 644
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: drop ursula release file
   template:

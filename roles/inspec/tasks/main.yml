@@ -72,7 +72,7 @@
     src: etc/inspec/host-controls/controls/rhel7-stigs.rb
     dest: /etc/inspec/host-controls/controls/
     mode: 0644
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: remove inspec lock file so we can upgrade
   file:

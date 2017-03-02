@@ -45,7 +45,7 @@
   file:
     dest: /etc/systemd/system/rabbitmq-server.service.d
     state: directory
-  when: os == 'rhel' 
+  when: ursula_os == 'rhel' 
 
 - name: set systemd overrides
   copy:
@@ -53,11 +53,11 @@
     content: "{{ rabbitmq.systemd.custom }}"
     force: yes
   register: override
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: restart systemd
   command: systemctl daemon-reload
-  when: override.changed and os == 'rhel'
+  when: override.changed and ursula_os == 'rhel'
   notify: 
     - restart rabbitmq
 

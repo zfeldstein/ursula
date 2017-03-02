@@ -27,7 +27,7 @@
     with_items:
       - "{{ neutron.services.neutron_linuxbridge_agent }}"
     when: neutron.plugin == 'ml2'
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install neutron-linuxbridge-agent service (rhel package)
   systemd_service:
@@ -46,7 +46,7 @@
   with_items:
     - "{{ neutron.services.neutron_linuxbridge_agent }}"
   when:
-    - os == 'rhel'
+    - ursula_os == 'rhel'
     - neutron.plugin == 'ml2'
 
 - name: ml2 dataplane config
@@ -78,7 +78,7 @@
   template: src=etc/cron.daily/cleanup-neutron-interfaces
             dest=/etc/cron.daily/cleanup-neutron-interfaces
             mode=0755 owner=root
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - include: monitoring.yml
   tags:

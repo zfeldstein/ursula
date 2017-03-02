@@ -2,7 +2,7 @@
 - name: ensure ssl.cafile is defined
   assert:
     that: "ssl.cafile is defined"
-    msg: "ssl.cafile must be defined based on the operating system {{ os }}"
+    msg: "ssl.cafile must be defined based on the operating system {{ ursula_os }}"
 
 - block:
   - name: check whether neutron-client is installed

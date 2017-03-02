@@ -2,11 +2,11 @@
 project_name: ceilometer
 ceilometer:
   services:
-    ceilometer_api: "{{ openstack_meta.ceilometer.services.ceilometer_api[os] }}"
-    ceilometer_collector: "{{ openstack_meta.ceilometer.services.ceilometer_collector[os] }}"
-    ceilometer_notification: "{{ openstack_meta.ceilometer.services.ceilometer_notification[os] }}"
-    ceilometer_polling: "{{ openstack_meta.ceilometer.services.ceilometer_polling[os] }}"
-    ceilometer_polling_compute: "{{ openstack_meta.ceilometer.services.ceilometer_polling_compute[os] }}"
+    ceilometer_api: "{{ openstack_meta.ceilometer.services.ceilometer_api[ursula_os] }}"
+    ceilometer_collector: "{{ openstack_meta.ceilometer.services.ceilometer_collector[ursula_os] }}"
+    ceilometer_notification: "{{ openstack_meta.ceilometer.services.ceilometer_notification[ursula_os] }}"
+    ceilometer_polling: "{{ openstack_meta.ceilometer.services.ceilometer_polling[ursula_os] }}"
+    ceilometer_polling_compute: "{{ openstack_meta.ceilometer.services.ceilometer_polling_compute[ursula_os] }}"
   enabled: False
   distro:
     controller:

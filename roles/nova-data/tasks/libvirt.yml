@@ -21,7 +21,7 @@
     - genisoimage
     - util-linux
   notify: restart nova services
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
@@ -45,7 +45,7 @@
   notify:
     - restart nova services
     - restart libvirt-bin
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -61,7 +61,7 @@
   register: lvpout
   changed_when: lvpout.stdout|search("Successfully installed")
   notify: restart nova services
-  when: openstack_install_method == 'package' and os == 'ubuntu'
+  when: openstack_install_method == 'package' and ursula_os == 'ubuntu'
 
 - name: install libvirt-python in source venv
   command: "{{ openstack_source.virtualenv_base }}/nova/bin/pip install libvirt-python"
@@ -72,7 +72,7 @@
 
 - name: delete lines in libvirtd.conf
   lineinfile:
-    dest: "/etc/libvirt/{{ nova.libvirt[os].config_file }}"
+    dest: "/etc/libvirt/{{ nova.libvirt[ursula_os].config_file }}"
     regexp: "{{ item.value.regexp }}"
     line: "{{ item.value.line }}"
     state: absent
@@ -87,7 +87,7 @@
 
 - name: add/update various lines in libvirtd.conf
   lineinfile:
-    dest: "/etc/libvirt/{{ nova.libvirt[os].config_file }}"
+    dest: "/etc/libvirt/{{ nova.libvirt[ursula_os].config_file }}"
     regexp: "{{ item.value.regexp }}"
     line: "{{ item.value.line }}"
   with_dict:
@@ -98,7 +98,7 @@
 
 - name: remove libvirtd defaults
   lineinfile:
-    dest: "{{ nova.libvirt[os].defaults }}"
+    dest: "{{ nova.libvirt[ursula_os].defaults }}"
     regexp: '^libvirtd_opts\s*='
     line: 'libvirtd_opts=\"-d -l\"'
     state: absent
@@ -115,14 +115,14 @@
   command: kvm-ok
   when:
     - nova.libvirt_type == 'kvm'
-    - os == 'ubuntu'
+    - ursula_os == 'ubuntu'
   changed_when: False
 
 - name: ensure kvm is supported by cpu and enabled in bios (rhel)
   command: egrep '(vmx|svm)' /proc/cpuinfo
   when:
     - nova.libvirt_type == 'kvm'
-    - os == 'rhel'
+    - ursula_os == 'rhel'
   changed_when: False
 
 - name: generate really unique uuid
@@ -159,5 +159,5 @@
 - name: disable libvirt default network autostart
   file: dest=/etc/libvirt/qemu/networks/autostart/default.xml state=absent
 
-- name: add nova to the {{ nova.libvirt[os].group }} group
-  user: name=nova groups={{ nova.libvirt[os].group }} append=true system=yes createhome=no
+- name: add nova to the {{ nova.libvirt[ursula_os].group }} group
+  user: name=nova groups={{ nova.libvirt[ursula_os].group }} append=true system=yes createhome=no

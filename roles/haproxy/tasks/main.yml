@@ -19,7 +19,7 @@
 # WORKAROUND: `service haproxy stop` fails due to incorrect `start-stop-daemon --pid`
 - name: fix haproxy init script
   template: src=etc/init.d/haproxy dest=/etc/init.d/haproxy mode=0755
-  when: os == "ubuntu"
+  when: ursula_os == "ubuntu"
 
 - block:
   - name: configure tmpfiles.d for creation of /run/haproxy on reboot
@@ -38,7 +38,7 @@
   - name: set selinux policy for haproxy
     seboolean: name=haproxy_connect_any state=yes persistent=yes
     tags: selinux
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: install ssl cert+key
   template: src=etc/haproxy/openstack.pem dest=/etc/haproxy/openstack.pem

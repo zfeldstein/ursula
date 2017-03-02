@@ -3,11 +3,11 @@ project_name: aodh
 aodh:
   debug: False
   services:
-    aodh_api: "{{ openstack_meta.aodh.services.aodh_api[os] }}"
-    aodh_evaluator: "{{ openstack_meta.aodh.services.aodh_evaluator[os] }}"
-    aodh_listener: "{{ openstack_meta.aodh.services.aodh_listener[os] }}"
-    aodh_notifier: "{{ openstack_meta.aodh.services.aodh_notifier[os] }}"
-    aodh_expirer: "{{ openstack_meta.aodh.services.aodh_expirer[os] }}"
+    aodh_api: "{{ openstack_meta.aodh.services.aodh_api[ursula_os] }}"
+    aodh_evaluator: "{{ openstack_meta.aodh.services.aodh_evaluator[ursula_os] }}"
+    aodh_listener: "{{ openstack_meta.aodh.services.aodh_listener[ursula_os] }}"
+    aodh_notifier: "{{ openstack_meta.aodh.services.aodh_notifier[ursula_os] }}"
+    aodh_expirer: "{{ openstack_meta.aodh.services.aodh_expirer[ursula_os] }}"
   distro:
     project_packages:
       - openstack-aodh-api

@@ -1,14 +1,14 @@
 ---
 - name: python-mysqldb package
   apt: pkg=python-mysqldb
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
 
 - name: python-mysqldb package
   package: name=MySQL-python
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -23,15 +23,15 @@
 
 - name: configure my.cnf
   template: src=etc/my.cnf dest=/etc/my.cnf mode=0644
-  when: os == 'rhel' or
-        (os == 'ubuntu' and
+  when: ursula_os == 'rhel' or
+        (ursula_os == 'ubuntu' and
         ansible_distribution_version == "12.04")
   notify:
     - restart mysql server
 
 - name: configure my.cnf
   template: src=etc/my.cnf dest=/etc/mysql/my.cnf mode=0644
-  when: os == 'ubuntu' and
+  when: ursula_os == 'ubuntu' and
         ansible_distribution_version != "12.04"
   notify:
     - restart mysql server
@@ -60,7 +60,7 @@
   - percona-xtradb-cluster-client-{{ xtradb.client_version }}
   - percona-xtradb-cluster-server-{{ xtradb.server_version }}
   - percona-xtrabackup
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
@@ -68,7 +68,7 @@
 - name: install percona xtradb packages
   package:
     name: "Percona-XtraDB-Cluster-server-{{ xtradb.server_version }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -149,8 +149,8 @@
 
 - name: start mysql server
   service: name=mysql state=started enabled=true
-  when: os == 'ubuntu' or
-        ( os == 'rhel' and result.rc != 0 )
+  when: ursula_os == 'ubuntu' or
+        ( ursula_os == 'rhel' and result.rc != 0 )
 
 - name: set mysql root password
   mysql_user: name=root password={{ mysql.root_password }}
@@ -214,13 +214,13 @@
 
   - name: bootstrap the primary node
     command: /etc/init.d/mysql bootstrap-pxc
-    when: os == 'ubuntu' and
+    when: ursula_os == 'ubuntu' and
           ( should_bootstrap_as_primary and not
             already_bootstrapped.rc == 0 )
 
   - name: bootstrap the primary node
     command: systemctl start mysql@bootstrap.service
-    when: os == 'rhel' and
+    when: ursula_os == 'rhel' and
           ( should_bootstrap_as_primary and not
             already_bootstrapped.rc == 0 )
 

@@ -80,7 +80,7 @@
     src: "etc/cinder/policy.json"
     dest: "/etc/openstack-dashboard/cinder_policy.json"
     owner: "root"
-    group: "{{ openstack_meta.apache[os].group }}"
+    group: "{{ openstack_meta.apache[ursula_os].group }}"
     mode: 0640
   when: inventory_hostname in groups['controller']
 
