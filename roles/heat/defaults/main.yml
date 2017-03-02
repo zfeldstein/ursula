@@ -3,6 +3,7 @@ project_name: heat
 heat:
   enabled: True
   heartbeat_timeout_threshold: 30
+  convergence_engine: False
   services:
     heat_api: "{{ openstack_meta.heat.services.heat_api[os] }}"
     heat_api_cfn: "{{ openstack_meta.heat.services.heat_api_cfn[os] }}"
