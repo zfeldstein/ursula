@@ -1,7 +1,7 @@
 ---
 - name: refresh cert auths
   command: update-ca-certificates
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: restart logstash-forwarder
   service: name=logstash-forwarder state=restarted must_exist=false

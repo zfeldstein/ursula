@@ -7,7 +7,7 @@
   retries: 3
   delay: 10
   notify: restart filebeat
-  when: os == "ubuntu"
+  when: ursula_os == "ubuntu"
 
 - name: install filebeat yum
   yum:
@@ -17,7 +17,7 @@
   retries: 3
   delay: 10
   notify: restart filebeat
-  when: os == "rhel"
+  when: ursula_os == "rhel"
 
 - name: filebeat config directory
   file:

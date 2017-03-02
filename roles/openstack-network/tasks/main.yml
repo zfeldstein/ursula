@@ -27,7 +27,7 @@
               owner=root group=root mode=0644
     when: not neutron_external_ifcfg.stat.exists
     notify: ifup neutron external interface
-  when: os == 'ubuntu' and result.id is defined
+  when: ursula_os == 'ubuntu' and result.id is defined
 
 - block:
   - name: set neutron interface fact
@@ -47,4 +47,4 @@
       - enable ip forwarding
       - enable ipv4 masquerade
       - persist enable ipv4 masquerade
-  when: os == 'rhel' and result.id is defined
+  when: ursula_os == 'rhel' and result.id is defined

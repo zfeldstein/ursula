@@ -1,6 +1,7 @@
 ---
 openstack_install_method: 'distro'
 openstack_distro_type: 'osp'
+ursula_os: 'rhel'
 stack_env: example_allinone
 floating_ip: 172.16.0.100
 xtradb:

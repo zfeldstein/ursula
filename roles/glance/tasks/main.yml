@@ -64,7 +64,7 @@
   with_items:
     - "{{ glance.services.glance_api }}"
     - "{{ glance.services.glance_registry }}"
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install glance services (rhel)
   systemd_service:
@@ -79,7 +79,7 @@
   with_items:
     - "{{ glance.services.glance_api }}"
     - "{{ glance.services.glance_registry }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: glance config
   template: src={{ item }} dest=/etc/glance mode=0640
@@ -93,7 +93,7 @@
     src: "etc/glance/policy.json"
     dest: "/etc/openstack-dashboard/glance_policy.json"
     owner: "root"
-    group: "{{ openstack_meta.apache[os].group }}"
+    group: "{{ openstack_meta.apache[ursula_os].group }}"
     mode: 0640
   when: inventory_hostname in groups['controller']
 

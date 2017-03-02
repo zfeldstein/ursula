@@ -1,10 +1,10 @@
 ---
 - set_fact:
     ntpd_service_name: ntp
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 - set_fact:
     ntpd_service_name: ntpd
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: install ntp.conf
   template:

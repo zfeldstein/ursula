@@ -26,7 +26,7 @@
 - include: dnsmasq.yml
 
 - include: igmp-router.yml
-  when: os == 'ubuntu' and (
+  when: ursula_os == 'ubuntu' and (
         neutron.plugin == 'ml2' and
         'vxlan' in neutron.tunnel_types
         and not neutron.l2_population )
@@ -76,7 +76,7 @@
            neutron.lbaas.enabled|bool)
     with_items:
       - "{{ neutron.services.neutron_lbaasv2_agent }}"
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - block:
   - name: install neutron-data-network services (rhel)
@@ -115,7 +115,7 @@
            neutron.lbaas.enabled|bool)
     with_items:
       - "{{ neutron.services.neutron_lbaasv2_agent }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: create lbaas templates folder
   file:

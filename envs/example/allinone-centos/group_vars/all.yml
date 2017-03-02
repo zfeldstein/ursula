@@ -1,6 +1,7 @@
 ---
 stack_env: example_allinone
 floating_ip: 172.16.0.100
+ursula_os: 'rhel'
 xtradb:
   sst_auth_password: asdf
 validate_certs: false

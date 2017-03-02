@@ -1,10 +1,10 @@
 ---
 - set_fact:
     garbd_service: garbd
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 - set_fact:
     garbd_service: garb
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 
 - name: create mysql user
@@ -28,4 +28,4 @@
   selinux_permissive:
     name: mysqld_t
     permissive: true
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'

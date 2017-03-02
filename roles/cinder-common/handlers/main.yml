@@ -30,4 +30,4 @@
 
 # FIXME variablize by OS
 - name: restart tgt service
-  service: name="{{ cinder.tgt_service[os] }}" state=restarted
+  service: name="{{ cinder.tgt_service[ursula_os] }}" state=restarted

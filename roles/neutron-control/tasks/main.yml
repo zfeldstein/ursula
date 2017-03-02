@@ -13,7 +13,7 @@
       envs: "{{ neutron.service.envs }}"
     with_items:
       - "{{ neutron.services.neutron_server }}"
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - block:
   - name: install neutron-server service (rhel)
@@ -31,7 +31,7 @@
       kill_mode: "{{ item.kill_mode }}"
     with_items:
       - "{{ neutron.services.neutron_server }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: stop neutron service before db sync
   service:

@@ -24,7 +24,7 @@
     - "{{ aodh.services.aodh_evaluator }}"
     - "{{ aodh.services.aodh_listener }}"
     - "{{ aodh.services.aodh_notifier }}"
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - block:
   - name: install aodh services (rhel)
@@ -50,7 +50,7 @@
       state: absent
     with_items:
       - "{{ aodh.services.aodh_expirer }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: aodh config
   template: src={{ item }} dest=/etc/aodh/

@@ -4,7 +4,7 @@ dependencies:
     repos:
       - repo: 'deb {{ apt_repos.chef.repo }} trusty main'
         key_url: '{{ apt_repos.chef.key_url }}'
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'
   - role: repos
     repo: chef
-    when: os == 'rhel'
+    when: ursula_os == 'rhel'

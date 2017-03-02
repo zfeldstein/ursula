@@ -8,16 +8,16 @@
 #  - name: horizon is up
 #    shell: curl -sSL -k http://localhost:8080 | grep "Login - OpenStack Dashboard"
 
-  - name: client stackrc has an os cacert env variable
+  - name: client stackrc has an cacert env variable
     shell: grep OS_CACERT /root/stackrc
 
   - name: common timezone is utc
     shell: grep UTC /etc/timezone
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'
 
   - name: common timezone is utc
     shell: grep UTC /etc/localtime
-    when: os == 'rhel'
+    when: ursula_os == 'rhel'
 
   - name: common date command has utc
     shell: date | grep UTC
@@ -79,11 +79,11 @@
 
   - name: iptables defaults to dropping connections from the internet
     shell: ufw status verbose | egrep '^Default. deny .incoming.'
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'
 
   - name: iptables lets ssh in from outside
     shell: ufw status verbose | egrep '^22/tcp                     ALLOW IN    Anywhere'
-    when: os == 'ubuntu'
+    when: ursula_os == 'ubuntu'
 
   - name: all backends are up in haproxy
     shell: curl -k -s -u admin:{{ secrets.admin_password }} https://127.0.0.1/haproxy_stats\;csv | awk '/DOWN/ {print;ec=1} END{exit ec}'

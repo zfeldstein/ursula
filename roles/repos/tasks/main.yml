@@ -1,6 +1,6 @@
 - include: apt.yml
-  when: os == "ubuntu"
+  when: ursula_os == "ubuntu"
 
 - include: yum.yml
-  when: os == "rhel"
+  when: ursula_os == "rhel"
 

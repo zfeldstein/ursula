@@ -8,7 +8,7 @@
 - name: install memcached packages
   package:
     name=libsasl2-dev
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
@@ -16,7 +16,7 @@
 - name: install memcached packages
   package:
     name=cyrus-sasl-devel
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5
@@ -25,7 +25,7 @@
 - name: install memcached packages
   package:
     name=python-memcache
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   register: result
   until: result|succeeded
   retries: 5
@@ -33,7 +33,7 @@
 - name: install memcached packages
   package:
     name=python-memcached
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
   register: result
   until: result|succeeded
   retries: 5

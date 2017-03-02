@@ -1,5 +1,6 @@
 ---
 stack_env: example_ci-ceph_swift
+ursula_os: 'ubuntu'
 
 state_path_base: /opt/stack/data
 

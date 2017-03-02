@@ -10,7 +10,7 @@
     - "{{ ceilometer.services.ceilometer_polling }}"
     - "{{ ceilometer.services.ceilometer_notification }}"
   notify: restart ceilometer services
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install ceilometer controller services (rhel)
   systemd_service:
@@ -26,7 +26,7 @@
     - "{{ ceilometer.services.ceilometer_collector }}"
     - "{{ ceilometer.services.ceilometer_notification }}"
     - "{{ ceilometer.services.ceilometer_polling }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: trigger restart on upgrades
   debug:

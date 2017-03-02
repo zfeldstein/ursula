@@ -7,7 +7,7 @@
   register: result
   until: result|succeeded
   retries: 5
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install mongodb packages (centos)
   yum: pkg={{ item }} state=installed
@@ -18,7 +18,7 @@
   until: result|succeeded
   retries: 5
   when:
-    - os == 'rhel'
+    - ursula_os == 'rhel'
     - openstack_install_method == 'source'
 
 - name: install mongodb packages (rhel osp)
@@ -30,7 +30,7 @@
   until: result|succeeded
   retries: 5
   when:
-    - os == 'rhel'
+    - ursula_os == 'rhel'
     - openstack_install_method == 'distro'
 
 - name: install mongodb config files

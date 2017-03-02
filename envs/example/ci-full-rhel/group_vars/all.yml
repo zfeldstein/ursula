@@ -1,6 +1,7 @@
 ---
 openstack_install_method: 'distro'
 openstack_distro_type: 'osp'
+ursula_os: 'rhel'
 
 stack_env: ci-full-centos
 undercloud_cidr:

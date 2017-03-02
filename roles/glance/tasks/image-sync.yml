@@ -3,16 +3,16 @@
 # set facts to deal with cross platform
 - set_fact:
     rsync_defaults: /etc/sysconfig/rsyncd
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 - set_fact:
     rsync_defaults: /etc/default/rsync
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 - set_fact:
     rsync_service: rsyncd
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 - set_fact:
     rsync_service: rsync
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 
 - name: stop btsync

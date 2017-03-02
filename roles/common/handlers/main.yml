@@ -4,11 +4,11 @@
 
 - name: refresh CAs
   command: update-ca-certificates
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: refresh rhel CAs
   command: /bin/update-ca-trust extract
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: apply-sysctl
   shell: "cat /etc/sysctl.d/*.conf /etc/sysctl.conf | sysctl -e -p -"
@@ -32,5 +32,5 @@
   register: result
   until: result|succeeded
   retries: 5
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
   

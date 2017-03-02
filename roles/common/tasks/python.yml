@@ -30,7 +30,7 @@
 - name: update pip (ubuntu)
   pip: name=pip version={{ common.pip_version }}
        extra_args="-i {{ openstack.pypi_mirror }}"
-  when: ansible_distribution_version != "12.04" and os == "ubuntu"
+  when: ansible_distribution_version != "12.04" and ursula_os == "ubuntu"
   register: result
   until: result|succeeded
   retries: 5

@@ -8,7 +8,7 @@
   with_items:
     - "{{ cinder.services.cinder_api }}"
     - "{{ cinder.services.cinder_scheduler }}"
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: install cinder controller services (rhel)
   systemd_service:
@@ -23,7 +23,7 @@
   with_items:
     - "{{ cinder.services.cinder_api }}"
     - "{{ cinder.services.cinder_scheduler }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: sync cinder database
   command: cinder-manage db sync

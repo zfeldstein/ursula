@@ -1,6 +1,6 @@
 ---
 - name: install ceph client
-  package: name=ceph-common{{ ceph.pkg_version_connector[os] }}{{ ceph.client_version[os] }}
+  package: name=ceph-common{{ ceph.pkg_version_connector[ursula_os] }}{{ ceph.client_version[ursula_os] }}
            state=present
   register: result_cephclient
   until: result_cephclient|succeeded

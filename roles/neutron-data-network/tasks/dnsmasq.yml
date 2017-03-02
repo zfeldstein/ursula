@@ -6,7 +6,7 @@
 
   - name: delete localhost dnsmask nameserver
     command: resolvconf -d lo.dnsmasq
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: neutron dnsmasq config
   template: src=etc/dnsmasq.conf dest=/etc/dnsmasq.conf mode=0644

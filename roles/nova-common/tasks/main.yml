@@ -8,7 +8,7 @@
   command: mv /etc/httpd/conf.d/00-nova-placement-api.conf /etc/httpd/conf.d/00-nova-placement-api.disabled
   when:
     - np.stat.exists == True
-    - os == 'rhel'
+    - ursula_os == 'rhel'
     - openstack_install_method == 'distro'
 
 - name: nova user
@@ -78,7 +78,7 @@
     src: "etc/nova/policy.json"
     dest: "/etc/openstack-dashboard/nova_policy.json"
     owner: "root"
-    group: "{{ openstack_meta.apache[os].group }}"
+    group: "{{ openstack_meta.apache[ursula_os].group }}"
     mode: 0640
   when: inventory_hostname in groups['controller']
 

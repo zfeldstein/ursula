@@ -19,12 +19,12 @@ apache:
   listen: []
   logs:
     - paths:
-        - "{{ apache_log_path[os] }}/access.log"
+        - "{{ apache_log_path[ursula_os] }}/access.log"
       fields:
         # type: <custom type defined in receiving Logstash>
         tags: apache_access
     - paths:
-        -  "{{ apache_log_path[os] }}/error.log"
+        -  "{{ apache_log_path[ursula_os] }}/error.log"
       fields:
         # type: <custom type defined in receiving Logstash>
         tags: apache_error

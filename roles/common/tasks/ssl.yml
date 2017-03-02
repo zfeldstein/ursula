@@ -15,7 +15,7 @@
       src: "{{ item.src | default(omit) }}"
     with_items: "{{ ssl.extracacerts | default([]) }}"
     notify: refresh CAs
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - block:
   - name: custom CA cert directory
@@ -34,7 +34,7 @@
       src: "{{ item.src | default(omit) }}"
     with_items: "{{ ssl.extracacerts | default([]) }}"
     notify: refresh rhel CAs
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 # ugly hack: some python http libs don't honor the system ca-certs, and ship with
 # their own list, instead.
@@ -59,8 +59,8 @@
 
 - name: update ca certificates
   command: update-ca-certificates
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 - name: update ca certificates (rhel)
   command: update-ca-trust
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'

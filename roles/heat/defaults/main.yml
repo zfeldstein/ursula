@@ -4,9 +4,9 @@ heat:
   enabled: True
   heartbeat_timeout_threshold: 30
   services:
-    heat_api: "{{ openstack_meta.heat.services.heat_api[os] }}"
-    heat_api_cfn: "{{ openstack_meta.heat.services.heat_api_cfn[os] }}"
-    heat_engine: "{{ openstack_meta.heat.services.heat_engine[os] }}"
+    heat_api: "{{ openstack_meta.heat.services.heat_api[ursula_os] }}"
+    heat_api_cfn: "{{ openstack_meta.heat.services.heat_api_cfn[ursula_os] }}"
+    heat_engine: "{{ openstack_meta.heat.services.heat_engine[ursula_os] }}"
   distro:
     project_packages:
       - openstack-heat-api

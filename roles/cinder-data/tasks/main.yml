@@ -1,7 +1,7 @@
 ---
 - name: install cinder-data required packages
   package: name={{ item }}
-  with_items: "{{ cinder.data_pkgs[os] }}"
+  with_items: "{{ cinder.data_pkgs[ursula_os] }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -21,13 +21,13 @@
   notify: restart tgt service
 
 - name: ensure tgt service is running
-  service: name="{{ cinder.tgt_service[os] }}" state=started
+  service: name="{{ cinder.tgt_service[ursula_os] }}" state=started
 
 - include: volume_group.yml
   when: cinder.create_vg|bool and ( cinder.fixed_key is not defined or (cinder.fixed_key is defined and "compute" not in group_names) )
 
 - name: iscsi start
-  service: name="{{ cinder.iscsi_service[os] }}" state=started
+  service: name="{{ cinder.iscsi_service[ursula_os] }}" state=started
 
 - name: enable cinder encryption
   template: src=etc/cinder/cinder.encryption.conf dest=/etc/cinder/cinder.encryption.conf mode=0640
@@ -60,7 +60,7 @@
     when: swift.enabled|default("false")|bool
     with_items:
       - "{{ cinder.services.cinder_backup }}"
-  when: os == 'ubuntu'
+  when: ursula_os == 'ubuntu'
 
 
 #When OS is Rhel
@@ -92,7 +92,7 @@
     when: swift.enabled|default("false")|bool
     with_items:
       - "{{ cinder.services.cinder_backup }}"
-  when: os == 'rhel'
+  when: ursula_os == 'rhel'
 
 - name: trigger restart on upgrades
   debug:

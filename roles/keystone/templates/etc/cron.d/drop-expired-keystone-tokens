@@ -1,4 +1,4 @@
-PATH=/sbin:/usr/sbin:{{ (os == 'rhel' ) | ternary('/usr/bin/', '/usr/local/bin/') }}
+PATH=/sbin:/usr/sbin:{{ (ursula_os == 'rhel' ) | ternary('/usr/bin/', '/usr/local/bin/') }}
 
 
 # Drop the tokens every 5 minutes

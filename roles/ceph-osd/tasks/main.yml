@@ -24,7 +24,7 @@
   retries: 5
 
 - name: install ceph osd
-  package: name=ceph-osd{{ ceph.pkg_version_connector[os] }}{{ ceph.version[os] }}
+  package: name=ceph-osd{{ ceph.pkg_version_connector[ursula_os] }}{{ ceph.version[ursula_os] }}
            state=present
   register: result
   until: result|succeeded

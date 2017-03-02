@@ -2,7 +2,7 @@
 # Restart serially as to not take keystone completely offline
 - name: restart keystone services
   service:
-    name: "{{ openstack_meta.keystone.services.keystone_api[os].name }}"
+    name: "{{ openstack_meta.keystone.services.keystone_api[ursula_os].name }}"
     state: restarted
     must_exist: false
   run_once: True
