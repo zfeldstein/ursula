@@ -33,6 +33,7 @@ EXAMPLES = """
 """
 
 import os
+import re
 
 
 def main():
@@ -53,13 +54,15 @@ def main():
 
     # the disks have symlinks to /dev/bcacheX. we need the disks
     # in increasing order by X.
+    # Use regex to determine the bcache index
+
     for subdir, dirs, files in os.walk('/dev/disk/by-uuid/'):
       for uuid in files:
         disk = os.path.join(subdir, uuid)
         path = os.path.realpath(disk)
 
         if 'bcache' in path:
-          bcache_index = int(path[len(path)-1:])
+          bcache_index = int(re.search(r'\d+$', path).group(0))
           uuids_in_order.pop(bcache_index)
           uuids_in_order.insert(bcache_index,uuid)
     cmd = ['grep', 'ceph', "/etc/fstab"]
@@ -103,13 +106,20 @@ def main():
 
         os.remove('/var/lib/ceph/osd/ceph-' + osd_id + '/journal')
 
-        cmd = ['chown', 'ceph:ceph', '/dev/' + ssd_device + str(partition_index)]
+        if 'nvme' in ssd_device:
+            cmd = ['chown', 'ceph:ceph', '/dev/' + ssd_device + 'p' + str(partition_index)]
+        else:
+            cmd = ['chown', 'ceph:ceph', '/dev/' + ssd_device + str(partition_index)]
         rc, out, err = module.run_command(cmd, check_rc=True)
 
         cmd = ['sgdisk', '-t', str(partition_index) + ':' + journal_guid, '/dev/' + ssd_device]
         rc, out, err = module.run_command(cmd, check_rc=True)
 
         cmd = ['ln', '-s', '/dev/' + ssd_device + str(partition_index), '/var/lib/ceph/osd/ceph-' + osd_id + '/journal']
+        if 'nvme' in ssd_device:
+            cmd = ['ln', '-s', '/dev/' + ssd_device + 'p' + str(partition_index), '/var/lib/ceph/osd/ceph-' + osd_id + '/journal']
+        else:
+            cmd = ['ln', '-s', '/dev/' + ssd_device + str(partition_index), '/var/lib/ceph/osd/ceph-' + osd_id + '/journal']
         rc, out, err = module.run_command(cmd, check_rc=True)
 
         cmd = ['ceph-osd', '-i', osd_id, '--mkjournal']
