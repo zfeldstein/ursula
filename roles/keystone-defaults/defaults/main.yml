@@ -51,7 +51,9 @@ keystone:
     - keystone-wsgi-public
   jellyroll: False # custom middleware for password compliance
   security_compliance:
-    enabled: true
+    # if enabled then the jellyroll middleware filter:passval
+    # should be removed from keystone-paste.ini
+    enabled: false
     password_regex: '^(?=.*\d)(?=.*[a-z]).{8,}$'
     password_regex_description: 'Password is not compliant. Password must contain lowercase letters, digits, and be at least 8 characters in length.'
   roles:
