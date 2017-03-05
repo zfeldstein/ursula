@@ -35,3 +35,12 @@
   delegate_to: "{{ groups['ceph_monitors'][0] }}"
   delegate_facts: yes
   when: result_osdhosts.stdout|int < groups['ceph_osds']|length
+
+- name: fail if current ceph version is less than Jewel
+  shell: test $(ceph --version |grep -oP "\d+\.\d+\.?\d{0,3}") \>
+         "{{ preflight_checks.ceph_minimum_version }}"
+  delegate_to: "{{ item }}" 
+  with_items: 
+    - "{{ groups['ceph_monitors']|default([]) }}"
+    - "{{ groups['ceph_osds_ssd']|default([]) }}"
+
