@@ -2,7 +2,7 @@
 - name: python dependencies
   package:
     name: "{{ item }}"
-  with_items: " {{ common.python[ansible_os_family | lower].system_packages }}"
+  with_items: " {{ common.python[ursula_os].system_packages }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -15,7 +15,7 @@
   set_fact:
     pip_extra_args: " -i {{ openstack.pypi_mirror }}"
   when: openstack.pypi_mirror is defined
-  
+
 - name: update pip (ubuntu trusty)
   pip: name=pip version={{ common.pip_version }}
        extra_args="-i {{ openstack.pypi_mirror }}"
@@ -68,7 +68,7 @@
     name: "{{ item }}"
     virtualenv: "{{ common.python.base_venv }}"
     extra_args: "{{ pip_extra_args }}"
-  with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+  with_items: "{{ common.python[ursula_os].extra_packages }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -101,7 +101,7 @@
   - name: install python extra packages
     pip:
       name: "{{ item }}"
-    with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+    with_items: "{{ common.python[ursula_os].extra_packages }}"
     register: result
     until: result|succeeded
     retries: 5
@@ -116,11 +116,11 @@
   # - name: install additional python packages
   #   git: repo={{ item.repo }} dest=/opt/stack/{{ item.name }}
   #        version={{ item.rev }} accept_hostkey=True
-  #   with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+  #   with_items: "{{ common.python[ursula_os].extra_packages }}"
   #
   # - name: install drivers
   #   command: python setup.py install chdir=/opt/stack/{{ item.name }}
-  #   with_items: "{{ common.python[ansible_os_family | lower].extra_packages }}"
+  #   with_items: "{{ common.python[ursula_os].extra_packages }}"
 
   - name: pip install python-dateutil
     pip: name=python-dateutil

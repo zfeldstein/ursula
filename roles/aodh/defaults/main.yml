@@ -23,7 +23,9 @@ aodh:
       - { name: PyMySQL }
       - { name: python-memcached }
       - { name: python-ceilometerclient }
-    system_dependencies: []
+    system_dependencies:
+      ubuntu: []
+      rhel: []
   alternatives:
     - aodh-evaluator
     - aodh-notifier

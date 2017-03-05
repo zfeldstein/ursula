@@ -11,7 +11,7 @@ common:
     state: probe
     baud_rate: 115200
   ntpd:
-    servers: 
+    servers:
        - 0.north-america.pool.ntp.org
        - 1.north-america.pool.ntp.org
        - 2.north-america.pool.ntp.org
@@ -40,7 +40,7 @@ common:
     tar_version: master
   system_tools:
     mcelog: True
-    debian:
+    ubuntu:
       lm_sensors_package: lm-sensors
       snmp_package: snmp
       packages:
@@ -75,7 +75,7 @@ common:
         - tree
         - vim
         - vlan
-    redhat:
+    rhel:
       lm_sensors_package: lm_sensors
       snmp_package: net-snmp-utils
       packages:
@@ -107,7 +107,7 @@ common:
         - vim
   python:
     base_venv: "/opt/openstack/base"
-    debian:
+    ubuntu:
       system_packages:
         - python-pip
         - python-libxml2
@@ -126,7 +126,7 @@ common:
         - libxml2-dev
         - libxslt1-dev
       extra_packages: []
-    redhat:
+    rhel:
       system_packages:
         - python-pip
         - libxml2-python

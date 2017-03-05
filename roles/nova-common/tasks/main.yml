@@ -1,16 +1,4 @@
 ---
-#FIXME, find a better way to handle this
-- stat:
-    path: /etc/httpd/conf.d/00-nova-placement-api.conf
-  register: np
-
-- name: disable nova placement API
-  command: mv /etc/httpd/conf.d/00-nova-placement-api.conf /etc/httpd/conf.d/00-nova-placement-api.disabled
-  when:
-    - np.stat.exists == True
-    - ursula_os == 'rhel'
-    - openstack_install_method == 'distro'
-
 - name: nova user
   user:
     name: nova

@@ -1,20 +1,4 @@
 ---
-# FIXME move to defaults
-# set facts to deal with cross platform
-- set_fact:
-    rsync_defaults: /etc/sysconfig/rsyncd
-  when: ursula_os == 'rhel'
-- set_fact:
-    rsync_defaults: /etc/default/rsync
-  when: ursula_os == 'ubuntu'
-- set_fact:
-    rsync_service: rsyncd
-  when: ursula_os == 'rhel'
-- set_fact:
-    rsync_service: rsync
-  when: ursula_os == 'ubuntu'
-
-
 - name: stop btsync
   service: name=btsync state=stopped enabled=false
   failed_when: False
@@ -36,7 +20,7 @@
 
 - name: rsync defaults
   lineinfile:
-    dest: "{{ rsync_defaults }}"
+    dest: "{{ glance.rsync.defaults }}"
     regexp: "{{ item.value.regexp }}"
     line: "{{ item.value.line }}"
   with_dict:
@@ -60,7 +44,7 @@
 - meta: flush_handlers
 
 - name: start rsync
-  service: name="{{ rsync_service }}" state=started enabled=yes
+  service: name="{{ glance.rsync.service }}" state=started enabled=yes
 
 - name: glance database credentials
   template: src=etc/glance/.my.cnf
