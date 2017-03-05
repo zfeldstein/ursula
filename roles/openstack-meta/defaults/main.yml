@@ -398,6 +398,233 @@ openstack_meta:
           config_files: /etc/neutron/neutron.conf,/etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini,/etc/neutron/neutron_lbaas.conf
           restart: on-failure
           kill_mode: process
+  swift:
+    services:
+      swift_account:
+        ubuntu:
+          name: swift-account
+          desc: OpenStack Object Storage (swift) - Account Service
+          cmd: /usr/local/bin/swift-account-server
+          config_files: /etc/swift/account-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-account
+          desc: OpenStack Object Storage (swift) - Account Service
+          cmd: /usr/bin/swift-account-service
+          args: /etc/swift/account-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_account_auditor:
+        ubuntu:
+          name: swift-account-auditor
+          desc: OpenStack Object Storage (swift) - Account Auditor
+          cmd: /usr/local/bin/swift-account-auditor
+          config_files: /etc/swift/account-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-account-auditor
+          desc: OpenStack Object Storage (swift) - Account Auditor
+          cmd: /usr/bin/swift-account-auditor
+          args: /etc/swift/account-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_account_reaper:
+        ubuntu:
+          name: swift-account-reaper
+          desc: OpenStack Object Storage (swift) - Account Reaper
+          cmd: /usr/local/bin/swift-account-reaper
+          config_files: /etc/swift/account-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-account-reaper
+          desc: OpenStack Object Storage (swift) - Account Reaper
+          cmd: /usr/bin/swift-account-reaper
+          args: /etc/swift/account-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_account_replicator:
+        ubuntu:
+          name: swift-account-replicator
+          desc: OpenStack Object Storage (swift) - Account Replicator
+          cmd: /usr/local/bin/swift-account-replicator
+          config_files: /etc/swift/account-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-account-replicator
+          desc: OpenStack Object Storage (swift) - Account Replicator
+          cmd: /usr/bin/swift-account-replicator
+          args: /etc/swift/account-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_container:
+        ubuntu:
+          name: swift-container
+          desc: OpenStack Object Storage (swift) - Container Server
+          cmd: /usr/local/bin/swift-container-server
+          config_files: /etc/swift/container-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-container
+          desc: OpenStack Object Storage (swift) - Container Server
+          cmd: /usr/bin/swift-container-server
+          args: /etc/swift/container-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_container_auditor:
+        ubuntu:
+          name: swift-container-auditor
+          desc: OpenStack Object Storage (swift) - Container Auditor
+          cmd: /usr/local/bin/swift-container-auditor
+          config_files: /etc/swift/container-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-container-auditor
+          desc: OpenStack Object Storage (swift) - Container Auditor
+          cmd: /usr/bin/swift-container-auditor
+          args: /etc/swift/container-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_container_replicator:
+        ubuntu:
+          name: swift-container-replicator
+          desc: OpenStack Object Storage (swift) - Container Replicator
+          cmd: /usr/local/bin/swift-container-replicator
+          config_files: /etc/swift/container-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-container-replicator
+          desc: OpenStack Object Storage (swift) - Container Replicator
+          cmd: /usr/bin/swift-container-replicator
+          args: /etc/swift/container-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_container_sync:
+        ubuntu:
+          name: swift-container-sync
+          desc: OpenStack Object Storage (swift) - Container Sync
+          cmd: /usr/local/bin/swift-container-sync
+          config_files: /etc/swift/container-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-container-sync
+          desc: OpenStack Object Storage (swift) - Container Sync
+          cmd: /usr/bin/swift-container-sync
+          args: /etc/swift/container-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_container_updater:
+        ubuntu:
+          name: swift-container-updater
+          desc: OpenStack Object Storage (swift) - Container Updater
+          cmd: /usr/local/bin/swift-container-updater
+          config_files: /etc/swift/container-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-container-updater
+          desc: OpenStack Object Storage (swift) - Container Updater
+          cmd: /usr/bin/swift-container-updater
+          args: /etc/swift/container-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_object:
+        ubuntu:
+          name: swift-object-server
+          desc: OpenStack Object Storage (swift) - Object Server
+          cmd: /usr/local/bin/swift-object-server
+          config_files: /etc/swift/object-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-object
+          desc: OpenStack Object Storage (swift) - Object Server
+          cmd: /usr/bin/swift-object-server
+          args: /etc/swift/object-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_object_auditor:
+        ubuntu:
+          name: swift-object-auditor
+          desc: OpenStack Object Storage (swift) - Object Auditor
+          cmd: /usr/local/bin/swift-object-auditor
+          config_files: /etc/swift/object-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-object-auditor
+          desc: OpenStack Object Storage (swift) - Object Auditor
+          cmd: /usr/bin/swift-object-auditor
+          args: /etc/swift/object-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_object_expirer:
+        ubuntu:
+          name: swift-object-expirer
+          desc: OpenStack Object Storage (swift) - Object Expirer
+          cmd: /usr/local/bin/swift-object-expirer
+          config_files: /etc/swift/object-expirer.conf
+          user: swift
+        rhel:
+          name: openstack-swift-object-expirer
+          desc: OpenStack Object Storage (swift) - Object Expirer
+          cmd: /usr/bin/swift-object-expirer
+          args: /etc/swift/object-expirer.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_object_replicator:
+        ubuntu:
+          name: swift-object-replicator
+          desc: OpenStack Object Storage (swift) - Object Replicator
+          cmd: /usr/local/bin/swift-object-replicator
+          config_files: /etc/swift/object-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-object-replicator
+          desc: OpenStack Object Storage (swift) - Object Replicator
+          cmd: /usr/bin/swift-object-replicator
+          args: /etc/swift/object-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_object_updater:
+        ubuntu:
+          name: swift-object-updater
+          desc: OpenStack Object Storage (swift) - Object Updater
+          cmd: /usr/local/bin/swift-object-updater
+          config_files: /etc/swift/object-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-object-updater
+          desc: OpenStack Object Storage (swift) - Object Updater
+          cmd: /usr/bin/swift-object-updater
+          args: /etc/swift/object-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
+      swift_proxy:
+        ubuntu:
+          name: swift-proxy
+          desc: OpenStack Object Storage (swift) - Proxy Server
+          cmd: /usr/local/bin/swift-proxy-server
+          config_files: /etc/swift/proxy-server.conf
+          user: swift
+        rhel:
+          name: openstack-swift-proxy
+          desc: OpenStack Object Storage (swift) - Proxy Server
+          cmd: /usr/bin/swift-proxy-server
+          args: /etc/swift/proxy-server.conf
+          user: swift
+          restart: on-failure
+          type: simple
   heat:
     services:
       heat_api:

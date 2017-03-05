@@ -1,6 +1,22 @@
 ---
 swift:
   enabled: False
+  services:
+    swift_account: "{{ openstack_meta.swift.services.swift_account[ursula_os] }}"
+    swift_account_auditor: "{{ openstack_meta.swift.services.swift_account_auditor[ursula_os] }}"
+    swift_account_reaper: "{{ openstack_meta.swift.services.swift_account_reaper[ursula_os] }}"
+    swift_account_replicator: "{{ openstack_meta.swift.services.swift_account_replicator[ursula_os] }}"
+    swift_container: "{{ openstack_meta.swift.services.swift_container[ursula_os] }}"
+    swift_container_auditor: "{{ openstack_meta.swift.services.swift_container_auditor[ursula_os] }}"
+    swift_container_replicator: "{{ openstack_meta.swift.services.swift_container_replicator[ursula_os] }}"
+    swift_container_sync: "{{ openstack_meta.swift.services.swift_container_sync[ursula_os] }}"
+    swift_container_updater: "{{ openstack_meta.swift.services.swift_container_updater[ursula_os] }}"
+    swift_object: "{{ openstack_meta.swift.services.swift_object[ursula_os] }}"
+    swift_object_auditor: "{{ openstack_meta.swift.services.swift_object_auditor[ursula_os] }}"
+    swift_object_expirer: "{{ openstack_meta.swift.services.swift_object_expirer[ursula_os] }}"
+    swift_object_replicator: "{{ openstack_meta.swift.services.swift_object_replicator[ursula_os] }}"
+    swift_object_updater: "{{ openstack_meta.swift.services.swift_object_updater[ursula_os] }}"
+    swift_proxy: "{{ openstack_meta.swift.services.swift_proxy[ursula_os] }}"
   logging:
     debug: False
   hash_path_prefix: a57b0dfd61b5fe3a
@@ -8,8 +24,14 @@ swift:
     - disk: sdb
   allow_versions: True
   distro:
+    dependent_packages:
+      - lshw
     project_packages:
       - openstack-swift
+      - openstack-swift-proxy
+      - openstack-swift-account
+      - openstack-swift-container
+      - openstack-swift-object
   source:
     rev: 'stable/newton'
     constrain: True
@@ -110,3 +132,4 @@ swift:
         no_auditors: 1
         no_updaters: 1
   venv_dir: '/opt/openstack/current/swift'
+

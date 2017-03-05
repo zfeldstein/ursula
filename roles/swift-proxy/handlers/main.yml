@@ -1,6 +1,6 @@
 ---
 - name: restart swift-proxy service
-  service: name=swift-proxy state=restarted
+  service: name="{{ swift.services.swift_proxy.name }}" state=restarted
   when: start_proxy|bool
 
 - name: restart haproxy

@@ -2,6 +2,8 @@
 - name: memcached gem for sensu check
   gem: name=memcached user_install=no include_dependencies=yes
        executable=/opt/sensu/embedded/bin/gem
+  environment:
+    PATH: "/opt/sensu/embedded/bin:{{ ansible_env.PATH }}"
   register: result
   until: result|succeeded
   retries: 5

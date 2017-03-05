@@ -10,31 +10,31 @@
 - name: sensu account process checks
   sensu_process_check: service={{ item }} warn_over=30 crit_over=35
   with_items:
-    - swift-account-auditor
-    - swift-account-replicator
-    - swift-account-reaper
-    - swift-account-server
+    - "{{ swift.services.swift_account_auditor.name }}"
+    - "{{ swift.services.swift_account_replicator.name }}"
+    - "{{ swift.services.swift_account_reaper.name }}"
+    - "{{ swift.services.swift_account.name }}"
 
 - name: sensu container process checks
   sensu_process_check: service={{ item }} warn_over=30 crit_over=35
   with_items:
-    - swift-container-replicator
-    - swift-container-updater
-    - swift-container-auditor
-    - swift-container-sync
-    - swift-container-server
+    - "{{ swift.services.swift_container_replicator.name }}"
+    - "{{ swift.services.swift_container_updater.name }}"
+    - "{{ swift.services.swift_container_auditor.name }}"
+    - "{{ swift.services.swift_container_sync.name }}"
+    - "{{ swift.services.swift_container.name }}"
 
 - name: sensu object process checks
   sensu_process_check: service={{ item }} warn_over=30 crit_over=35
   with_items:
-    - swift-object-replicator
-    - swift-object-updater
-    - swift-object-server
+    - "{{ swift.services.swift_object_replicator.name }}"
+    - "{{ swift.services.swift_object_updater.name }}"
+    - "{{ swift.services.swift_object.name }}"
 
 - name: sensu proxy process checks
   sensu_process_check: service={{ item }}
   with_items:
-    - swift-proxy
+    - "{{ swift.services.swift_proxy.name }}"
     - haproxy
     - memcached
 
