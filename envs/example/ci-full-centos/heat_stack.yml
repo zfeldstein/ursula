@@ -154,7 +154,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: ci_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   controller-1:
@@ -168,7 +168,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: ci_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
   compute-0:
@@ -182,7 +182,7 @@ resources:
       security_groups: [{ get_resource: server_security_group }]
       networks:
         - network: { get_param: network }
-      availability_zone: ci_compute_standard
+      availability_zone: { get_param: az }
       # placeholder line
 
 
