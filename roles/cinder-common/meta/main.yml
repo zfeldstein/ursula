@@ -10,13 +10,13 @@ dependencies:
     logdata: "{{ cinder.logs }}"
   - role: openstack-source
     project_name: cinder
-    project_rev: "{{ cinder.source.rev }}"
+    project_rev: "{{ cinder.rev |default(openstack_rev) }}"
     rootwrap: True
     alternatives: "{{ cinder.alternatives }}"
     system_dependencies: "{{ cinder.source.system_dependencies }}"
     python_dependencies: "{{ cinder.source.python_dependencies }}"
-    constrain: "{{ cinder.source.constrain }}"
-    upper_constraints: "{{ cinder.source.upper_constraints }}"
+    constrain: "{{ cinder.constrain }}"
+    upper_constraints: "{{ cinder.upper_constraints |default(openstack_constraints) }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: cinder
@@ -28,5 +28,7 @@ dependencies:
   - role: openstack-distro
     project_name: cinder
     project_packages: "{{ cinder.distro.project_packages }}"
+    upper_constraints: "{{ cinder.upper_constraints |default(openstack_constraints) }}"
+    constrain: "{{ cinder.constrain }}"
     rootwrap: True
     when: openstack_install_method == 'distro'

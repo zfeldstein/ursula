@@ -27,6 +27,27 @@
     pip_extra_args: "{{ pip_extra_args }} -i {{ openstack.pypi_mirror }}"
   when: openstack.pypi_mirror is defined
 
+- block:
+  - name: write constraints file
+    copy:
+      src: files/constraints.txt
+      dest: /opt/stack/constraints.txt
+      force: true
+    when: upper_constraints is not defined
+
+  - name: get constraints file {{ upper_constraints }}
+    get_url:
+      url: "{{ upper_constraints }}"
+      dest: /opt/stack/constraints.txt
+      force: true
+    when: upper_constraints is defined
+
+  - name: set pip constraints args
+    set_fact:
+      pip_extra_args: "{{ pip_extra_args }} -c /opt/stack/constraints.txt"
+
+  when: constrain | bool
+
 - name: python post dependencies for project
   pip:
     name: "{{ item.name }}"

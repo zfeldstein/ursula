@@ -10,13 +10,13 @@ dependencies:
     logdata: "{{ glance.logs }}"
   - role: openstack-source
     project_name: glance
-    project_rev: "{{ glance.source.rev }}"
+    project_rev: "{{ glance.rev |default(openstack_rev) }}"
     alternatives: "{{ glance.alternatives }}"
     system_dependencies: "{{ glance.source.system_dependencies }}"
     python_dependencies: "{{ glance.source.python_dependencies }}"
     python_post_dependencies: "{{ glance.source.python_post_dependencies }}"
-    constrain: "{{ glance.source.constrain }}"
-    upper_constraints: "{{ glance.source.upper_constraints }}"
+    constrain: "{{ glance.constrain }}"
+    upper_constraints: "{{ glance.upper_constraints |default(openstack_constraints) }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: glance
@@ -30,6 +30,8 @@ dependencies:
     database_name: glance
   - role: openstack-distro
     project_name: glance
+    constrain: "{{ glance.constrain }}"
+    upper_constraints: "{{ glance.upper_constraints |default(openstack_constraints) }}"
     project_packages: "{{ glance.distro.project_packages }}"
     python_post_dependencies: "{{ glance.distro.python_post_dependencies }}"
     when: openstack_install_method == 'distro'

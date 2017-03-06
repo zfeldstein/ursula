@@ -1,6 +1,7 @@
 ---
 project_name: heat
 heat:
+  constrain: True
   enabled: True
   heartbeat_timeout_threshold: 30
   convergence_engine: False
@@ -20,9 +21,6 @@ heat:
     #     pip_extra_args: '--extra-index-url https://pypi-mirror.openstack.blueboxgrid.com/root/pypi...'
     python_post_dependencies: []
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
     python_post_dependencies: []

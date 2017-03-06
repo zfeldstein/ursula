@@ -1,6 +1,7 @@
 ---
 project_name: aodh
 aodh:
+  constrain: True
   debug: False
   services:
     aodh_api: "{{ openstack_meta.aodh.services.aodh_api[ursula_os] }}"
@@ -16,9 +17,6 @@ aodh:
       - openstack-aodh-notifier
       - openstack-aodh-expirer
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }

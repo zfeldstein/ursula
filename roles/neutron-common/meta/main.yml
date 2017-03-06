@@ -10,14 +10,14 @@ dependencies:
     logdata: "{{ neutron.logs }}"
   - role: openstack-source
     project_name: neutron
-    project_rev: "{{ neutron.source.rev }}"
+    project_rev: "{{ neutron.rev |default(openstack_rev) }}"
     rootwrap: True
     alternatives: "{{ neutron.alternatives }}"
     system_dependencies: "{{ neutron.source.system_dependencies }}"
     python_dependencies: "{{ neutron.source.python_dependencies }}"
     python_post_dependencies: "{{ neutron.source.python_post_dependencies }}"
-    constrain: "{{ neutron.source.constrain }}"
-    upper_constraints: "{{ neutron.source.upper_constraints }}"
+    constrain: "{{ neutron.constrain }}"
+    upper_constraints: "{{ neutron.upper_constraints |default(openstack_constraints) }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: neutron
@@ -28,6 +28,8 @@ dependencies:
     project_name: neutron
     project_packages: "{{ neutron.distro.project_packages }}"
     python_post_dependencies: "{{ neutron.distro.python_post_dependencies }}"
+    constrain: "{{ neutron.constrain }}"
+    upper_constraints: "{{ neutron.upper_constraints |default(openstack_constraints) }}"
     rootwrap: True
     when: openstack_install_method == 'distro'
   - role: openstack-distro

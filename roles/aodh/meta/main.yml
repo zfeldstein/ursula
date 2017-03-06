@@ -4,12 +4,12 @@ dependencies:
   - role: endpoints
   - role: openstack-source
     project_name: aodh
-    project_rev: "{{ aodh.source.rev }}"
+    project_rev: "{{ aodh.rev |default(openstack_rev) }}"
     alternatives: "{{ aodh.alternatives }}"
     system_dependencies: "{{ aodh.source.system_dependencies }}"
     python_dependencies: "{{ aodh.source.python_dependencies }}"
-    constrain: "{{ aodh.source.constrain }}"
-    upper_constraints: "{{ aodh.source.upper_constraints }}"
+    constrain: "{{ aodh.constrain }}"
+    upper_constraints: "{{ aodh.upper_constraints |default(openstack_constraints) }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: aodh
@@ -26,6 +26,8 @@ dependencies:
   - role: openstack-distro
     project_name: aodh
     project_packages: "{{ aodh.distro.project_packages }}"
+    upper_constraints: "{{ aodh.upper_constraints |default(openstack_constraints) }}"
+    constrain: "{{ aodh.constrain }}"
     when: openstack_install_method == 'distro'
   - role: openstack-firewall
     rule_name: aodh

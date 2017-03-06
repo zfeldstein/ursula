@@ -1,6 +1,7 @@
 ---
 project_name: nova
 nova:
+  constrain: True
   services:
     nova_api: "{{ openstack_meta.nova.services.nova_api[ursula_os] }}"
     nova_conductor: "{{ openstack_meta.nova.services.nova_conductor[ursula_os] }}"
@@ -78,9 +79,6 @@ nova:
       project_packages:
         - openstack-nova-compute
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }

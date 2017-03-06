@@ -10,13 +10,13 @@ dependencies:
     logdata: "{{ heat.logs }}"
   - role: openstack-source
     project_name: heat
-    project_rev: "{{ heat.source.rev }}"
+    project_rev: "{{ heat.rev |default(openstack_rev) }}"
     alternatives: "{{ heat.alternatives }}"
     system_dependencies: "{{ heat.source.system_dependencies }}"
     python_dependencies: "{{ heat.source.python_dependencies }}"
     python_post_dependencies: "{{ heat.source.python_post_dependencies }}"
-    constrain: "{{ heat.source.constrain }}"
-    upper_constraints: "{{ heat.source.upper_constraints }}"
+    constrain: "{{ heat.constrain }}"
+    upper_constraints: "{{ heat.upper_constraints |default(openstack_constraints) }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: heat
@@ -26,6 +26,8 @@ dependencies:
     project_name: heat
     project_packages: "{{ heat.distro.project_packages }}"
     python_post_dependencies: "{{ heat.distro.python_post_dependencies }}"
+    upper_constraints: "{{ heat.upper_constraints |default(openstack_constraints) }}"
+    constrain: "{{ heat.constrain }}"
     when: openstack_install_method == 'distro'
   - role: openstack-database
     database_name: heat

@@ -10,11 +10,11 @@ dependencies:
     logdata: "{{ ceilometer.logs }}"
   - role: openstack-source
     project_name: ceilometer
-    project_rev: "{{ ceilometer.source.rev }}"
+    project_rev: "{{ ceilometer.rev | default(openstack_rev) }}"
     alternatives: "{{ ceilometer.alternatives }}"
     python_dependencies: "{{ ceilometer.source.python_dependencies }}"
-    constrain: "{{ ceilometer.source.constrain }}"
-    upper_constraints: "{{ ceilometer.source.upper_constraints }}"
+    constrain: "{{ ceilometer.constrain }}"
+    upper_constraints: "{{ ceilometer.upper_constraints | default(openstack_constraints) }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: ceilometer
@@ -23,12 +23,16 @@ dependencies:
   - role: openstack-distro
     project_name: ceilometer
     project_packages: "{{ ceilometer.distro.controller.project_packages }}"
+    upper_constraints: "{{ ceilometer.upper_constraints |default(openstack_constraints) }}"
+    constrain: "{{ ceilometer.constrain }}"
     when:
       - openstack_install_method == 'distro'
       - inventory_hostname in groups['controller']
   - role: openstack-distro
     project_name: ceilometer
     project_packages: "{{ ceilometer.distro.compute.project_packages }}"
+    upper_constraints: "{{ ceilometer.upper_constraints |default(openstack_constraints) }}"
+    constrain: "{{ ceilometer.constrain }}"
     when:
       - openstack_install_method == 'distro'
       - inventory_hostname in groups['compute']

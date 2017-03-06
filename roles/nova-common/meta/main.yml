@@ -18,13 +18,13 @@ dependencies:
     logdata: "{{ nova.logs }}"
   - role: openstack-source
     project_name: nova
-    project_rev: "{{ nova.source.rev }}"
+    project_rev: "{{ nova.rev |default(openstack_rev) }}"
     rootwrap: True
     alternatives: "{{ nova.alternatives }}"
     system_dependencies: "{{ nova.source.system_dependencies }}"
     python_dependencies: "{{ nova.source.python_dependencies }}"
-    constrain: "{{ nova.source.constrain }}"
-    upper_constraints: "{{ nova.source.upper_constraints }}"
+    constrain: "{{ nova.constrain }}"
+    upper_constraints: "{{ nova.upper_constraints |default(openstack_constraints) }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
     project_name: nova
@@ -34,6 +34,8 @@ dependencies:
   - role: openstack-distro
     project_name: nova
     project_packages: "{{ nova.distro.controller.project_packages }}"
+    constrain: "{{ nova.constrain }}"
+    upper_constraints: "{{ nova.upper_constraints |default(openstack_constraints) }}"
     rootwrap: True
     when: 
       - openstack_install_method == 'distro'
@@ -41,6 +43,8 @@ dependencies:
   - role: openstack-distro
     project_name: nova
     project_packages: "{{ nova.distro.compute.project_packages }}"
+    constrain: "{{ nova.constrain }}"
+    upper_constraints: "{{ nova.upper_constraints |default(openstack_constraints) }}"
     rootwrap: True
     when:
       - openstack_install_method == 'distro'

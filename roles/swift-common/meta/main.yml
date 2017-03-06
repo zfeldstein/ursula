@@ -12,9 +12,9 @@ dependencies:
     project_name: swift
     python_dependencies: "{{ swift.source.python_dependencies }}"
     system_dependencies: "{{ swift.source.system_dependencies }}"
-    constrain: "{{ swift.source.constrain }}"
-    upper_constraints: "{{ swift.source.upper_constraints }}"
-    project_rev: "{{ swift.source.rev }}"
+    constrain: "{{ swift.constrain }}"
+    upper_constraints: "{{ swift.upper_constraints |default(openstack_constraints) }}"
+    project_rev: "{{ swift.rev |default(openstack_rev) }}"
     alternatives: "{{ swift.alternatives }}"
     when: openstack_install_method == 'source'
   - role: openstack-package
@@ -25,4 +25,6 @@ dependencies:
     project_name: swift
     project_packages: "{{ swift.distro.project_packages }}"
     dependent_packages: "{{ swift.distro.dependent_packages }}"
+    constrain: "{{ swift.constrain }}"
+    upper_constraints: "{{ swift.upper_constraints |default(openstack_constraints) }}"
     when: openstack_install_method == 'distro'

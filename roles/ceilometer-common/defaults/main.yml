@@ -1,6 +1,7 @@
 ---
 project_name: ceilometer
 ceilometer:
+  constrain: True
   services:
     ceilometer_api: "{{ openstack_meta.ceilometer.services.ceilometer_api[ursula_os] }}"
     ceilometer_collector: "{{ openstack_meta.ceilometer.services.ceilometer_collector[ursula_os] }}"
@@ -20,9 +21,6 @@ ceilometer:
         - openstack-ceilometer-polling
         - openstack-ceilometer-compute
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: pymongo }
       - { name: python-memcached }

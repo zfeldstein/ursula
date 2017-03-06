@@ -1,5 +1,6 @@
 ---
 swift:
+  constrain: True
   enabled: False
   services:
     swift_account: "{{ openstack_meta.swift.services.swift_account[ursula_os] }}"
@@ -33,9 +34,6 @@ swift:
       - openstack-swift-container
       - openstack-swift-object
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: keystonemiddleware }
       - { name: python-swiftclient }

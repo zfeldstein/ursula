@@ -3,7 +3,8 @@ stack_env: example
 ursula_env_path: "{{ lookup('env','URSULA_ENV') }}"
 country_code: US
 openstack_install_method: 'source'
-
+openstack_rev: 'stable/newton'
+openstack_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
 
 basevenv: "/opt/openstack/base"
 basevenv_lib_dir: "{{ basevenv }}/lib/python2.7/site-packages"

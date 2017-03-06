@@ -1,6 +1,7 @@
 ---
 project_name: glance
 glance:
+  constrain: True
   services:
     glance_api: "{{ openstack_meta.glance.services.glance_api[ursula_os] }}"
     glance_registry: "{{ openstack_meta.glance.services.glance_registry[ursula_os] }}"
@@ -29,9 +30,6 @@ glance:
       - openstack-glance
     python_post_dependencies: []
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-swiftclient }

@@ -1,6 +1,7 @@
 ---
 project_name: keystone
 keystone:
+  constrain: True
   token_expiration_in_seconds: 86400
   admin_workers: 5
   public_workers: 5
@@ -25,9 +26,6 @@ keystone:
   #     version: 1.58
   #     pip_extra_args: '--extra-index-url https://pypi-mirror.openstack.blueboxgrid.com/root/pypi...'
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
       - { name: uwsgi }

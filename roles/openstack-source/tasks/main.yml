@@ -44,14 +44,14 @@
       src: files/constraints.txt
       dest: /opt/stack/constraints.txt
       force: true
-    when: not upper_constraints|bool
+    when: upper_constraints is not defined
 
   - name: get constraints file
     get_url:
       url: "{{ upper_constraints }}"
       dest: /opt/stack/constraints.txt
       force: true
-    when: upper_constraints|bool
+    when: upper_constraints is defined
 
   - name: set pip constraints args
     set_fact:

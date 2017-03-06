@@ -1,5 +1,6 @@
 ---
 ironic:
+  constrain: True
   virtualenv: /opt/stack/ironic
   path: /opt/stack/ironic
   client_rev: e611ae5f206d846e72684ba16c345653232c45c3
@@ -21,9 +22,6 @@ ironic:
     project_packages:
       - openstack-ironic
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }

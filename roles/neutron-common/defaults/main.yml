@@ -1,6 +1,7 @@
 ---
 project_name: neutron
 neutron:
+  constrain: True
   services:
     neutron_server: "{{ openstack_meta.neutron.services.neutron_server[ursula_os] }}"
     neutron_dhcp_agent: "{{ openstack_meta.neutron.services.neutron_dhcp_agent[ursula_os] }}"
@@ -95,9 +96,6 @@ neutron:
   #     version: 1.58
   #     pip_extra_args: '--extra-index-url https://pypi-mirror.openstack.blueboxgrid.com/root/pypi...'
   source:
-    rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
     python_dependencies:
       - { name: "git+git://github.com/openstack/neutron-lbaas.git@stable/newton#egg=neutron-lbaas" }
       - { name: PyMySQL }
