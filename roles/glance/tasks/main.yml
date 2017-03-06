@@ -43,19 +43,6 @@
     - etype: other
       permission: r
 
-# FIXME - Probably do not need this as we now overwriting systemd
-#Glance-manage in OSP is creating the api.log with incorrect permissions
-# this prohibits glance-api from starting
-- name: glance fixme acl
-  acl:
-    name: /var/log/glance
-    state: present
-    default: yes
-    entity: glance
-    permissions: rw
-    etype: user
-    recursive: yes
-
 - name: install glance services (ubuntu)
   upstart_service:
     name: "{{ item.name }}"

@@ -4,6 +4,9 @@ glance:
   services:
     glance_api: "{{ openstack_meta.glance.services.glance_api[ursula_os] }}"
     glance_registry: "{{ openstack_meta.glance.services.glance_registry[ursula_os] }}"
+  rsync:
+    service: "{{ ( ursula_os == 'ubuntu' ) | ternary('rsync', 'rsyncd') }}"
+    defaults: "{{ ( ursula_os == 'ubuntu' ) | ternary('/etc/default/rsync', '/etc/sysconfig/rsyncd') }}"
   api_workers: 5
   rbd_store_chunk_size: 8
   registry_workers: 5

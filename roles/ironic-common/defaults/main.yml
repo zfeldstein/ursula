@@ -27,7 +27,9 @@ ironic:
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }
-    system_dependencies: []
+    system_dependencies:
+      ubuntu: []
+      rhel: []
   alternatives:
     - ironic-api
     - ironic-conductor

@@ -28,6 +28,5 @@
   when: restart|default('True') and swift.enabled|default('False')
   with_items: "{{ play_hosts }}"
 
-# FIXME variablize by OS
 - name: restart tgt service
   service: name="{{ cinder.tgt_service[ursula_os] }}" state=restarted

@@ -13,7 +13,9 @@ magnum:
     virtualenv: "/opt/openstack/magnum"
     python_dependencies:
       - { name: PyMySQL }
-    system_dependencies: []
+    system_dependencies:
+      ubuntu: []
+      rhel: []
   package: ~
   cafile: "{{ ssl.cafile }}"
   logs:
