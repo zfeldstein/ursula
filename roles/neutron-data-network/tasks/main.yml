@@ -85,7 +85,7 @@
       description: "{{ item.desc }}"
       type: "{{ item.type }}"
       user: "{{ item.user }}"
-      #envs: "{{ neutron.service.envs }}"
+      environment: "{{ neutron.service.envs }}"
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"
@@ -103,7 +103,7 @@
       description: "{{ item.desc }}"
       type: "{{ item.type }}"
       user: "{{ item.user }}"
-      #envs: "{{ neutron.service.envs }}"
+      environment: "{{ neutron.service.envs }}"
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"
@@ -165,7 +165,7 @@
     - haproxy.loadbalancer.j2
     - haproxy_proxies.j2
   notify: restart neutron lbaas agent
-  when: 
+  when:
     - openstack_install_method == 'distro'
     - (neutron.lbaas.enabled == "smart" and groups['controller'][0] not in groups['compute']) or neutron.lbaas.enabled|bool
 
