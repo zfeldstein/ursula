@@ -15,9 +15,9 @@ export TEST_ENV=${TEST_ENV:=ci-full}
 if [[ -n ${ghprbPullId} ]]; then
   export testenv_instance_prefix="ursula-${BUILD_ID}-pr${ghprbPullId}"
 elif [[ $(git rev-parse --abbrev-ref HEAD) == 'HEAD' ]]; then
-  export testenv_instance_prefix="ursula-$(git rev-parse --short HEAD)"
+  export testenv_instance_prefix="ursula-${BUILD_ID}-$(git rev-parse --short HEAD)"
 else
-  export testenv_instance_prefix="ursula-$(git rev-parse --abbrev-ref HEAD)"
+  export testenv_instance_prefix="ursula-${BUILD_ID}-$(git rev-parse --abbrev-ref HEAD)"
 fi
 
 export testenv_heat_template_file=${ROOT}/envs/test/heat_stack.yml
