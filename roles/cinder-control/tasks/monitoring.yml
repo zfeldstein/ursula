@@ -9,6 +9,7 @@
 - name: cinder services check
   sensu_check: name=check-cinder-services plugin=check-cinder-services.py
                use_sudo=true args="-z {{ cinder.monitoring.sensu_checks.check_cinder_services.criticality }}"
+               only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
 
 - include: nimble-monitoring.yml
@@ -22,5 +23,6 @@
 
 - name: cinder sla metrics
   sensu_metrics_check: name=cinder-sla-metrics plugin=metrics-os-api.py
-                       args='-S cinder --scheme {{ monitoring.graphite.host_prefix }}'
+                       args='-S cinder --scheme {{ monitoring.graphite.cluster_prefix }}'
+                       only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client

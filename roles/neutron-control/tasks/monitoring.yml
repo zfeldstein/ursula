@@ -19,12 +19,14 @@
 
 - name: neutron sla metrics
   sensu_metrics_check: name=neutron-sla-metrics plugin=metrics-os-api.py
-                       args='-S neutron --scheme {{ monitoring.graphite.host_prefix }}'
+                       args='-S neutron --scheme {{ monitoring.graphite.cluster_prefix }}'
+                       only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
 
 - name: lbaas sla metrics
   sensu_metrics_check: name=lbaas-sla-metrics plugin=metrics-os-api.py
-                       args='-S lbaas --scheme {{ monitoring.graphite.host_prefix }}'
+                       args='-S lbaas --scheme {{ monitoring.graphite.cluster_prefix }}'
+                       only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   when: (neutron.lbaas.enabled == "smart" and
         groups['controller'][0] not in groups['compute']) or
         neutron.lbaas.enabled|bool
@@ -34,12 +36,14 @@
   sensu_check_dict:
     name: "check-neutron-agents"
     check: "{{ sensu_checks.neutron.check_neutron_agents }}"
+    only_on_ip: "{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client missing ok
 
 - name: neutron agents duplicate check
   sensu_check_dict:
     name: "check-neutron-agents-duplicate"
     check: "{{ sensu_checks.neutron.check_neutron_agents_duplicate }}"
+    only_on_ip: "{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client missing ok
 
 - name: template neutron l3 router script for ucarp
@@ -51,3 +55,4 @@
     name: "check-neutron-l3-routers"
     check: "{{ sensu_checks.neutron.check_neutron_l3_routers }}"
   notify: restart sensu-client missing ok
+

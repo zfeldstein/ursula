@@ -9,6 +9,7 @@
 - name: glance-api check
   sensu_check: name=check-glance-api plugin=check-os-api.rb
                args="--service glance --criticality {{ glance.monitoring.sensu_checks.check_glance_api.criticality }}"
+               only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
 
 - name: install functools32 for glance-store check
@@ -36,5 +37,6 @@
 
 - name: glance sla metrics
   sensu_metrics_check: name=glance-sla-metrics plugin=metrics-os-api.py
-                       args='-S glance --scheme {{ monitoring.graphite.host_prefix }}'
+                       args='-S glance --scheme {{ monitoring.graphite.cluster_prefix }}'
+                       only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
