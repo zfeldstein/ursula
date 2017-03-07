@@ -11,12 +11,14 @@ ceilometer:
   distro:
     controller:
       project_packages:
+        - openstack-selinux
         - openstack-ceilometer-api
         - openstack-ceilometer-collector
         - openstack-ceilometer-notification
         - openstack-ceilometer-polling
     compute:
       project_packages:
+        - openstack-selinux
         - openstack-ceilometer-polling
         - openstack-ceilometer-compute
   source:

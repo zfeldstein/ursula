@@ -56,6 +56,7 @@ cinder:
   heartbeat_timeout_threshold: 30
   distro:
     project_packages:
+      - openstack-selinux
       - openstack-cinder
   source:
     rev: 'stable/newton'

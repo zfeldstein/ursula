@@ -27,6 +27,7 @@ swift:
     dependent_packages:
       - lshw
     project_packages:
+      - openstack-selinux
       - openstack-swift
       - openstack-swift-proxy
       - openstack-swift-account
