@@ -2,7 +2,7 @@
 - name: import rados module into base_venv (rhel)
   file:
     src: "{{ ceph.pylib_dir[ursula_os] }}{{ item }}"
-    dest: "/opt/openstack/base/lib/python2.7/site-packages/{{ item }}"
+    dest: "{{ basevenv_lib_dir }}/{{ item }}"
     state: link
     owner: root
     group: root
@@ -15,7 +15,7 @@
 - name: import rados module into base_venv (ubuntu)
   file:
     src: "{{ ceph.pylib_dir[ursula_os] }}{{ item }}"
-    dest: "/opt/openstack/base/lib/python2.7/site-packages/{{ item }}"
+    dest: "{{ basevenv_lib_dir }}/{{ item }}"
     state: link
     owner: root
     group: root
@@ -28,7 +28,7 @@
 - name: import other ceph modules into base_venv
   file:
     src: "{{ ceph.pylib_dir2[ursula_os] }}{{ item }}"
-    dest: "/opt/openstack/base/lib/python2.7/site-packages/{{ item }}"
+    dest: "{{ basevenv_lib_dir }}/{{ item }}"
     state: link
     owner: root
     group: root
