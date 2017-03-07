@@ -40,7 +40,10 @@ swift:
       - { name: keystonemiddleware }
       - { name: python-swiftclient }
     system_dependencies:
-      - liberasurecode-dev
+      ubuntu:
+        - liberasurecode-dev
+      rhel:
+        - liberasurecode-devel
   alternatives:
     - swift-account-audit
     - swift-account-auditor
@@ -132,4 +135,3 @@ swift:
         no_auditors: 1
         no_updaters: 1
   venv_dir: '/opt/openstack/current/swift'
-
