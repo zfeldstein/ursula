@@ -3,6 +3,7 @@ stack_env: example
 ursula_env_path: "{{ lookup('env','URSULA_ENV') }}"
 country_code: US
 openstack_install_method: 'source'
+openstack_distro_type: ~
 
 
 basevenv: "/opt/openstack/base"
