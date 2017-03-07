@@ -106,7 +106,7 @@ common:
         - tree
         - vim
   python:
-    base_venv: "/opt/openstack/base"
+    base_venv: "{{ basevenv | default('/opt/openstack/base') }}"
     ubuntu:
       system_packages:
         - python-pip
@@ -138,6 +138,7 @@ common:
         - python-virtualenv
         - MySQL-python
         - python-jinja2
+        - PyYAML
         - cryptsetup
         - libffi-devel
         - openssl-libs
