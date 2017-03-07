@@ -1,5 +1,6 @@
 - include: logstash.yml
-  when: logging.forward_type != 'filebeat'
+  when: logging.forward_type|default('filebeat') != 'filebeat'
 
 - include: filebeat.yml
-  when: logging.forward_type  == 'filebeat'
+  when: logging.forward_type|default('filebeat')  == 'filebeat'
+
