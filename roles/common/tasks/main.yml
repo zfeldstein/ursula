@@ -23,12 +23,11 @@
     retries: 5
   when: ansible_distribution == "Ubuntu"
 
-#FIXME
-- name: set selinux to permissive on redhat
+- name: set selinux mode  on redhat
   selinux:
     policy: targeted
-    state: permissive
-  when: ansible_distribution == "RedHat"
+    state: "{{ common.selinux.mode }}"
+  when: ursula_os == "rhel" and "{{ common.selinux.enabled }}"
   tags: selinux
 
 - name: secure paths sudoers operations

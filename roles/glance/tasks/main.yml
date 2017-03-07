@@ -30,6 +30,34 @@
   file: dest=/var/cache/glance state=directory mode=0700 owner=glance
         group=glance
 
+- block:
+  - name: change the selinux label for the glance image dirs
+    sefcontext:
+      target: "{{ glance.state_path }}(/.*)?"
+      setype: glance_var_run_t
+      state: present
+
+  - name: apply the context immediately to nova cache dir
+    command: restorecon -R -v "{{ glance.state_path }}"
+    register: result
+    changed_when: "'restorecon reset' in result.stdout and result.rc == 0"
+    failed_when: result.rc != 0
+
+  - name: change the selinux label on the glance cache dir
+    sefcontext:
+      target: "/var/cache/glance(/.*)?"
+      setype: glance_var_run_t
+      state: present
+
+  - name: apply the context immediately to nova cache dir
+    command: restorecon -R -v /var/cache/glance
+    register: result
+    changed_when: "'restorecon reset' in result.stdout and result.rc == 0"
+    failed_when: "result.rc != 0"
+
+  when: ansible_distribution == 'RedHat'
+  tags: selinux
+
 - name: glance log dir
   file: dest=/var/log/glance state=directory mode=2750 owner=glance group=adm
 

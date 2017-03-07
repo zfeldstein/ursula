@@ -23,6 +23,8 @@ keystone:
 common:
   hwraid:
     enabled: False
+  selinux:
+    mode: permissive
 
 logging:
   enabled: true

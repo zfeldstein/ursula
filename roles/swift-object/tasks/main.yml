@@ -62,6 +62,14 @@
   template: src=usr/local/bin/swift-drive-auditor mode=0755
             dest=/usr/local/bin/swift-drive-auditor owner=root group=root
 
+- name: apply the label for selinux to /srv/node/* dirs
+  command: restorecon -R -v /srv
+  register: result
+  changed_when: "'restorecon reset' in result.stdout and result.rc == 0"
+  failed_when: "result.rc != 0"
+  when: ansible_distribution == 'RedHat'
+  tags: selinux
+
 - name: start swift-object services
   service: name={{ item }} state=started
   with_items:
