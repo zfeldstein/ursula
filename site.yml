@@ -33,6 +33,9 @@
   hosts: all:!vyatta-*
   any_errors_fatal: true
   roles:
+    - role: logging
+      tags: ['common', 'logging']
+      when: logging.enabled|default("True")|bool
     - role: common
       tags: ['common','common-base']
     - role: manage-disks
@@ -44,9 +47,6 @@
     - role: inspec
       tags: ['common', 'inspec']
       when: inspec.enabled|default("False")|bool
-    - role: logging
-      tags: ['common', 'logging']
-      when: logging.enabled|default("True")|bool
     - role: audit
       tags: ['common', 'logging', 'audit']
       when: audit.enabled|default('False')|bool
@@ -62,15 +62,6 @@
     - role: security_errata
       tags: ['common', 'security', 'errata']
       when: ansible_distribution == 'Ubuntu'
-  environment: "{{ env_vars|default({}) }}"
-
-- name: install logging and dependencies
-  hosts: all:!vyatta-*
-  any_errors_fatal: true
-  roles:
-    - role: logging
-      tags: ['common', 'logging']
-      when: logging.enabled|default('True')|bool
   environment: "{{ env_vars|default({}) }}"
 
 - name: setup IPv6 router advertisements
