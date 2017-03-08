@@ -5,15 +5,29 @@ inspec:
   interval: 3600
   dependency_install_method: 'tar'
   dependency_path: /etc/inspec/
-  profile_dependencies:
-    - name: inspec-openstack-security
+  profiles:
+    openstack_security:
+      name: inspec-openstack-security
       version: master
       url: https://github.com/chef-partners/inspec-openstack-security/archive/master.tar.gz
-    - name: inspec-stig-rhel7
+    stig_rhel:
+      name: inspec-stig-rhel7
       version: master
       url: https://github.com/inspec-stigs/inspec-stig-rhel7/archive/master.tar.gz
-  openstack:
+  controls:
+    rhel7:
+      enabled: false
+      profile_location: stig_rhel
+      skip_controls: []
+      attributes:
+        RHEL_07_030710_audit_key_name: audit_account_changes-V-38531
+        client_alive_interval: '900'
+        RHEL_07_030523_audit_key_name: actions-V-38578
     horizon:
+      enabled: true
+      profile_location: openstack_security
+      attributes:
+        horizon_config_group: apache
       required_controls:
         - check-dashboard-01
         - check-dashboard-02
@@ -26,9 +40,9 @@ inspec:
         - check-dashboard-09
         - check-dashboard-10
         - check-dashboard-11
-      attributes:
-        horizon_config_group: apache
     cinder:
+      enabled: true
+      profile_location: openstack_security
       required_controls:
         - check-block-01
         - check-block-02
@@ -39,16 +53,22 @@ inspec:
         - check-block-07
         - check-block-08
     glance:
+      enabled: true
+      profile_location: openstack_security
       required_controls:
         - check-image-03
         - check-image-04
     nova:
+      enabled: true
+      profile_location: openstack_security
       required_controls:
         - check-compute-01
         - check-compute-02
         - check-compute-03
         - check-compute-04
     keystone:
+      enabled: true
+      profile_location: openstack_security
       required_controls:
         - check-identity-01
         - check-identity-02
@@ -57,14 +77,10 @@ inspec:
         - check-identity-05
         - check-identity-06
     neutron:
+      enabled: true
+      profile_location: openstack_security
       required_controls:
         - check-neutron-01
         - check-neutron-02
         - check-neutron-03
         - check-neutron-04
-  rhel7:
-    attributes:
-      RHEL_07_030710_audit_key_name: audit_account_changes-V-38531
-      client_alive_interval: '900'
-      RHEL_07_030523_audit_key_name: actions-V-38578
-    skip_controls: []
