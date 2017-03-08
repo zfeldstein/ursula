@@ -40,9 +40,11 @@ Alias={{ alias }}.service
 {% if environment_file -%}
 EnvironmentFile={{ environment_file }}
 {% endif %}
-{% if environment -%}
+{% if environments -%}
+{% for environment in environments %}
 Environment={{ environment }}
-{% endif %}
+{% endfor %}
+{% endif -%}
 Type={{ type }}
 {% if notify_access -%}
 NotifyAccess={{ notify_access }}
@@ -84,7 +86,7 @@ def main():
         argument_spec=dict(
             name=dict(default=None, required=True),
             cmd=dict(default=None, required=True),
-            environment=dict(default=None),
+            environments=dict(default=None, type='list'),
             environment_file=dict(default=None),
             args=dict(default=None),
             user=dict(default=None),
