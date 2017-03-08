@@ -31,6 +31,7 @@ nova:
   metadata_api_workers: 5
   cpu_allocation_ratio: 1.0
   ram_allocation_ratio: 1.0
+  libvirt_cpu_mode: host-model
   libvirt_cpu_model: null
   libvirt_type: kvm
   enable_ssh: False
