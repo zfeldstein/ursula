@@ -1,0 +1,8 @@
+---
+- name: install logstash-forwarder process check
+  sensu_process_check: service=logstash-forwarder
+  when: logging.forward_type != 'filebeat'
+
+- name: install filebeat process check
+  sensu_process_check: service=filebeat
+  when: logging.forward_type == 'filebeat'

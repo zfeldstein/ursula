@@ -75,9 +75,6 @@
   notify: restart logstash-forwarder
   when: logging.forward.host
 
-- include: checks.yml
-  tags: sensu-checks
-
 - meta: flush_handlers
 
 - name: start and enable logstash-forwarder service
