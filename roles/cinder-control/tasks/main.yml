@@ -17,7 +17,6 @@
     type: "{{ item.type }}"
     user: "{{ item.user }}"
     cmd: "{{ item.cmd }}"
-    config_dirs: "{{ item.config_dirs }}"
     config_files: "{{ item.config_files }}"
     restart: "{{ item.restart }}"
   with_items:

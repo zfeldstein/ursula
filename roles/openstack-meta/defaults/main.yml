@@ -61,7 +61,6 @@ openstack_meta:
           type: simple
           user: cinder
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-api"
-          config_dirs: /etc/cinder
           config_files: /etc/cinder/cinder.conf
           restart: on-failure
       cinder_scheduler:
@@ -77,7 +76,6 @@ openstack_meta:
           type: simple
           user: cinder
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-scheduler"
-          config_dirs: /etc/cinder
           config_files: /etc/cinder/cinder.conf
           restart: on-failure
       cinder_volume:
@@ -93,7 +91,6 @@ openstack_meta:
           type: simple
           user: cinder
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-volume"
-          config_dirs: /etc/cinder
           config_files: /etc/cinder/cinder.conf
           restart: on-failure
           kill_mode: process
@@ -110,7 +107,6 @@ openstack_meta:
           type: simple
           user: cinder
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}cinder-backup"
-          config_dirs: /etc/cinder
           config_files: /etc/cinder/cinder.conf
           restart: on-failure
   nova:

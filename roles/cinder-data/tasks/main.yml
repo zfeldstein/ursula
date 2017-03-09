@@ -72,7 +72,6 @@
       type: "{{ item.type }}"
       user: "{{ item.user }}"
       cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"
       restart: "{{ item.restart }}"
       kill_mode: "{{ item.kill_mode }}"
@@ -86,7 +85,6 @@
       type: "{{ item.type }}"
       user: "{{ item.user }}"
       cmd: "{{ item.cmd }}"
-      config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"
       restart: "{{ item.restart }}"
     when: swift.enabled|default("false")|bool
