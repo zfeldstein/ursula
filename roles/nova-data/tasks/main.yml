@@ -119,6 +119,9 @@
     name: "{{ nova.services.nova_compute.name }}"
     state: started
     enabled: True
+  register: result
+  until: result|succeeded
+  retries: 3
 
 - include: monitoring.yml
   tags:
