@@ -35,7 +35,7 @@
     description: "{{ item.desc }}"
     type: "{{ item.type }}"
     user: "{{ item.user }}"
-    environment: "{{ neutron.service.envs }}"
+    environments: "{{ neutron.service.envs }}"
     #FIXME added prestart to match up osp systemd
     #prestart_script: "{{ item.prestart_script }}"
     cmd: "{{ item.cmd }}"
