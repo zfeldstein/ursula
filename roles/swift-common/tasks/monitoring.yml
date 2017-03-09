@@ -8,33 +8,33 @@
                interval=600 occurrences=1 use_sudo=true
 
 - name: sensu account process checks
-  sensu_process_check: service={{ item }} warn_over=30 crit_over=35
+  sensu_process_check: service={{ item | basename }} warn_over=30 crit_over=35
   with_items:
-    - "{{ swift.services.swift_account_auditor.name }}"
-    - "{{ swift.services.swift_account_replicator.name }}"
-    - "{{ swift.services.swift_account_reaper.name }}"
-    - "{{ swift.services.swift_account.name }}"
+    - "{{ swift.services.swift_account_auditor.cmd }}"
+    - "{{ swift.services.swift_account_replicator.cmd }}"
+    - "{{ swift.services.swift_account_reaper.cmd }}"
+    - "{{ swift.services.swift_account.cmd }}"
 
 - name: sensu container process checks
-  sensu_process_check: service={{ item }} warn_over=30 crit_over=35
+  sensu_process_check: service={{ item | basename }} warn_over=30 crit_over=35
   with_items:
-    - "{{ swift.services.swift_container_replicator.name }}"
-    - "{{ swift.services.swift_container_updater.name }}"
-    - "{{ swift.services.swift_container_auditor.name }}"
-    - "{{ swift.services.swift_container_sync.name }}"
-    - "{{ swift.services.swift_container.name }}"
+    - "{{ swift.services.swift_container_replicator.cmd }}"
+    - "{{ swift.services.swift_container_updater.cmd }}"
+    - "{{ swift.services.swift_container_auditor.cmd }}"
+    - "{{ swift.services.swift_container_sync.cmd }}"
+    - "{{ swift.services.swift_container.cmd }}"
 
 - name: sensu object process checks
-  sensu_process_check: service={{ item }} warn_over=30 crit_over=35
+  sensu_process_check: service={{ item | basename }} warn_over=30 crit_over=35
   with_items:
-    - "{{ swift.services.swift_object_replicator.name }}"
-    - "{{ swift.services.swift_object_updater.name }}"
-    - "{{ swift.services.swift_object.name }}"
+    - "{{ swift.services.swift_object_replicator.cmd }}"
+    - "{{ swift.services.swift_object_updater.cmd }}"
+    - "{{ swift.services.swift_object.cmd }}"
 
 - name: sensu proxy process checks
-  sensu_process_check: service={{ item }}
+  sensu_process_check: service={{ item | basename }}
   with_items:
-    - "{{ swift.services.swift_proxy.name }}"
+    - "{{ swift.services.swift_proxy.cmd }}"
     - haproxy
     - memcached
 
