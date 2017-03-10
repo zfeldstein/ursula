@@ -1,134 +1,127 @@
 ---
-- name: integration testing
-  hosts: controller[0]
+- name: generate ssh key for root
+  user: name=root generate_ssh_key=yes
+  register: rootuser
 
-  tasks:
-    - name: generate ssh key for root
-      user: name=root generate_ssh_key=yes
-      register: rootuser
+- name: generate nova key-pair
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_keypair:
+    name: turtle-key
+    auth:
+      auth_url: "{{ endpoints.auth_uri }}"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
+    public_key: "{{ rootuser.ssh_public_key }}"
+    state: present
 
-    - name: generate nova key-pair
-      environment:
-        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-      os_keypair:
-        name: turtle-key
-        auth:
-          auth_url: "{{ endpoints.auth_uri }}"
-          project_name: admin
-          username: admin
-          password: "{{ secrets.admin_password }}"
-        public_key: "{{ rootuser.ssh_public_key }}"
+- name: generate test security group
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_security_group:
+    auth:
+      auth_url: "{{ endpoints.auth_uri }}"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
+    name: turtle-sec
+    description: turtle-sec
 
-    - name: generate test security group
-      environment:
-        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-      os_security_group:
-        auth:
-          auth_url: "{{ endpoints.auth_uri }}"
-          project_name: admin
-          username: admin
-          password: "{{ secrets.admin_password }}"
-        name: turtle-sec
-        description: turtle-sec
+- name: add security group rule
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_security_group_rule:
+    auth:
+      auth_url: "{{ endpoints.auth_uri }}"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
+    security_group: turtle-sec
+    remote_ip_prefix: 0.0.0.0/0
 
-    - name: test security group rule
-      environment:
-        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-      os_security_group_rule:
-        auth:
-          auth_url: "{{ endpoints.auth_uri }}"
-          project_name: admin
-          username: admin
-          password: "{{ secrets.admin_password }}"
-        security_group: turtle-sec
-        remote_ip_prefix: 0.0.0.0/0
+- name: nova can boot an instance
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_server:
+      name: turtle-stack
+      auth:
+        auth_url: "{{ endpoints.auth_uri }}"
+        project_name: admin
+        username: admin
+        password: "{{ secrets.admin_password }}"
+      image: cirros
+      security_groups: turtle-sec
+      key_name: turtle-key
+      flavor: 1
+      auto_floating_ip: no
+      nics:
+        - net-name: internal
+  register: turtle_stack
 
-    - name: nova can boot an instance
-      environment:
-        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-      os_server:
-          name: turtle-stack
-          auth:
-            auth_url: "{{ endpoints.auth_uri }}"
-            project_name: admin
-            username: admin
-            password: "{{ secrets.admin_password }}"
-          image: cirros
-          security_groups: turtle-sec
-          key_name: turtle-key
-          flavor: 1
-          auto_floating_ip: no
-          nics:
-            - net-name: internal
-      register: turtle_stack
+- name: delete any existing floating IP associated with instance
+  shell: . /root/stackrc; openstack floating ip delete $(openstack floating ip list | grep {{ turtle_stack.openstack.private_v4 }}  | awk '{ print $2 }')
+  failed_when: false
 
-    - name: nova can associate floating IP with test instance
-      environment:
-        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-      os_floating_ip:
-        auth:
-          auth_url: "{{ endpoints.auth_uri }}"
-          project_name: admin
-          username: admin
-          password: "{{ secrets.admin_password }}"
-        network: external
-        server: turtle-stack
-        reuse: true
-        fixed_address: "{{ item.addr }}"
-        wait: true
-      register: floating_ip
-      with_items: "{{ turtle_stack.openstack.addresses.internal }}"
-      when: item.version == 4
+- name: nova can associate floating IP with test instance
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_floating_ip:
+    auth:
+      auth_url: "{{ endpoints.auth_uri }}"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
+    network: external
+    server: turtle-stack
+    reuse: true
+    fixed_address: "{{ turtle_stack.openstack.private_v4 }}"
+    wait: true
+  register: floating_ip
 
-    - name: nova can create a volume via cinder
-      environment:
-        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-      os_volume:
-        auth:
-          auth_url: "{{ endpoints.auth_uri }}"
-          project_name: admin
-          username: admin
-          password: "{{ secrets.admin_password }}"
-        display_name: turtle-vol
-        size: 2
-      when: cinder.enabled|bool
+- name: nova can create a volume via cinder
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_volume:
+    auth:
+      auth_url: "{{ endpoints.auth_uri }}"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
+    display_name: turtle-vol
+    size: 2
+  when: cinder.enabled|bool
 
-    - name: nova can attach cinder volume
-      environment:
-        PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-      os_server_volume:
-        auth:
-          auth_url: "{{ endpoints.auth_uri }}"
-          project_name: admin
-          username: admin
-          password: "{{ secrets.admin_password }}"
-        server: turtle-stack
-        volume: turtle-vol
-      when: cinder.enabled|bool
+- name: nova can attach cinder volume
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_server_volume:
+    auth:
+      auth_url: "{{ endpoints.auth_uri }}"
+      project_name: admin
+      username: admin
+      password: "{{ secrets.admin_password }}"
+    server: turtle-stack
+    volume: turtle-vol
+  when: cinder.enabled|bool
 
-    - block:
-      - name: wait for instance to boot
-        wait_for:
-          host: "{{ item.floating_ip.floating_ip_address }}"
-          port: 22
-          timeout: 180
-        with_items: "{{ floating_ip.results }}"
-        when: item.floating_ip is defined
+- name: wait for instance to boot
+  wait_for:
+    host: "{{ floating_ip.floating_ip.floating_ip_address }}"
+    port: 22
+    timeout: 180
+  when: floating_ip.floating_ip.floating_ip_address is defined
 
-      - name: test instance can ping 8888
-        command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
-                 -i /root/.ssh/id_rsa
-                 cirros@{{ item.floating_ip.floating_ip_address }}
-                 ping -c 5 8.8.8.8
-        with_items: "{{ floating_ip.results }}"
-        when: item.floating_ip is defined
+- name: test instance can ping 8.8.8.8
+  command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+           -i /root/.ssh/id_rsa
+           cirros@{{ floating_ip.floating_ip.floating_ip_address }}
+           ping -c 5 8.8.8.8
+  when: floating_ip.floating_ip.floating_ip_address is defined
 
-      - name: test instance can ping Google
-        command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
-                 -i /root/.ssh/id_rsa
-                 cirros@{{ item.floating_ip.floating_ip_address }}
-                 ping -c 5 www.google.com
-        with_items: "{{ floating_ip.results }}"
-        when: item.floating_ip is defined
-      when: ursula_os == 'ubuntu' or ansible_distribution =='CentOS'
-      #Temporarily skipping above tests on rhel until we have a fix.
+- name: test instance can ping Google
+  command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
+           -i /root/.ssh/id_rsa
+           cirros@{{ floating_ip.floating_ip.floating_ip_address }}
+           ping -c 5 www.google.com
+  when: floating_ip.floating_ip.floating_ip_address is defined

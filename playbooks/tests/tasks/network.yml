@@ -50,18 +50,14 @@
   - name: neutron has the default router
     shell: . /root/stackrc; neutron router-list | grep default
 
-  - block:
-    # try ping internet for 5 minutes
-    - name: neutron router can ping internet
-      shell: ROUTER_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
-             ip netns exec ${ROUTER_NS} ping -c 5 8.8.8.8
-      when: neutron.l3ha.enabled is defined and neutron.l3ha.enabled|bool
-      register: result
-      until: result|success
-      retries: 30
-      delay: 10
-    when: ursula_os == 'ubuntu' or ansible_distribution =='CentOS'
-    #Temporarily skipping above tests on rhel until we have a fix.
+# try ping internet for 5 minutes
+  - name: neutron network namespace can ping internet
+    shell: DHCP_NS=$( ip netns show | grep qdhcp- | awk '{print $1}' );
+           ip netns exec ${DHCP_NS} ping -c 5 8.8.8.8
+    register: result
+    until: result|success
+    retries: 30
+    delay: 10
 
 - name: network tests across all network nodes
   hosts: network

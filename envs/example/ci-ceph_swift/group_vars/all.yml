@@ -15,6 +15,13 @@ etc_hosts:
 
 neutron:
   enable_external_interface: True
+  l3ha:
+    enabled: True
+    max_agents: 2
+    min_agents: 2
+    cidr: 169.254.192.0/18
+    password: "{{ secrets.service_password }}"
+    interval: 2  
   lbaas:
     enabled: True
 
