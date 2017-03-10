@@ -195,7 +195,6 @@
     owner: root
     group: root
     mode: 0640
-  run_once: true
 
 - name: delete old token flush job
   file:
