@@ -19,7 +19,6 @@
     dest: '{{ inspec.dependency_path }}/archive/'
     mode: 0766
     state: directory
-  with_items: '{{inspec.profile_dependencies }}'
   when: inspec.dependency_install_method == 'tar'
 
 - name: create current directory for inspec dependencies
@@ -29,29 +28,39 @@
     state: directory
   when: inspec.dependency_install_method == 'tar'
 
+- name: populate dependent profile list
+  set_fact:
+    inspec_dependency_profiles: '{{ inspec_dependency_profiles|default([]) + [ inspec.controls[item].profile_location ] }}'
+  when: "{{ inspec.controls[item].enabled|default('False')|bool }}"
+  with_items: '{{ inspec.controls.keys() }}'
+
+- name: make sure every element in the profile list is unique
+  set_fact:
+    inspec_dependency_profiles: '{{ inspec_dependency_profiles|unique }}'
+
 - name: fetch inspec dependencies when install method is tar
   get_url:
-    url: '{{ item.url }}'
-    dest: '{{ inspec.dependency_path }}/archive/{{ item.name }}-{{ item.version }}'
+    url: '{{ inspec.profiles[item].url }}'
+    dest: '{{ inspec.dependency_path }}/archive/{{ inspec.profiles[item].name}}-{{ inspec.profiles[item].version }}'
     mode: 0644
-  with_items: '{{ inspec.profile_dependencies }}'
+  with_items: inspec_dependency_profiles
   when: inspec.dependency_install_method == 'tar'
 
 - name: untar inspec dependencies
   unarchive:
-    src: '{{ inspec.dependency_path }}/archive/{{ item.name }}-{{ item.version }}'
+    src: '{{ inspec.dependency_path }}/archive/{{ inspec.profiles[item].name }}-{{ inspec.profiles[item].version }}'
     dest: '{{ inspec.dependency_path }}'
     copy: no
-  with_items: '{{inspec.profile_dependencies }}'
+  with_items: inspec_dependency_profiles
   when: inspec.dependency_install_method == 'tar'
 
 - name: create inspec dependency current symlink
   file:
-    src: '{{ inspec.dependency_path }}/{{ item.name }}-{{ item.version }}'
-    dest: '{{ inspec.dependency_path }}/current/{{ item.name }}'
+    src: '{{ inspec.dependency_path }}/{{ inspec.profiles[item].name }}-{{ inspec.profiles[item].version }}'
+    dest: '{{ inspec.dependency_path }}/current/{{ inspec.profiles[item].name }}'
     state: link
     force: true
-  with_items: '{{inspec.profile_dependencies }}'
+  with_items: inspec_dependency_profiles
   when: inspec.dependency_install_method == 'tar'
 
 - name: inspec profile yml
@@ -65,14 +74,16 @@
     src: etc/inspec/host-controls/controls/openstack-security.rb
     dest: /etc/inspec/host-controls/controls/
     mode: 0644
-  when: inventory_hostname in groups['controller'] or  inventory_hostname in groups['compute'] or inventory_hostname in groups['cinder_volume']|default([])
+  when: inventory_hostname in groups['controller'] or
+        inventory_hostname in groups['compute'] or
+        inventory_hostname in groups['cinder_volume']|default([])
 
 - name: rhel control files
   template:
     src: etc/inspec/host-controls/controls/rhel7-stigs.rb
     dest: /etc/inspec/host-controls/controls/
     mode: 0644
-  when: ursula_os == 'rhel'
+  when: inspec.controls.rhel7.enabled|default('False')|bool
 
 - name: remove inspec lock file so we can upgrade
   file:

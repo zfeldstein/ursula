@@ -1,3 +1,7 @@
-{% for name,value in inspec.openstack.horizon.attributes.iteritems() %}
+{% for profile_name,profile in inspec.controls.iteritems() %}
+{% if profile.enabled|default('False')|bool and profile.attributes is defined %}
+{% for name,value in profile.attributes.iteritems() %}
 {{ name }}: {{ value }}
+{% endfor %}
+{% endif %}
 {% endfor %}

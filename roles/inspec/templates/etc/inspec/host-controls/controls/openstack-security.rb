@@ -5,32 +5,42 @@
 require_controls 'inspec-openstack-security' do
 
 {% if inventory_hostname in groups['controller'] %}
-{% for control in inspec.openstack.horizon.required_controls %}
-    control '{{ control }}'
-{% endfor %}
-{% for control in inspec.openstack.glance.required_controls %}
-    control '{{ control }}'
-{% endfor %}
-{% for control in inspec.openstack.keystone.required_controls %}
+{% if inspec.controls.horizon.enabled|default('False')|bool %}
+{% for control in inspec.controls.horizon.required_controls %}
     control '{{ control }}'
 {% endfor %}
 {% endif %}
+{% if inspec.controls.glance.enabled|default('False')|bool %}
+{% for control in inspec.controls.glance.required_controls %}
+    control '{{ control }}'
+{% endfor %}
+{% endif %}
+{% if inspec.controls.keystone.enabled|default('False')|bool %}
+{% for control in inspec.controls.keystone.required_controls %}
+    control '{{ control }}'
+{% endfor %}
+{% endif %}
+{% endif %}
 
 {% if inventory_hostname in groups['controller'] or inventory_hostname in groups['cinder_volume']|default([]) %}
-{% if cinder.enabled|default('False')|bool %}
-{% for control in inspec.openstack.cinder.required_controls %}
+{% if cinder.enabled|default('False')|bool and inspec.controls.cinder.enabled|default('False')|bool %}
+{% for control in inspec.controls.cinder.required_controls %}
     control '{{ control }}'
 {% endfor %}
 {% endif %}
 {% endif %}
 
 {% if inventory_hostname in groups['controller'] or inventory_hostname in groups['compute'] %}
-{% for control in inspec.openstack.nova.required_controls %}
+{% if inspec.controls.nova.enabled|default('False')|bool %}
+{% for control in inspec.controls.nova.required_controls %}
     control '{{ control }}'
 {% endfor %}
-{% for control in inspec.openstack.neutron.required_controls %}
+{% endif %}
+{% if inspec.controls.neutron.enabled|default('False')|bool %}
+{% for control in inspec.controls.neutron.required_controls %}
     control '{{ control }}'
 {% endfor %}
+{% endif %}
 {% endif %}
 
 end
