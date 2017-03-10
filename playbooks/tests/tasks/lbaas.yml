@@ -9,8 +9,8 @@
   tasks:
   - name: copy heat stack yaml file to hosts
     copy: >
-      src={{ lookup('env', 'URSULA_ENV') }}/../../playbooks/tests/tasks/lb_stack.yml
-      dest=/tmp/lb_stack.yml owner=ubuntu group=ubuntu
+      src=lb_stack.yml
+      dest=/tmp/lb_stack.yml
 
   - name: create heat stack for lbaas
     shell: >
