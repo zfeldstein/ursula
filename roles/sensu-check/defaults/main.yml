@@ -110,6 +110,13 @@ sensu_checks:
       #dependencies:
       #  - "controller1.ursula-vagrant/keepalive"
       #  - "controller2.ursula-vagrant/keepalive"
+    check_qemu_crash:
+      handler: default
+      interval: 30
+      standalone: true
+      command: sudo check-dir-new-files.rb -z critical
+      service_owner: openstack
+      auto_resolve: false
 
   percona:
     check_cluster_size:

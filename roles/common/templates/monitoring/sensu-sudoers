@@ -26,5 +26,6 @@ sensu ALL= NOPASSWD: /etc/sensu/plugins/check-ceph-usage.rb
 sensu ALL= NOPASSWD: /etc/sensu/plugins/metrics-os-api.py
 sensu ALL= NOPASSWD: /etc/sensu/plugins/check-serverspec.rb
 sensu ALL= NOPASSWD: /etc/sensu/plugins/metrics-ceph.py
+sensu ALL= NOPASSWD: /etc/sensu/plugins/check-dir-new-files.rb
 sensu ALL= NOPASSWD: /etc/sensu/plugins/check-ipmi-sensors.py
 sensu ALL= NOPASSWD: /etc/sensu/plugins/metrics-ceph-pool-capacity.rb
