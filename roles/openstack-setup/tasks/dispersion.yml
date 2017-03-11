@@ -7,7 +7,7 @@
     regexp: 'urllib2\.urlopen\(req, timeout=timeout\)'
     replace: >
        urllib2.urlopen(req, cafile='{{ ssl.cafile }}', timeout=timeout)
-    when: client.self_signed_cert|default('False')|bool
+  when: client.self_signed_cert|default('False')|bool
 
 - name: run insecure swift dispersion populate
   command: swift-dispersion-populate --insecure
