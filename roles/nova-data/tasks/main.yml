@@ -37,9 +37,24 @@
     mode: 0755
 
 - block:
+  - name: set selinux label on the nova state directory
+    sefcontext:
+      target: "{{ nova.state_path }}(/.*)?"
+      setype: nova_var_run_t
+      state: present
+  
+  - name: apply the context immediately to nova cache dir
+    command: restorecon -R -v "{{ nova.state_path }}"
+    register: result
+    changed_when: "'restorecon reset' in result.stdout and result.rc == 0"
+    failed_when: "result.rc != 0"
+
+  when: ansible_distribution == 'RedHat'
+  tags: selinux
+
+- block:
   - name: nbd module - ubuntu
     lineinfile: dest=/etc/modules line="nbd"
-    when: ursula_os == 'ubuntu'
 
   - name: probe nbd - ubuntu
     modprobe: name=nbd state=present

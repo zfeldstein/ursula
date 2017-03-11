@@ -11,6 +11,8 @@ percona:
 common:
   hwraid:
     enabled: False
+  selinux:
+    mode: permissive
 
 sensu_checks:
     percona:

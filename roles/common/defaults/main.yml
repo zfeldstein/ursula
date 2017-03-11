@@ -186,6 +186,9 @@ common:
       - ftp
       - games
       - gopher
+  selinux:
+    enabled: True
+    mode: enforcing
 
 # Below is a ucarp config example:
 network:
