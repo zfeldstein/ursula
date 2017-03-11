@@ -27,7 +27,7 @@
   selinux:
     policy: targeted
     state: "{{ common.selinux.mode }}"
-  when: ursula_os == "rhel" and "{{ common.selinux.enabled }}"
+  when: ursula_os == "rhel" and common.selinux.enabled|bool
   tags: selinux
 
 - name: secure paths sudoers operations
