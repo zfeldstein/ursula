@@ -35,8 +35,10 @@ testenv_keypair_name: ${KEY_NAME}
 testenv_keypair_path: ${KEY_PATH}
 eof
 
-echo "deleting heat stack to destroy resources including VMs: ${VMS}"
-${ROOT}/test/cleanup
+if $RUN_CLEANUP; then
+  echo "deleting heat stack to destroy resources including VMs: ${VMS}"
+  ${ROOT}/test/cleanup
+fi
 
 echo "building config"
 rm -rf ${ROOT}/envs/test/group_vars/
@@ -87,7 +89,7 @@ controller_primary: ${CONTROLLER_IP}
 ursula_env_path: ${ROOT}/envs/test
 eof
 
-if [[ ${TEST_ENV} == "ci-ceph_swift" ]]; then
+if [[ ${TEST_ENV} == "ci-ceph_swift" || ${TEST_ENV} == "ci-ceph-swift-rhel" ]]; then
   echo "generating ring_definition.yml file for swift ..."
   swift_0_ip="$(private_ip ${testenv_instance_prefix}-swift-0)"
   swift_1_ip="$(private_ip ${testenv_instance_prefix}-swift-1)"
