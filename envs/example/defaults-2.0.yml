@@ -229,6 +229,7 @@ neutron:
   network_vlan_ranges: ''
   tenant_network_type: vxlan
   arp_responder: false
+  l2_population: false
   tunnel_types:
     - vxlan
   lbaas:
