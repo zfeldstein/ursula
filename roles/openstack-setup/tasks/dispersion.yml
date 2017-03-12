@@ -8,6 +8,8 @@
     replace: >
        urllib2.urlopen(req, cafile='{{ ssl.cafile }}', timeout=timeout)
   when: client.self_signed_cert|default('False')|bool
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['swiftnode'] }}" 
 
 - name: run insecure swift dispersion populate
   command: swift-dispersion-populate --insecure
@@ -20,4 +22,3 @@
   when: not client.self_signed_cert|default('True')|bool
   run_once: True
   delegate_to: "{{ groups['swiftnode_primary'][0] }}"
-
