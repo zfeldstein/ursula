@@ -35,11 +35,6 @@ haproxy:
 
 neutron:
   enable_external_interface: True
-  l2_population: True
-  enable_tunneling: True
-  tenant_network_type: vxlan
-  tunnel_types:
-    - vxlan
   allow_overlapping_ips: true
   l3ha:
     enabled: True

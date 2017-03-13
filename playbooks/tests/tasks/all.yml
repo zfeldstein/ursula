@@ -1,5 +1,5 @@
 ---
-- name: gather some extr facts
+- name: gather some extra facts
   hosts: all
   tags: always
   tasks:
