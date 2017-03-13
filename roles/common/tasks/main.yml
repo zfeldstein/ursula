@@ -6,6 +6,14 @@
 - name: create facts.d
   file: dest=/etc/ansible/facts.d state=directory
 
+- name: disable tuned service before our tunnig
+  service: name=tuned state=stopped enabled=no
+  when: ursula_os == 'rhel'
+
+- name: mask unwanted tuned service
+  command: systemctl mask tuned.service
+  when: ursula_os == 'rhel'
+
 - block:
   - name: ubuntu apt source list
     template: src=etc/apt/sources.list dest=/etc/apt/sources.list
