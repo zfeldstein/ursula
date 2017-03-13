@@ -49,22 +49,6 @@ sensu_checks:
       tags:
         - ticket
 
-  logging:
-    check_logstash_forwarder_process:
-      handler: default
-      notification: "unexpected number of logstash-forwarder processes"
-      interval: 120
-      standalone: true
-      command: "check-procs.rb -p logstash-forwarder -W 1 -C 1"
-      service_owner: openstack
-    check_filebeat_process:
-      handler: default
-      notification: "unexpected number of filebeat processes"
-      interval: 120
-      standalone: true
-      command: "check-procs.rb -p filebeat -W 1 -C 1"
-      service_owner: openstack
-
   neutron:
     check_neutron_agents:
       handler: default
