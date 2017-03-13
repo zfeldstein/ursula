@@ -1,8 +1,29 @@
 ---
 ceph:
-  pylib_dir:
-    rhel: /usr/lib64/python2.7/site-packages/
-    ubuntu: /usr/lib/python2.7/dist-packages/
+  pylib:
+    rhel:
+      dir: /usr/lib64/python2.7/site-packages/
+      modules:
+        - rados.so
+        - rbd.so
+      oldmodules:
+        - rados.py
+        - rados.pyc
+        - rbd.py
+        - rbd.pyc
+    ubuntu:
+      dir: /usr/lib/python2.7/dist-packages/
+      modules:
+        - rados.x86_64-linux-gnu.so
+        - rbd.x86_64-linux-gnu.so
+      oldmodules:
+        - rados.py
+        - rados.pyc
+        - rbd.py
+        - rbd.pyc
+        - rados.so
+        - rbd.so
+  
   pylib_dir2:
     rhel: /usr/lib/python2.7/site-packages/
     ubuntu: /usr/lib/python2.7/dist-packages/

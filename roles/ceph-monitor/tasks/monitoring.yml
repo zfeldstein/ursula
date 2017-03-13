@@ -1,7 +1,7 @@
 ---
-- name: import rados module into base_venv (rhel)
+- name: import rados module into base_venv
   file:
-    src: "{{ ceph.pylib_dir[ursula_os] }}{{ item }}"
+    src: "{{ ceph.pylib[ursula_os].dir }}{{ item }}"
     dest: "{{ basevenv_lib_dir }}/{{ item }}"
     state: link
     owner: root
@@ -10,20 +10,6 @@
   with_items:
     - rados.so
     - rbd.so
-  when: ursula_os == "rhel"
-
-- name: import rados module into base_venv (ubuntu)
-  file:
-    src: "{{ ceph.pylib_dir[ursula_os] }}{{ item }}"
-    dest: "{{ basevenv_lib_dir }}/{{ item }}"
-    state: link
-    owner: root
-    group: root
-    mode: 0644
-  with_items:
-    - rados.x86_64-linux-gnu.so
-    - rbd.x86_64-linux-gnu.so
-  when: ursula_os == "ubuntu"
 
 - name: import other ceph modules into base_venv
   file:

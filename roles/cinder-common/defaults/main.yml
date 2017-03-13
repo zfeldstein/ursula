@@ -10,7 +10,7 @@ cinder:
   enabled_backends: [] # determined automatically by Ceph roles
   default_backend:
   backends: []
-    # determined automatically by Ceph roles
+  # determined automatically by Ceph roles
   api_workers: 5
   state_path: "{{ state_path_base }}/cinder"
   volume_type: file
