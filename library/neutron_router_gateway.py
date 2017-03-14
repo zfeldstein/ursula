@@ -76,6 +76,10 @@ options:
         - Enable SNAT on traffic using this gateway (may require admin role).
      required: false
      default: true
+   fixed_ip:
+     description:
+        - IP Address for this router's external gateway.
+     required: false
 requirements: ["neutronclient", "keystoneclient"]
 '''
 
@@ -144,10 +148,17 @@ def _get_net_id(neutron, module):
     return networks['networks'][0]['id']
 
 def _add_gateway_router(neutron, module, router_id, network_id):
-    kwargs = {
-        'network_id': network_id,
-        'enable_snat': module.params['enable_snat']
-    }
+    if module.params['fixed_ip'] is not None:
+        kwargs = {
+            'network_id': network_id,
+            'enable_snat': module.params['enable_snat'],
+            'external_fixed_ips': [{'ip_address': module.params['fixed_ip']}]
+        }
+    else:
+        kwargs = {
+            'network_id': network_id,
+            'enable_snat': module.params['enable_snat'],
+        }
 
     try:
         neutron.add_gateway_router(router_id, kwargs)
@@ -174,6 +185,7 @@ def main():
             router_name = dict(required=True),
             network_name = dict(required=True),
             enable_snat = dict(default=True, type='bool'),
+            fixed_ip = dict(required=False),
             state = dict(default='present', choices=['absent', 'present']),
             verify = dict(type='bool', default=False)
         ),
@@ -195,9 +207,15 @@ def main():
             module.exit_json(changed=True, updated=False, result="created")
         else:
             if router['external_gateway_info']['network_id'] == network_id \
-                    and router['external_gateway_info']['enable_snat'] == \
-                    module.params['enable_snat']:
-                module.exit_json(changed=False, updated=False, result="success")
+                    and router['external_gateway_info']['enable_snat'] == module.params['enable_snat']:
+                if module.params['fixed_ip'] is not None:
+                    if router['external_gateway_info']['external_fixed_ips'][0]['ip_address'] == module.params['fixed_ip']:
+                        module.exit_json(changed=False, updated=False, result="success")
+                    else:
+                        _add_gateway_router(neutron, module, router['id'], network_id)
+                        module.exit_json(changed=True, updated=True, result="updated")
+                else:
+                    module.exit_json(changed=False, updated=False, result="success")
             elif router['external_gateway_info']['network_id'] == network_id:
                 _add_gateway_router(neutron, module, router['id'], network_id)
                 module.exit_json(changed=True, updated=True, result="updated")
