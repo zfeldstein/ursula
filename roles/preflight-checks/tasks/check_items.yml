@@ -25,6 +25,7 @@
   delegate_to: "{{ groups['controller'][0] }}"
   run_once: true
 
+# ceph cluster checks
 - block:
   - name: check ceph installed
     command: ceph --version
@@ -43,6 +44,21 @@
       - result_ceph_installed.rc == 0
       - result_cinder_endpoint.rc == 0
 
-  when: ceph.enabled | default('False') | bool
+  when: ceph.enabled
   tags: ['precheck_ceph']
   run_once: true
+
+# individual ceph nodes checks
+- block:
+  - name: get ceph version number
+    shell: ceph --version |grep -oP "\d+\.\d+\.?\d{0,3}"
+    failed_when: false
+    register: result
+
+  - name: fail if current ceph version is less than Jewel
+    shell: test {{ result.stdout }} \> "{{ preflight_checks.ceph_minimum_version }}"
+    when: result.rc == 0
+  when:
+    - ceph.enabled
+    - "'ceph_monitors' in group_names or 'ceph_osds' in group_names"
+  tags: ['precheck_ceph']
