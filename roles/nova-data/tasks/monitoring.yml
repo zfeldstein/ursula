@@ -36,3 +36,9 @@
     check: "{{ sensu_checks.neutron.check_neutron_l3_routers }}"
     state: "absent"
   notify: restart sensu-client missing ok
+  
+- name: nova compute data out of sync check (only in Mitaka)
+  sensu_check: name=check-nova-compute-not-sync plugin=check-log.rb use_sudo=true
+               auto_resolve=false interval=120 occurrences=1
+               args="-f '/var/log/nova/nova-compute.log' -q 'ERROR nova.compute.manager.*Error updating resources for node' --silent"
+  notify: restart sensu-client
