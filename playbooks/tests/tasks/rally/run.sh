@@ -12,7 +12,7 @@ while getopts 'e:t:h' OPT; do
         h)
             HELP;;
         ?)
-            echo "unkonw argument!"
+            echo "Unknown argument!"
             HELP;;
     esac
 done
