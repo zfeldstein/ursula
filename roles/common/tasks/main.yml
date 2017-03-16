@@ -162,22 +162,22 @@
 - name: drop an motd with ursula metadata for ubuntu
   template:
     src: etc/update-motd.d/90-ursula-motd
-    dest: /etc/update-motd.d/90-ursula-motd 
+    dest: /etc/update-motd.d/90-ursula-motd
     mode: 0755
   when: ursula_os == 'ubuntu'
 
-- block:
-  - name: drop an motd with ursula metadata for rhel
-    template:
-      src: etc/update-motd.d/90-ursula-motd
-      dest: /etc/90-ursula-motd
-      mode: 0755
-
-  - name: run the ursula-motd script from profile.d
-    template:
-      src: etc/profile.d/ursula-motd.sh
-      dest: /etc/profile.d/ursula-motd.sh
-      mode: 644
+- name: drop an motd with ursula metadata for rhel
+  lineinfile:
+    destfile: /etc/motd
+    regexp: "^{{ item.0 }}"
+    line: "{{ item.0 }}: {{ item.1 }}"
+  with_together:
+    - ['Ursula Node Data', 'Stack', 'Release', 'Deployed', 'Groups']
+    - - ""
+      - "{{ stack_env }}"
+      - "{{ ursula_revision }}"
+      - "{{ ansible_date_time['iso8601'] }}"
+      - "{{ group_names | join(', ') }}"
   when: ursula_os == 'rhel'
 
 - name: drop ursula release file
