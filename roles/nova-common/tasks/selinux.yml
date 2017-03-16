@@ -2,46 +2,19 @@
 - name: set selinux label on the nova state directory
   sefcontext:
     target: "{{ nova.state_path }}(/.*)?"
-    setype: nova_var_run_t
+    setype: nova_var_lib_t
     state: present
 
 - name: set selinux label on the sharedlock directory
   sefcontext:
     target: "{{ state_path_base }}/sharedlock(/.*)?"
-    setype: nova_var_run_t
-    state: present
-
-- name: set selinux label on the nova instances directory
-  sefcontext:
-    target: "{{ nova.state_path }}/instances(/.*)?"
-    setype: virtlogd_var_run_t
+    setype: nova_var_lib_t
     state: present
 
 - name: apply the fcontext immediately to {{ state_path_base }}
   command: restorecon -R -v "{{ state_path_base }}"
   register: result
   changed_when: "'restorecon reset' in result.stdout and result.rc == 0"
-  failed_when: "result.rc != 0"
-
-# The rules for custom selinux module (ursula_virtlogd.pp) are in readable txt
-# file files/selinux/ursula_virtlogd.te
-- name: check ursula_virtlogd modules is loaded
-  shell: semodule -l | grep ursula_virtlogd > /dev/null 2>&1
-  register: ursula_virtlogd
-  changed_when: False
-  failed_when: false
-
-- name: write ursula_virtlogd selinux module
-  copy:
-    src: selinux/ursula_virtlogd.pp
-    dest: /tmp/ursula_virtlogd.pp
-    mode: 0600
-  when: "ursula_virtlogd.rc == 1"
-
-- name: install ursula_virtlogd selinux module
-  command: semodule -i /tmp/ursula_virtlogd.pp
-  register: result
-  when: "ursula_virtlogd.rc == 1"
   failed_when: "result.rc != 0"
 
 - name: set selinux label on nova cache  dir
