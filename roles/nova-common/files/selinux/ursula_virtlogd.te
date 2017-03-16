@@ -1,11 +1,0 @@
-
-module ursula_virtlogd 1.0;
-
-require {
-	type virtlogd_t;
-	type nova_var_run_t;
-	class file { append getattr open };
-}
-
-#============= virtlogd_t ==============
-allow virtlogd_t nova_var_run_t:file { append getattr open };
