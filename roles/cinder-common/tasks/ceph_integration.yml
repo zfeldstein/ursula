@@ -1,26 +1,21 @@
 ---
 - name: import rados and rbd modules into cinder
   file:
-    src: "{{ ceph.pylib_dir[ursula_os] }}{{ item }}"
+    src: "{{ ceph.pylib[ursula_os].dir }}{{ item }}"
     dest: /opt/openstack/current/cinder/lib/python2.7/site-packages/{{ item }}
     state: link
     owner: root
     group: root
     mode: 0644
-  with_items:
-    - rados.so
-    - rbd.so
+  with_items: "{{ ceph.pylib[ursula_os].modules |default([]) }}"
   when: openstack_install_method != 'distro'
 
+# we will don't need this task when oldmodeuls are removed in all prod envs.
 - name: remove modules those were used for Hammer
   file:
     path: /opt/openstack/current/cinder/lib/python2.7/site-packages/{{ item }}
     state: absent
-  with_items:
-    - rados.py
-    - rados.pyc
-    - rbd.py
-    - rbd.pyc
+  with_items: "{{ ceph.pylib[ursula_os].oldmodules |default([]) }}"
   when: openstack_install_method != 'distro'
 
 - name: fetch cinder keyring
