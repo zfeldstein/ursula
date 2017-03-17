@@ -664,17 +664,18 @@ security_password_minimum_length: 8
 security_password_minimum_days: 1
 security_password_maximum_days: 90
 security_password_warn_age: 7
-security_audit_DAC_chmod: 'yes'                      # V-38543
-security_audit_DAC_chown: 'yes'                    # V-38545
-security_audit_DAC_lchown: 'yes'                     # V-38558
-security_audit_DAC_fchmod: 'yes'                     # V-38547
-security_audit_DAC_fchmodat: 'yes'                   # V-38550
-security_audit_DAC_fchown: 'yes'                     # V-38552
-security_audit_DAC_fchownat: 'yes'                   # V-38554
-security_audit_DAC_fremovexattr: 'yes'               # V-38556
-security_audit_DAC_lremovexattr: 'yes'               # V-38559
-security_audit_DAC_fsetxattr: 'yes'                  # V-38557
-security_audit_DAC_lsetxattr: 'yes'                  # V-38561
-security_audit_DAC_setxattr: 'yes'                   # V-38565
-security_audit_deletions: 'yes'                      # V-38575
-security_audit_failed_access: 'yes'                  # V-38566
+security_audit_DAC_chmod: yes                      # V-38543
+security_audit_DAC_chown: yes                    # V-38545
+security_audit_DAC_lchown: yes                     # V-38558
+security_audit_DAC_fchmod: yes                     # V-38547
+security_audit_DAC_fchmodat: yes                   # V-38550
+security_audit_DAC_fchown: yes                     # V-38552
+security_audit_DAC_fchownat: yes                   # V-38554
+security_audit_DAC_fremovexattr: yes               # V-38556
+security_audit_DAC_lremovexattr: yes               # V-38559
+security_audit_DAC_fsetxattr: yes                  # V-38557
+security_audit_DAC_lsetxattr: yes                  # V-38561
+security_audit_DAC_setxattr: yes                   # V-38565
+security_audit_deletions: yes                      # V-38575
+security_audit_failed_access: yes                  # V-38566
+security_enable_grub_update: no 
