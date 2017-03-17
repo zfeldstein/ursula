@@ -123,6 +123,8 @@ swift:
         criticality: 'critical'
       fstab_mounts:
         criticality: 'critical'
+      check_swift_dispersion:
+        criticality: 'critical'
   rsync:
       object:
         max_connections: 8
