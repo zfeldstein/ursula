@@ -162,7 +162,7 @@
 - name: drop an motd with ursula metadata for ubuntu
   template:
     src: etc/update-motd.d/90-ursula-motd
-    dest: /etc/update-motd.d/90-ursula-motd 
+    dest: /etc/update-motd.d/90-ursula-motd
     mode: 0755
   when: ursula_os == 'ubuntu'
 
@@ -204,8 +204,3 @@
   tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
-
-- include: inspec.yml
-  tags:
-    - inspec
-  when: inspec.enabled|default('False')|bool

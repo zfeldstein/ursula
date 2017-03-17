@@ -8,6 +8,12 @@ dependencies:
     when: logging.enabled|default(True)|bool
     service: cinder
     logdata: "{{ cinder.logs }}"
+  - role: inspec
+    install_inspec_controls: [cinder]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.cinder.enabled|bool
   - role: openstack-source
     project_name: cinder
     project_rev: "{{ cinder.source.rev }}"

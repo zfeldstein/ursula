@@ -7,6 +7,12 @@ dependencies:
     when: logging.enabled|default(True)|bool
     service: horizon
     logdata: "{{ horizon.logs }}"
+  - role: inspec
+    install_inspec_controls: [horizon]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.horizon.enabled|bool
   - role: openstack-source
     project_name: horizon
     project_rev: "{{ horizon.source.rev }}"

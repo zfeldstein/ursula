@@ -1,8 +1,10 @@
 ---
+install_inspec_controls: []
+
 inspec:
   version: ~
   enabled: true
-  interval: 3600
+  interval: 43200
   dependency_install_method: 'tar'
   dependency_path: /etc/inspec/
   profiles:
@@ -16,8 +18,8 @@ inspec:
       url: https://github.com/inspec-stigs/inspec-stig-rhel7/archive/master.tar.gz
   controls:
     rhel7:
-      enabled: false
-      profile_location: stig_rhel
+      enabled: true
+      profile: stig_rhel
       skip_controls: []
       attributes:
         RHEL_07_030710_audit_key_name: audit_account_changes-V-38531
@@ -25,7 +27,7 @@ inspec:
         RHEL_07_030523_audit_key_name: actions-V-38578
     horizon:
       enabled: true
-      profile_location: openstack_security
+      profile: openstack_security
       attributes:
         horizon_config_group: apache
       required_controls:
@@ -42,7 +44,7 @@ inspec:
         - check-dashboard-11
     cinder:
       enabled: true
-      profile_location: openstack_security
+      profile: openstack_security
       required_controls:
         - check-block-01
         - check-block-02
@@ -54,13 +56,13 @@ inspec:
         - check-block-08
     glance:
       enabled: true
-      profile_location: openstack_security
+      profile: openstack_security
       required_controls:
         - check-image-03
         - check-image-04
     nova:
       enabled: true
-      profile_location: openstack_security
+      profile: openstack_security
       required_controls:
         - check-compute-01
         - check-compute-02
@@ -68,7 +70,7 @@ inspec:
         - check-compute-04
     keystone:
       enabled: true
-      profile_location: openstack_security
+      profile: openstack_security
       required_controls:
         - check-identity-01
         - check-identity-02
@@ -78,7 +80,7 @@ inspec:
         - check-identity-06
     neutron:
       enabled: true
-      profile_location: openstack_security
+      profile: openstack_security
       required_controls:
         - check-neutron-01
         - check-neutron-02

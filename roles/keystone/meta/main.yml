@@ -9,6 +9,12 @@ dependencies:
     when: logging.enabled|default(True)|bool
     service: keystone
     logdata: "{{ keystone.logs }}"
+  - role: inspec
+    install_inspec_controls: [keystone]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.keystone.enabled|bool
   - role: openstack-source
     project_name: keystone
     project_rev: "{{ keystone.source.rev }}"
