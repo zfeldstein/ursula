@@ -152,6 +152,7 @@ common:
       extra_packages:
         - pytz
         - pyopenssl
+        - python-dateutil
   packages_to_remove:
     - language-selector-common
   logs:
