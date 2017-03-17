@@ -407,7 +407,7 @@ openstack_meta:
         rhel:
           name: openstack-swift-account
           desc: OpenStack Object Storage (swift) - Account Service
-          cmd: /usr/bin/swift-account-service
+          cmd: /usr/bin/swift-account-server
           args: /etc/swift/account-server.conf
           user: swift
           restart: on-failure
