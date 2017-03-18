@@ -133,7 +133,10 @@
 - include: disable-swap.yml
 
 - include: hwraid.yml
-  when: common.hwraid.enabled and ansible_architecture != "ppc64le"
+  when:
+    - common.hwraid.enabled
+    - ansible_architecture != "ppc64le"
+    - ursula_os == 'ubuntu'
   tags: hwraid
 
 - include: hwraid-ppc.yml
