@@ -31,11 +31,13 @@
     command: ceph --version
     register: result_ceph_installed
     failed_when: false
+    changed_when: false
     delegate_to: "{{ groups['ceph_monitors'][0] }}"
 
   - name: Check whether Cinder endpoint exists
     shell: . /root/stackrc; openstack endpoint list | grep cinder
     failed_when: false
+    changed_when: false
     register: result_cinder_endpoint
     delegate_to: "{{ groups['controller'][0] }}"
 
@@ -43,7 +45,6 @@
     when:
       - result_ceph_installed.rc == 0
       - result_cinder_endpoint.rc == 0
-
   when: ceph.enabled
   tags: ['precheck_ceph']
   run_once: true
@@ -53,10 +54,12 @@
   - name: get ceph version number
     shell: ceph --version |grep -oP "\d+\.\d+\.?\d{0,3}"
     failed_when: false
+    changed_when: false
     register: result
 
   - name: fail if current ceph version is less than Jewel
     shell: test {{ result.stdout }} \> "{{ preflight_checks.ceph_minimum_version }}"
+    changed_when: false
     when: result.rc == 0
   when:
     - ceph.enabled

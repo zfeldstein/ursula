@@ -9,6 +9,7 @@
 
 - name: gather existing cluster pool data if any
   shell: rados lspools
+  changed_when: false
   register: existing_pools
 
 # if default pool doesn't exist
@@ -21,6 +22,7 @@
 # if default pool exist and ssd/hybrid pool doesn't exist
 - name: get first osd host
   shell: ceph osd tree |sort -rn -k1 |grep -m1  -oP "(?<=host )\S+"
+  changed_when: false
   register: result_first_osd_host
   when:
     - existing_pools.stdout | search("default")
@@ -128,6 +130,7 @@
 - name: get first host if two pools exist
   shell: ceph osd tree |sort -rn -k1 |grep -m1  -oP "(?<=host )\S+"
   failed_when: false
+  changed_when: false
   register: result_running_first_osd
   when: ceph_pools.rbd_ssd.enabled and ceph_pools.rbd_hybrid.enabled
 
