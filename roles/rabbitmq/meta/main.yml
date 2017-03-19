@@ -13,5 +13,11 @@ dependencies:
     when: logging.enabled|default(True)|bool
     service: rabbitmq
     logdata: "{{ rabbitmq.logs }}"
+  - role: inspec
+    install_inspec_controls: [rabbitmq]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.rabbitmq.enabled|bool
   - role: collectd-plugin
     when: collectd is defined and collectd.enabled|bool

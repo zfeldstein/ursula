@@ -16,6 +16,10 @@ inspec:
       name: inspec-stig-rhel7
       version: master
       url: https://github.com/inspec-stigs/inspec-stig-rhel7/archive/master.tar.gz
+    ursula-inspec:
+      name: ursula-inspec
+      version: master
+      url: https://github.com/blueboxgroup/ursula-inspec/archive/master.tar.gz
   controls:
     rhel7:
       enabled: true
@@ -147,3 +151,44 @@ inspec:
         - check-telemetry-alarming-01
         - check-telemetry-alarming-02
         - check-telemetry-alarming-03
+    kvm:
+      enabled: true
+      profile: ursula-inspec
+      required_controls:
+        - KVM001
+        - KVM002
+        - KVM003
+        - KVM004
+    mongodb:
+      enabled: true
+      profile: ursula-inspec
+      required_controls:
+        - MON001
+        - MON002
+        - MON003
+        - MON004
+        - MON005
+        - MON006
+        - MON007
+        - MON008
+    mysql:
+      enabled: true
+      profile: ursula-inspec
+      required_controls:
+        - MYSQL001
+        - MYSQL002
+        - MYSQL003
+        - MYSQL004
+        - MYSQL005
+        - MYSQL006
+    rabbitmq:
+      enabled: true
+      profile: ursula-inspec
+      required_controls:
+        - RABBITMQ001
+        - RABBITMQ002
+        - RABBITMQ003
+        - RABBITMQ004
+        - RABBITMQ005
+        - RABBITMQ006
+        - RABBITMQ007
