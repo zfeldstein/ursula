@@ -651,10 +651,7 @@ serverspec:
   enabled: False
 
 inspec:
-  enabled: False
-  controls:
-    rhel7:
-      enabled: "{{ ursula_os == 'rhel' }}"
+  enabled: true
 
 #openstack-ansible-security overrides
 security_enable_chrony: false

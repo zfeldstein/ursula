@@ -7,14 +7,5 @@ license: Apache 2.0
 summary: An InSpec Compliance Profile
 version: 0.1.0
 depends:
-{% for item in inspec_dependency_profiles %}
-{% if not inspec.profiles[item].sub_profiles is defined %}
-- name: {{ inspec.profiles[item].name }}
-  path: '{{ inspec.dependency_path }}/current/{{ inspec.profiles[item].name }}'
-{% else %}
-{% for sub_profile in inspec.profiles[item].sub_profiles %}
-- name: {{ sub_profile.name }}
-  path: '{{ inspec.dependency_path }}/current/{{ inspec.profiles[item].name }}/{{ sub_profile.path }}'
-{% endfor %}
-{% endif %}
-{% endfor %}
+- name: {{ inspec.profiles[inspec.controls[item].profile].name }}
+  path: '/etc/inspec/profiles/{{ inspec.profiles[inspec.controls[item].profile].name }}-current'

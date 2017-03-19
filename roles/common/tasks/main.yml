@@ -207,8 +207,3 @@
   tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
-
-- include: inspec.yml
-  tags:
-    - inspec
-  when: inspec.enabled|default('False')|bool

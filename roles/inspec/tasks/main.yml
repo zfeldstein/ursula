@@ -1,104 +1,122 @@
 ---
 - name: install inspec
-  package: name=inspec
+  package:
+    name: inspec
 
 - name: ensure inspec directory exists
   file:
-    dest: "{{ item }}"
+    dest: /etc/inspec
     state: directory
     owner: root
     mode: 0755
-  with_items:
-    - /etc/inspec
-    - /etc/inspec/host-controls
-    - /etc/inspec/host-controls/controls
-    - /etc/inspec/host-controls/libraries
+
+- name: ensure inspec directory exists
+  file:
+    dest: "/etc/inspec/{{ item }}"
+    state: directory
+    owner: root
+    mode: 0755
+  with_items: "{{ install_inspec_controls }}"
 
 - name: inspec dependency profile directories
   file:
-    dest: '{{ inspec.dependency_path }}/archive/'
-    mode: 0766
+    dest: "/etc/inspec/profiles/archive"
+    mode: 0744
     state: directory
   when: inspec.dependency_install_method == 'tar'
 
-- name: create current directory for inspec dependencies
-  file:
-    dest: '{{ inspec.dependency_path }}/current/'
-    mode: 0766
-    state: directory
-  when: inspec.dependency_install_method == 'tar'
+# only populate inspec controls and profiles if install_inspec_controls is set
+- block:
+  - name: initialize install_inspec_profiles fact
+    set_fact:
+      install_inspec_profiles: []
 
-- name: populate dependent profile list
-  set_fact:
-    inspec_dependency_profiles: '{{ inspec_dependency_profiles|default([]) + [ inspec.controls[item].profile_location ] }}'
-  when: "{{ inspec.controls[item].enabled|default('False')|bool }}"
-  with_items: '{{ inspec.controls.keys() }}'
+  - name: populate dependent profile list
+    set_fact:
+      install_inspec_profiles: '{{ install_inspec_profiles + [ inspec.controls[item].profile ] }}'
+    when: "{{ inspec.controls[item].enabled|default(true) }}"
+    with_items: "{{ install_inspec_controls }}"
 
-- name: make sure every element in the profile list is unique
-  set_fact:
-    inspec_dependency_profiles: '{{ inspec_dependency_profiles|unique }}'
+  - name: make sure every element in the profile list is unique
+    set_fact:
+      install_inspec_profiles: '{{ install_inspec_profiles|unique }}'
 
-- name: fetch inspec dependencies when install method is tar
-  get_url:
-    url: '{{ inspec.profiles[item].url }}'
-    dest: '{{ inspec.dependency_path }}/archive/{{ inspec.profiles[item].name}}-{{ inspec.profiles[item].version }}'
-    mode: 0644
-  with_items: inspec_dependency_profiles
-  when: inspec.dependency_install_method == 'tar'
+  - name: fetch inspec dependencies when install method is tar
+    get_url:
+      url: '{{ inspec.profiles[item].url }}'
+      dest: '/etc/inspec/profiles/archive/{{ inspec.profiles[item].name}}-{{ inspec.profiles[item].version }}.tgz'
+      mode: 0644
+    with_items: "{{ install_inspec_profiles }}"
+    when: inspec.dependency_install_method == 'tar'
 
-- name: untar inspec dependencies
-  unarchive:
-    src: '{{ inspec.dependency_path }}/archive/{{ inspec.profiles[item].name }}-{{ inspec.profiles[item].version }}'
-    dest: '{{ inspec.dependency_path }}'
-    copy: no
-  with_items: inspec_dependency_profiles
-  when: inspec.dependency_install_method == 'tar'
+  - name: untar inspec dependencies
+    unarchive:
+      src: '/etc/inspec/profiles/archive/{{ inspec.profiles[item].name }}-{{ inspec.profiles[item].version }}.tgz'
+      dest: '/etc/inspec/profiles/'
+      copy: no
+    with_items: "{{ install_inspec_profiles }}"
+    when: inspec.dependency_install_method == 'tar'
 
-- name: create inspec dependency current symlink
-  file:
-    src: '{{ inspec.dependency_path }}/{{ inspec.profiles[item].name }}-{{ inspec.profiles[item].version }}'
-    dest: '{{ inspec.dependency_path }}/current/{{ inspec.profiles[item].name }}'
-    state: link
-    force: true
-  with_items: inspec_dependency_profiles
-  when: inspec.dependency_install_method == 'tar'
+  - name: create inspec dependency current symlink
+    file:
+      src: "/etc/inspec/profiles/{{ inspec.profiles[item].name }}-{{ inspec.profiles[item].version }}"
+      dest: "/etc/inspec/profiles/{{ inspec.profiles[item].name }}-current"
+      state: link
+      force: true
+    with_items: "{{ install_inspec_profiles }}"
+    when: inspec.dependency_install_method == 'tar'
 
-- name: inspec profile yml
-  template:
-    src: etc/inspec/host-controls/inspec.yml
-    dest: /etc/inspec/host-controls/inspec.yml
-    mode: 0644
+  - name: create path for inspec control
+    file:
+      dest: "/etc/inspec/{{ item }}"
+      mode: 0755
+      state: directory
+    with_items: "{{ install_inspec_controls }}"
 
-- name: inspec openstack control files
-  template:
-    src: etc/inspec/host-controls/controls/openstack-security.rb
-    dest: /etc/inspec/host-controls/controls/
-    mode: 0644
-  when: inventory_hostname in groups['controller'] or
-        inventory_hostname in groups['compute'] or
-        inventory_hostname in groups['cinder_volume']|default([])
+  - name: create inspec control dir
+    file:
+      dest: "/etc/inspec/{{ item }}/controls"
+      mode: 0755
+      state: directory
+    with_items: "{{ install_inspec_controls }}"
 
-- name: rhel control files
-  template:
-    src: etc/inspec/host-controls/controls/rhel7-stigs.rb
-    dest: /etc/inspec/host-controls/controls/
-    mode: 0644
-  when: inspec.controls.rhel7.enabled|default('False')|bool
+  - name: create inspec control dir
+    file:
+      dest: "/etc/inspec/{{ item }}/libraries"
+      mode: 0755
+      state: directory
+    with_items: "{{ install_inspec_controls }}"
 
-- name: remove inspec lock file so we can upgrade
-  file:
-    dest: /etc/inspec/host-controls/inspec.lock
-    state: absent
 
-- name: inspec attributes
-  template:
-    src: etc/inspec/host-controls/attributes.yml
-    dest: /etc/inspec/host-controls/attributes.yml
-    mode: 0644
+  - name: inspec yml for control
+    template:
+      src: etc/inspec/host-controls/inspec.yml
+      dest: /etc/inspec/{{ item }}/inspec.yml
+      mode: 0644
+    with_items: "{{ install_inspec_controls }}"
 
-- name: inspec sensu hook
-  sensu_check: name=inspec-check plugin=check-inspec.rb
-               args='--controls /etc/inspec/host-controls --attrs /etc/inspec/host-controls/attributes.yml' use_sudo=true
-               interval={{ inspec.interval }}
-  notify: restart sensu-client
-  when: inspec.enabled|default(True)|bool
+  - name: control files
+    template:
+      src: etc/inspec/host-controls/controls/control.rb
+      dest: /etc/inspec/{{ item }}/controls/control.rb
+      mode: 0644
+    with_items: "{{ install_inspec_controls }}"
+
+  - name: inspec attributes
+    template:
+      src: etc/inspec/host-controls/attributes.yml
+      dest: /etc/inspec/attributes.yml
+      mode: 0644
+
+  - name: inspec sensu hook
+    sensu_check:
+      name: check-inspec-{{ item }}
+      plugin: check-inspec.rb
+      args: '--controls /etc/inspec/{{ item }} --attrs /etc/inspec/attributes.yml'
+      use_sudo: true
+      interval: "{{ inspec.interval }}"
+    notify: restart sensu-client
+    with_items: "{{ install_inspec_controls }}"
+    when: monitoring.enabled|default(True)|bool
+
+  when: install_inspec_controls|length > 0

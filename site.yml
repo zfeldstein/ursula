@@ -45,8 +45,11 @@
       tags: ['common', 'serverspec']
       when: serverspec.enabled|default("False")|bool
     - role: inspec
-      tags: ['common', 'inspec']
-      when: inspec.enabled|default("False")|bool
+      install_inspec_controls: [rhel7]
+      tags: [common,inspec]
+      when:
+        - inspec.enabled|default("False")|bool
+        - ursula_os == 'rhel'
     - role: audit
       tags: ['common', 'logging', 'audit']
       when: audit.enabled|default('False')|bool
