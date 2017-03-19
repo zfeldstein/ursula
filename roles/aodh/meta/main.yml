@@ -2,6 +2,12 @@
 dependencies:
   - role: openstack-meta
   - role: endpoints
+  - role: inspec
+    install_inspec_controls: [aodh]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.aodh.enabled|bool
   - role: openstack-source
     project_name: aodh
     project_rev: "{{ aodh.source.rev }}"

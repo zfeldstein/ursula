@@ -57,10 +57,34 @@ inspec:
     glance:
       enabled: true
       profile: openstack_security
+      attributes:
+        glance_config_files:
+          - glance_api_audit_map.conf
+          - glance-api-paste.ini
+          - glance-api.conf
+          - glance-cache.conf
+          - glance-glare.conf
+          - glance-registry-paste.ini
+          - glance-registry.conf
+          - glance-scrubber.conf
+          - glance-swift-store.conf
+          - policy.json
+          - schema-image.json
       required_controls:
+        - check-image-01
+        - check-image-02
         - check-image-03
         - check-image-04
-    nova:
+    nova_data:
+      enabled: true
+      profile: openstack_security
+      required_controls:
+        - check-compute-01
+        - check-compute-02
+        - check-compute-03
+        - check-compute-04
+        - check-compute-05
+    nova_control:
       enabled: true
       profile: openstack_security
       required_controls:
@@ -78,7 +102,7 @@ inspec:
         - check-identity-04
         - check-identity-05
         - check-identity-06
-    neutron:
+    neutron_data:
       enabled: true
       profile: openstack_security
       required_controls:
@@ -86,3 +110,40 @@ inspec:
         - check-neutron-02
         - check-neutron-03
         - check-neutron-04
+    neutron_control:
+      enabled: true
+      profile: openstack_security
+      required_controls:
+        - check-neutron-01
+        - check-neutron-02
+        - check-neutron-03
+        - check-neutron-04
+        - check-neutron-05
+    heat:
+      enabled: true
+      attributes:
+        heat_enabled: true
+      profile: openstack_security
+      required_controls:
+        - check-orchestration-01
+        - check-orchestration-02
+        - check-orchestration-03
+    ceilometer:
+      enabled: true
+      profile: openstack_security
+      attributes:
+        ceilometer_enabled: true
+      required_controls:
+        - check-telemetry-01
+        - check-telemetry-02
+        - check-telemetry-03
+        - check-telemetry-04
+    aodh:
+      enabled: true
+      profile: openstack_security
+      attributes:
+        aodh_enabled: true
+      required_controls:
+        - check-telemetry-alarming-01
+        - check-telemetry-alarming-02
+        - check-telemetry-alarming-03
