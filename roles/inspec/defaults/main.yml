@@ -87,7 +87,6 @@ inspec:
         - check-compute-02
         - check-compute-03
         - check-compute-04
-        - check-compute-05
     nova_control:
       enabled: true
       profile: openstack_security

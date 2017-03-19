@@ -132,3 +132,9 @@
   tags:
     - serverspec
   when: serverspec.enabled|default('False')|bool
+
+- name: /dev/kvm permissions should be 0660 for compliance
+  file:
+    dest: /dev/kvm
+    mode: 0660
+  when: ursula_os == 'rhel'
