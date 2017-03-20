@@ -68,3 +68,9 @@ ironic:
 
 cinder:
   enabled: False
+
+# we don't enabled ceph server, but nova needs ceph client
+# so we specify ceph client version here
+ceph:
+  client_version:
+    rhel: 0.94.5
