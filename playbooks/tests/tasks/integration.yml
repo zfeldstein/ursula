@@ -40,6 +40,14 @@
     security_group: turtle-sec
     remote_ip_prefix: 0.0.0.0/0
 
+- name: neutron router namespace can ping internet
+  shell: ROUTER_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
+         ip netns exec ${ROUTER_NS} ping -c 5 8.8.8.8
+  register: result
+  until: result|success
+  retries: 6
+  delay: 10
+
 - name: nova can boot an instance
   environment:
     PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
@@ -104,6 +112,35 @@
     server: turtle-stack
     volume: turtle-vol
   when: cinder.enabled|bool
+
+- name: instance is active
+  shell: . /root/stackrc; openstack server show {{ turtle_stack.openstack.id }} | grep ACTIVE
+  register: result
+  until: result|success
+  retries: 6
+  delay: 10
+
+- name: instance is running
+  shell: . /root/stackrc; openstack server show {{ turtle_stack.openstack.id }} | grep Running
+  register: result
+  until: result|success
+  retries: 6
+  delay: 10
+
+- name: instance ready for login
+  shell: . /root/stackrc; openstack console log show {{ turtle_stack.openstack.id }} | grep "login:"
+  register: result
+  until: result|success
+  retries: 30
+  delay: 10
+
+- name: neutron dhcp  namespace can ping instance
+  shell: DHCP_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
+         ip netns exec ${DHCP_NS} ping -c 5 {{ turtle_stack.openstack.private_v4 }}
+
+- name: neutron router namespace can ping instance
+  shell: ROUTER_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
+         ip netns exec ${ROUTER_NS} ping -c 5 {{ turtle_stack.openstack.private_v4 }}
 
 - name: wait for instance to boot
   wait_for:
