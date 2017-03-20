@@ -6,6 +6,12 @@ dependencies:
         key_url: '{{ apt_repos.bbg_openstack_ppa.key_url }}'
     when: ansible_distribution_version == "12.04"
   - role: sensu-check
+  - role: inspec
+    install_inspec_controls: [neutron_data]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.neutron_data.enabled|bool
   - role: neutron-common
   - role: openstack-firewall
     rule_name: VXLAN

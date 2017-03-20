@@ -1,5 +1,11 @@
 ---
 dependencies:
+  - role: inspec
+    install_inspec_controls: [glance]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.glance.enabled|bool
   - role: openstack-meta
   - role: endpoints
   - role: monitoring-common

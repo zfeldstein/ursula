@@ -8,6 +8,12 @@ dependencies:
     when: logging.enabled|default(True)|bool
     service: heat
     logdata: "{{ heat.logs }}"
+  - role: inspec
+    install_inspec_controls: [heat]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.heat.enabled|bool
   - role: openstack-source
     project_name: heat
     project_rev: "{{ heat.source.rev }}"
