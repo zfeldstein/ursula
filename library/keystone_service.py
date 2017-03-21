@@ -180,8 +180,19 @@ def ensure_endpoint_present(keystone, name, public_url, internal_url,
         # Endpoint doesn't exist yet, we'll need to create one
         pass
     else:
-        # endpoints can't be updated with this module (v2 API)
-        return (False, endpoint.id)
+        # Re-create endpoint if endpoint urls do not match
+        # Note: Keystone v2.0 endpoint is created outside of this library by
+        # keystone-manage bootstrap so them them alone
+        if ( (name != 'keystone') and (endpoint.adminurl != admin_url or
+            endpoint.internalurl != internal_url or
+            endpoint.publicurl != public_url) ):
+            # Existing endpoint does not match with passed endpoint arguments
+            keystone.endpoints.delete(endpoint.id)
+            # Clear out endpoint to get it recreated with passed information
+            endpoint = None
+        else:
+            # endpoints can't be updated with this module (v2 API)
+            return (False, endpoint.id)
 
     # At this point, we know we will need to make a change
     if check_mode:
