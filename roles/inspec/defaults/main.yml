@@ -192,3 +192,9 @@ inspec:
         - RABBITMQ005
         - RABBITMQ006
         - RABBITMQ007
+    swift:
+      enabled: true
+      profile: ursula-inspec
+      required_controls:
+        - check-swift-01
+        - check-swift-05
