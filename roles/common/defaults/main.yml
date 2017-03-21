@@ -29,6 +29,7 @@ common:
     #  - ::/0
     disable_root: False
     disable_dns: True
+    client_alive_interval: 1800
   pip_version: 8.0.2
   setuptools_version: system
   ursula_monitoring:

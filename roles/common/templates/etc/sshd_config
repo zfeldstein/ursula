@@ -115,6 +115,6 @@ GatewayPorts no
 UseDNS no
 {% endif %}
 
-ClientAliveInterval 1800
+ClientAliveInterval {{ common.ssh.client_alive_interval }}
 ClientAliveCountMax 0
 Compression delayed
