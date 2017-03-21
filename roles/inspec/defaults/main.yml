@@ -198,3 +198,10 @@ inspec:
       required_controls:
         - check-swift-01
         - check-swift-05
+    ceph:
+      enabled: true
+      profile: ursula-inspec
+      required_controls:
+        - CEPH001
+        - CEPH002
+        - CEPH003
