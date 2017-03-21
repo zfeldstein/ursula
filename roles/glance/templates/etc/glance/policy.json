@@ -15,9 +15,14 @@
     "download_image": "",
     "upload_image": "",
 
-    "delete_image_location": "",
     "get_image_location": "",
+{% if glance.allow_image_locations|default('False')|bool %}
+    "delete_image_location": "",
     "set_image_location": "",
+{% else %}
+    "delete_image_location": "role:admin or role:cloud_admin",
+    "set_image_location": "role:admin or role:cloud_admin",
+{% endif %}
 
     "add_member": "",
     "delete_member": "",
