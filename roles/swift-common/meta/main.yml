@@ -26,3 +26,9 @@ dependencies:
     project_packages: "{{ swift.distro.project_packages }}"
     dependent_packages: "{{ swift.distro.dependent_packages }}"
     when: openstack_install_method == 'distro'
+  - role: inspec
+    install_inspec_controls: [swift]
+    tags: inspec
+    when:
+      - inspec.enabled|bool
+      - inspec.controls.swift.enabled|bool
