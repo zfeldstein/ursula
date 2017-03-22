@@ -53,7 +53,7 @@ logging:
     port: 4560
 
 serverspec:
-  enabled: false
+  enabled: True
 
 haproxy:
   stats_group: root

@@ -12,7 +12,6 @@ percona:
 neutron:
   enable_external_interface: True
 
-
 sensu_checks:
     percona:
       check_cluster_size:

@@ -23,3 +23,6 @@ keystone:
 
 serverspec:
   enabled: True
+
+inspec:
+  enabled: False

@@ -49,8 +49,8 @@ logging:
     host: 127.0.0.1
     port: 4560
 
-serverspec:
-  enabled: false
+inspec:
+  enabled: True
 
 xtradb:
   galera_version: 3
