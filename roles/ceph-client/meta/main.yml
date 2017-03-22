@@ -6,3 +6,5 @@ dependencies:
         key_package: ubuntu-cloud-keyring
     when: ursula_os == 'ubuntu'
   - role: ceph-config
+  - role: monitoring-common
+    when: monitoring.enabled|default(True)|bool
