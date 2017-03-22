@@ -7,6 +7,7 @@ glance:
   rsync:
     service: "{{ ( ursula_os == 'ubuntu' ) | ternary('rsync', 'rsyncd') }}"
     defaults: "{{ ( ursula_os == 'ubuntu' ) | ternary('/etc/default/rsync', '/etc/sysconfig/rsyncd') }}"
+  allow_image_locations: False
   api_workers: 5
   rbd_store_chunk_size: 8
   registry_workers: 5
