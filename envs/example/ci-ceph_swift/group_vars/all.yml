@@ -21,7 +21,7 @@ neutron:
     min_agents: 2
     cidr: 169.254.192.0/18
     password: "{{ secrets.service_password }}"
-    interval: 2  
+    interval: 2
   lbaas:
     enabled: True
 

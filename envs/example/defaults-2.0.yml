@@ -653,7 +653,7 @@ serverspec:
   enabled: False
 
 inspec:
-  enabled: true
+  enabled: False
 
 #openstack-ansible-security overrides
 security_enable_chrony: false
@@ -677,4 +677,4 @@ security_audit_DAC_lsetxattr: yes                  # V-38561
 security_audit_DAC_setxattr: yes                   # V-38565
 security_audit_deletions: yes                      # V-38575
 security_audit_failed_access: yes                  # V-38566
-security_enable_grub_update: no 
+security_enable_grub_update: no
