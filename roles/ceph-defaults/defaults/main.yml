@@ -70,6 +70,11 @@ ceph:
     - parted
   bcache_pkgs:
     - bcache-tools
+  bbg_ceph_utils_pkg: {}
+  # bbg_ceph_utils_pkg:
+  #   name: bbg-ceph-utils
+  #   version: ~
+  #   pip_extra_args: ~
   # ubuntu and redhat have different package version connector.
   # for ceph as example
   #   ubuntu: apt-get install ceph-common=10.2.3
@@ -78,6 +83,10 @@ ceph:
     ubuntu: "="
     rhel: "-"
 
+  target_pgs_per_osd: 200
+  max_pgs_per_osd: 300
+  adjust_inveral: 5 # minutes
+
   # Ceph options
   cephx: true
   cephx_require_signatures: true # Kernel RBD does NOT support signatures for Kernels < 3.18!
@@ -85,6 +94,7 @@ ceph:
   cephx_service_require_signatures: false
   max_open_files: 131072
   disable_in_memory_logs: true # set this to false while enabling the options below
+  mon_osd_max_split_count: 32
 
   # Debug logs
   enable_debug_global: false
