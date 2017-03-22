@@ -96,6 +96,22 @@
       line: "listen_tls = 0"
   notify: restart libvirt-bin
 
+- name: update variables in libvirtd.conf for compliance
+  ini_file:
+    dest: /etc/libvirt/libvirtd.conf
+    section: ~
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+  with_items:
+    - option: 'unix_sock_group'
+      value: '"libvirt"'
+    - option: 'unix_sock_ro_perms'
+      value: '"0770"'
+    - option: 'unix_sock_rw_perms'
+      value: '"0770"'
+  notify: restart libvirt-bin
+  when: ursula_os == 'rhel'
+
 - name: remove libvirtd defaults
   lineinfile:
     dest: "{{ nova.libvirt[ursula_os].defaults }}"
@@ -110,6 +126,20 @@
     regexp: '^allow_incoming_qemukvm\s*='
     line: 'allow_incoming_qemukvm = 1'
   notify: restart libvirt-bin
+
+- name: update qemu options for compliance
+  ini_file:
+    dest: /etc/libvirt/qemu.conf
+    section: ~
+    option: '{{ item.option }}'
+    value: '{{ item.value }}'
+  with_items:
+    - option: 'user'
+      value: '"qemu"'
+    - option: 'group'
+      value: '"qemu"'
+  notify: restart libvirt-bin
+  when: ursula_os == 'rhel'
 
 - name: ensure kvm is supported by cpu and enabled in bios (ubuntu)
   command: kvm-ok
