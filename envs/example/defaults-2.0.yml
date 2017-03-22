@@ -598,6 +598,8 @@ common:
   ntpd:
     servers: []
     #  - servertime.service.softlayer.com
+  ssh:
+    client_alive_interval: 1800
 
 heat:
   enabled: True

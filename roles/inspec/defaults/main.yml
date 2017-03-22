@@ -27,7 +27,7 @@ inspec:
       skip_controls: []
       attributes:
         RHEL_07_030710_audit_key_name: audit_account_changes-V-38531
-        client_alive_interval: '900'
+        client_alive_interval: "{{ common.ssh.client_alive_interval }}"
         RHEL_07_030523_audit_key_name: actions-V-38578
     horizon:
       enabled: true
