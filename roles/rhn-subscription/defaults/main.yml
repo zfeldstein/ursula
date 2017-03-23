@@ -2,7 +2,7 @@
 rhn_subscription:
   username: ~
   password: ~
-  pool_names_regex: "^(Red Hat OpenStack Platform)"
+  pool_names_regex: "^Red Hat Satellite - Add-Ons for Providers"
   repos:
     refresh: false
     enable:

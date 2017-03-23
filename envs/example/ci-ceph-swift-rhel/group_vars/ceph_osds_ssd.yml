@@ -1,6 +1,6 @@
 ---
 rhn_subscription:
-  pool_names_regex: "^Red Hat Ceph Storage"
+  pool_names_regex: "^Red Hat Satellite - Add-Ons for Providers"
   repos:
     enable:
       - rhel-7-server-rpms
