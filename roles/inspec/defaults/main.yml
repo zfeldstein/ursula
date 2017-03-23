@@ -131,6 +131,15 @@ inspec:
         - RHEL-07-010140
         - RHEL-07-010150
         - RHEL-07-010160
+        - RHEL-07-010250
+        - RHEL-07-020151
+        - RHEL-07-020152
+        - RHEL-07-040170
+        - RHEL-07-010220
+        - RHEL-07-020680
+        - RHEL-07-020670
+        - RHEL-07-020250
+        - RHEL-07-021060
       attributes:
         RHEL_07_030710_audit_key_name: audit_account_changes-V-38531
         client_alive_interval: "{{ common.ssh.client_alive_interval }}"
