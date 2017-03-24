@@ -21,10 +21,15 @@ inspec:
       version: master
       url: https://github.com/blueboxgroup/ursula-inspec/archive/master.tar.gz
   controls:
+    common:
+      enabled: true
+      profile: ursula-inspec
+      required_controls:
+        - COMMON001
     rhel7:
       enabled: true
       profile: stig_rhel
-      skip_controls: 
+      skip_controls:
         - RHEL-07-010010
         - RHEL-07-010020
         - RHEL-07-010371
