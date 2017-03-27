@@ -15,7 +15,7 @@
       name: "{{ item.name }}"
       user: "{{ item.user }}"
       cmd:  "{{ item.cmd }}"
-      args: "{{ item.config_dirs }}"
+      args: "{{ item.config_files }}"
   with_items:
     - "{{ swift.services.swift_object }}"
     - "{{ swift.services.swift_object_expirer }}"

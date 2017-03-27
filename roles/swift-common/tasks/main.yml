@@ -38,7 +38,6 @@
     repo=https://github.com/blueboxgroup/swifttool.git
     dest=/opt/stack/{{ swift.swifttool_dir  }}
     update={{ openstack.git_update }}
-    virtualenv={{ swifttool_venv|default(omit) }}
   notify:
     - pip install swifttool
   when: swift.swifttool_method == 'git'
