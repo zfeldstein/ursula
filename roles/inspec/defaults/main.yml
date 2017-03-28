@@ -261,7 +261,6 @@ inspec:
       profile: ursula-inspec
       required_controls:
         - KVM001
-        - KVM002
         - KVM003
         - KVM004
     mongodb:
