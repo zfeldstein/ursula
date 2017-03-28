@@ -3,7 +3,7 @@
   upstart_service:
     name: "{{ item.name }}"
     cmd:  "{{ item.cmd }}"
-    args: "{{ item.config_dirs }}"
+    args: "{{ item.config_files }}"
     user: "{{ item.user }}"
   with_items:
     - "{{ swift.services.swift_account }}"
