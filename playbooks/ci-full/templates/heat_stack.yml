@@ -72,6 +72,26 @@ resources:
           port_range_max: 5000
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
+          port_range_min: 5001
+          port_range_max: 5001
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 4789
+          port_range_max: 4789
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8004
+          port_range_max: 8004
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8001
+          port_range_max: 8001
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 8042
+          port_range_max: 8042
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
           port_range_min: 6080
           port_range_max: 6080
         - remote_ip_prefix: 0.0.0.0/0
@@ -103,6 +123,17 @@ resources:
         - ethertype: 'IPv4'
           remote_mode: 'remote_group_id'
         - ethertype: 'IPv6'
+          remote_mode: 'remote_group_id'
+        - ethertype: IPv4
+          remote_ip_prefix: 192.168.0.0/22
+          protocol: igmp
+        - ethertype: 'IPv4'
+          remote_mode: 'remote_group_id'
+          protocol: tcp
+        - ethertype: 'IPv4'
+          remote_mode: 'remote_group_id'
+          protocol: udp
+        - ethertype: 'IPv4'
           remote_mode: 'remote_group_id'
 
   ssh_keypair:
