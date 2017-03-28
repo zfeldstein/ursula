@@ -16,29 +16,17 @@
     public_key: "{{ rootuser.ssh_public_key }}"
     state: present
 
-- name: generate test security group
-  environment:
-    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-  os_security_group:
-    auth:
-      auth_url: "{{ endpoints.auth_uri }}"
-      project_name: admin
-      username: admin
-      password: "{{ secrets.admin_password }}"
-    name: turtle-sec
-    description: turtle-sec
+- name: check if test security group exists
+  shell: . /root/stackrc; openstack security group list | grep  turtle-sec;
+  register: sec_group_result
+  failed_when: false
 
-- name: add security group rule
-  environment:
-    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-  os_security_group_rule:
-    auth:
-      auth_url: "{{ endpoints.auth_uri }}"
-      project_name: admin
-      username: admin
-      password: "{{ secrets.admin_password }}"
-    security_group: turtle-sec
-    remote_ip_prefix: 0.0.0.0/0
+- name: generate test security group
+  shell: . /root/stackrc; SECURITY_GROUP_NAME=turtle-sec;
+         openstack security group create $SECURITY_GROUP_NAME;
+         openstack security group rule create --ingress --protocol tcp $SECURITY_GROUP_NAME;
+         openstack security group rule create --ingress --protocol icmp $SECURITY_GROUP_NAME;
+  when: sec_group_result.rc != 0
 
 - name: neutron router namespace can ping internet
   shell: ROUTER_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
@@ -47,6 +35,14 @@
   until: result|success
   retries: 6
   delay: 10
+
+- name: ensure neutron meta-data is running
+  shell: . /root/stackrc; ROUTER_ID=$(neutron router-show default | grep " id " | awk '{ print $4 }');
+         pgrep -u neutron -f neutron-ns-metadata-proxy.*$ROUTER_ID;
+
+- name: ensure neutron meta-data is listening
+  shell: ROUTER_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
+         ip netns exec ${ROUTER_NS} lsof -i:9697
 
 - name: nova can boot an instance
   environment:
@@ -134,8 +130,8 @@
   retries: 30
   delay: 10
 
-- name: neutron dhcp  namespace can ping instance
-  shell: DHCP_NS=$( ip netns show | grep qrouter- | awk '{print $1}' );
+- name: neutron dhcp namespace can ping instance
+  shell: DHCP_NS=$( ip netns show | grep qdhcp- | awk '{print $1}' );
          ip netns exec ${DHCP_NS} ping -c 5 {{ turtle_stack.openstack.private_v4 }}
 
 - name: neutron router namespace can ping instance
