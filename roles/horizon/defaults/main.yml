@@ -21,8 +21,7 @@ horizon:
   source:
     python_post_dependencies: []
     rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
+    upper_constraints: '{{ openstack_meta.upper_constraints }}'
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }

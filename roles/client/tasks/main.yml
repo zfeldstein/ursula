@@ -22,15 +22,43 @@
   retries: 5
   when: ursula_os == 'rhel' and openstack_install_method == 'distro'
 
+- block:
+  - name: make sure /opt/stack/ exists
+    file: dest=/opt/stack state=directory
+
+  - name: write constraints file
+    copy:
+      src: ../../openstack-source/files/constraints.txt
+      dest: /opt/stack/constraints.txt
+      force: true
+    when: client.upper_constraints == None
+
+  - name: get constraints file
+    get_url:
+      url: "{{ client.upper_constraints }}"
+      dest: /opt/stack/constraints.txt
+      force: true
+    when: client.upper_constraints != None
+
+  - name: upgrade system setuptools using upper_contraints
+    pip:
+      name: setuptools
+      extra_args: "-c /opt/stack/constraints.txt --upgrade"
+    register: result
+    until: result|succeeded
+    retries: 5
+  when:
+    - openstack_install_method != 'distro'
+
 - name: install openstack clients
-  pip: name={{ item }}
+  pip: name={{ item }} extra_args='-c /opt/stack/constraints.txt'
   with_items: "{{ client.names['pip_pkgs'] }}"
   notify:
     - update ca certs
   register: result
   until: result|succeeded
   retries: 5
-  when: (ursula_os == 'ubuntu') or (ursula_os == 'rhel' and openstack_install_method == 'source')
+  when: openstack_install_method != 'distro'
 
 - name: fix ssl certs for requests for keystone-client on trusty
   file: src=/etc/ssl/certs/ca-certificates.crt

@@ -1,5 +1,6 @@
 ---
 openstack_meta:
+  upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
   keystone:
     services:
       keystone_api:
