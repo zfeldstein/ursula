@@ -50,6 +50,10 @@
       when:
         - inspec.enabled|default("False")|bool
         - ursula_os == 'rhel'
+    - role: inspec
+      install_inspec_controls: [common]
+      tags: [common,inspec]
+      when: inspec.enabled|default("False")|bool
     - role: audit
       tags: ['common', 'logging', 'audit']
       when: audit.enabled|default('False')|bool
