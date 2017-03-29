@@ -130,6 +130,13 @@
   retries: 30
   delay: 10
 
+- name: capture instance boot log
+  shell: . /root/stackrc; openstack console log show {{ turtle_stack.openstack.id }}
+  register: vm_log
+
+- debug:
+    var: vm_log
+
 - name: neutron dhcp namespace can ping instance
   shell: DHCP_NS=$( ip netns show | grep qdhcp- | awk '{print $1}' );
          ip netns exec ${DHCP_NS} ping -c 5 {{ turtle_stack.openstack.private_v4 }}
