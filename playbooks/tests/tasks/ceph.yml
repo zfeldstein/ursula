@@ -64,11 +64,14 @@
   hosts: ceph_osds[0]:ceph_monitors[0]
   serial: 1
   tasks:
-    - name: reboot ceph_osds|ceph_monitor nodes
-      shell: (sleep 5 ; shutdown -r now )&
+    - name: reboot {{ inventory_hostname }} node
+      shell: sleep 3 && shutdown -r now
+      async: 1
+      poll: 0
        
-    - name: wait for the server to become reachable
-      local_action: wait_for port=22 host={{ ansible_ssh_host | default(inventory_hostname) }} search_regex=OpenSSH delay=10
+    - name: wait for {{ inventory_hostname }} to become reachable
+      local_action: wait_for port=22 host={{ ansible_ssh_host | default(inventory_hostname) }} search_regex=OpenSSH delay=20
+      become: false
 
     - name: check ceph status
       shell: ceph health
