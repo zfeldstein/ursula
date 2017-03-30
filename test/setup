@@ -115,5 +115,13 @@ zones:
 eof
 fi
 
+#workaround security group issue for defect 344951 and security rules can take effect after retouch securitygroup
+
+secgroup=$(nova secgroup-list|grep ${SECURITYGROUP_NAME})
+secgroup_id=$(echo ${secgroup}|awk '{print $2}')
+
+nova secgroup-add-rule    ${secgroup_id} tcp 23 23 192.168.1.1/32
+nova secgroup-delete-rule ${secgroup_id} tcp 23 23 192.168.1.1/32
+
 ring_bell
 echo "vms are up: ${VMS} !!"
