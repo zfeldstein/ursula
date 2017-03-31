@@ -9,7 +9,7 @@
   failed_when: false
   run_once: True
   delegate_to: "{{ item[0] }}"
-  when: restart|default('True')
+  when: restart|default(True)
   with_nested:
     - "{{ play_hosts }}"
     - ["{{ nova.services.nova_api }}",
