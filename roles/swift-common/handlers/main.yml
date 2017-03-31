@@ -43,7 +43,7 @@
 
 - name: restart swift services
   service: name={{ item.name }} state=restarted must_exist=false
-  when: restart|default('True')
+  when: restart|default(True)
   with_items:
     - "{{ swift.services.swift_container }}"
     - "{{ swift.services.swift_container_auditor }}"

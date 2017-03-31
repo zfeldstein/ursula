@@ -4,4 +4,4 @@
     name: "{{ openstack_meta.keystone.services.keystone_api[ursula_os].name }}"
     state: restarted
     must_exist: false
-  when: restart|default('True')
+  when: restart|default(True)

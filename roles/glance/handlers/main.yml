@@ -1,7 +1,7 @@
 ---
 - name: restart glance services
   service: name={{ item.name }} state=restarted must_exist=false
-  when: restart|default('True')
+  when: restart|default(True)
   with_items:
     - "{{ glance.services.glance_api }}"
     - "{{ glance.services.glance_registry }}"

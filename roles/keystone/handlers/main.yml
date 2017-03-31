@@ -7,9 +7,9 @@
     must_exist: false
   run_once: True
   delegate_to: "{{ item }}"
-  when: restart|default('True')
+  when: restart|default(True)
   with_items: play_hosts
 
 - name: restart shibboleth
   service: name=shibd state=restarted
-  when: restart|default('True')
+  when: restart|default(True)

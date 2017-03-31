@@ -1,7 +1,7 @@
 ---
 - name: restart neutron services
   service: name={{ item.name }} state=restarted_if_running must_exist=false
-  when: restart|default('True')
+  when: restart|default(True)
   failed_when: false
   with_items:
     - "{{ neutron.services.neutron_server }}"
