@@ -4,4 +4,4 @@
   with_items:
     - magnum-api
     - magnum-conductor
-  when: restart|default('True')
+  when: restart|default(True)
