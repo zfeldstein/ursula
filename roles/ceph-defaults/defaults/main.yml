@@ -23,7 +23,7 @@ ceph:
         - rbd.pyc
         - rados.so
         - rbd.so
-  
+
   pylib_dir2:
     rhel: /usr/lib/python2.7/site-packages/
     ubuntu: /usr/lib/python2.7/dist-packages/
@@ -38,7 +38,7 @@ ceph:
     ubuntu: 10.2.3~bbc1
     rhel: 10.2.3
   client_version:
-    ubuntu: 10.2.3-0ubuntu0.16.04.2~cloud0
+    ubuntu: 10.2.6-0ubuntu0.16.04.1~cloud0
     rhel: 10.2.3
 
   openstack_keys:
