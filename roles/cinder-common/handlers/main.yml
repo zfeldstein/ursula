@@ -11,7 +11,7 @@
   run_once: True
   failed_when: false
   delegate_to: "{{ item[0] }}"
-  when: restart|default('True')
+  when: restart|default(True)
   with_nested:
     - "{{ play_hosts }}"
     - ["{{ cinder.services.cinder_api }}",
@@ -25,7 +25,7 @@
     must_exist: false
   run_once: True
   delegate_to: "{{ item }}"
-  when: restart|default('True') and swift.enabled|default('False')
+  when: restart|default(True) and swift.enabled|default(False)
   with_items: "{{ play_hosts }}"
 
 - name: restart tgt service

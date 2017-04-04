@@ -1,7 +1,7 @@
 ---
 - name: restart ceilometer services
   service: name={{ item.name }} state=restarted must_exist=false
-  when: restart|default('True')
+  when: restart|default(True)
   failed_when: false
   with_items:
     - "{{ ceilometer.services.ceilometer_api }}"
@@ -11,7 +11,7 @@
 
 - name: restart ceilometer data services
   service: name={{ item.name }} state=restarted must_exist=false
-  when: restart|default('True')
+  when: restart|default(True)
   failed_when: false
   with_items:
     - "{{ ceilometer.services.ceilometer_polling }}"
