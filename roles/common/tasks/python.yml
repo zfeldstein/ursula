@@ -86,13 +86,16 @@
 - block:
   - name: uninstall python-setuptools
     package: name=python-setuptools state=absent
-    when: common.setuptools_version != "system"
+    when:
+      - common.setuptools_version != "system"
+      - ursula_os == 'ubuntu'
     register: result
     until: result|succeeded
     retries: 5
 
   - name: install pip setuptools
-    pip: name=setuptools version={{ common.setuptools_version }}
+    pip:
+      name: setuptools"{{ common.setuptools_version }}"
     when: common.setuptools_version != "system"
     register: result
     until: result|succeeded

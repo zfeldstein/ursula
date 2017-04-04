@@ -31,7 +31,7 @@ common:
     disable_dns: True
     client_alive_interval: 1800
   pip_version: 8.0.2
-  setuptools_version: system
+  setuptools_version: '>=16.0,!=24.0.0,<34.0'
   ursula_monitoring:
     path: /opt/ursula-monitoring
     method: git # git|tar
