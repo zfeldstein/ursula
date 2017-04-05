@@ -38,7 +38,7 @@
     pkg: "{{ item }}"
     update_cache: yes
   with_items:
-    - rabbitmq-server=3.6.6*
+    - rabbitmq-server={{ rabbitmq.version_for_upgrade }}
   when: upgrade | default('False') | bool
 
 - name: create systemd override dir

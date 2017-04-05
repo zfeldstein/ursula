@@ -11,6 +11,7 @@ rabbitmq:
   numqueues_warning_multiplier: 60
   numqueues_critical_multiplier: 120
   nofile: 10240
+  version_for_upgrade: 3.6.9*
   monitoring:
     sensu_checks:
       rabbitmq_cluster:
