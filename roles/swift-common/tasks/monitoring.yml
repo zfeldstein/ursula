@@ -4,6 +4,7 @@
                interval=600 occurrences=1 use_sudo=true
                args='{{ (client.self_signed_cert|default('False')|bool) | ternary("--insecure ","") }} -z {{ swift.monitoring.sensu_checks.check_swift_dispersion.criticality }}'
                only_on_ip="{{ swift_undercloud_floating_ip | default( swift_floating_ip ) }}"
+  notify: restart sensu-client
 
 - name: sensu account process checks
   sensu_process_check: service={{ item | basename }} warn_over=30 crit_over=35
@@ -12,6 +13,7 @@
     - "{{ swift.services.swift_account_replicator.cmd }}"
     - "{{ swift.services.swift_account_reaper.cmd }}"
     - "{{ swift.services.swift_account.cmd }}"
+  notify: restart sensu-client
 
 - name: sensu container process checks
   sensu_process_check: service={{ item | basename }} warn_over=30 crit_over=35
@@ -21,6 +23,7 @@
     - "{{ swift.services.swift_container_auditor.cmd }}"
     - "{{ swift.services.swift_container_sync.cmd }}"
     - "{{ swift.services.swift_container.cmd }}"
+  notify: restart sensu-client
 
 - name: sensu object process checks
   sensu_process_check: service={{ item | basename }} warn_over=30 crit_over=35
@@ -28,6 +31,7 @@
     - "{{ swift.services.swift_object_replicator.cmd }}"
     - "{{ swift.services.swift_object_updater.cmd }}"
     - "{{ swift.services.swift_object.cmd }}"
+  notify: restart sensu-client
 
 - name: sensu proxy process checks
   sensu_process_check: service={{ item | basename }}
@@ -35,11 +39,13 @@
     - "{{ swift.services.swift_proxy.cmd }}"
     - haproxy
     - memcached
+  notify: restart sensu-client
 
 - name: sensu check for mounted drives
   sensu_check: name=fstab-mounts plugin=check-fstab-mounts.rb
                args='-t xfs -z {{ swift.monitoring.sensu_checks.fstab_mounts.criticality }}'
                interval=60
+  notify: restart sensu-client
 
 - name: ucarp failover alert
   sensu_check: name=check-ucarp-failover plugin=check-log.rb use_sudo=true
@@ -63,4 +69,4 @@
     name: swift-usage-metrics
     plugin: metrics-swift.py
     args: "--ip-addr={{ primary_ip }} --scheme {{ monitoring.graphite.host_prefix }}"
-
+  notify: restart sensu-client
