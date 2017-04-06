@@ -13,6 +13,22 @@
       msg: "OS is {{ ansible_distribution }}"
     failed_when: ursula_os is not defined
 
+# bandaid metadata issue
+- name: restart haproxy service
+  hosts: controller
+  tasks:
+  - name: check haproxy status
+    shell: service haproxy status
+    register: haproxy_status
+
+  - debug:
+      var: haproxy_status.stdout_lines
+
+  - service:
+      name: haproxy
+      state: restarted
+    when: '"DOWN" in haproxy_status.stdout'
+
 - name: Test basic things on all hosts
   hosts: all
   tasks:
