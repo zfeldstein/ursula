@@ -190,6 +190,7 @@
   shell: . /root/stackrc && {{ item }}
   with_items:
     - openstack server remove volume turtle-stack turtle-vol
+    - while [[ $(cinder list |grep turtle-vol|awk '{print $4}') != 'available' ]]; do echo "wait for volume detach";sleep 1 ;done 
     - openstack volume delete turtle-vol
   when: cinder.enabled|bool
 
