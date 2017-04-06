@@ -2,17 +2,30 @@
 client:
   write_stackrc: True
   self_signed_cert: false
-  names:
-    - python-keystoneclient
-    - python-glanceclient
-    - python-novaclient
-    - python-neutronclient
-    - python-cinderclient
-    - python-heatclient
-    - python-ceilometerclient
-    - python-ironicclient
-    - python-swiftclient
-    - python-magnumclient
-    - python-openstackclient
-  apt_packages:
+  dep_pkgs:
     - python-prettytable
+  names:
+    pip_pkgs:
+      - python-keystoneclient
+      - python-glanceclient
+      - python-novaclient<8.0.0
+      - python-neutronclient
+      - python-cinderclient
+      - python-heatclient
+      - python-ceilometerclient
+      - python-ironicclient
+      - python-swiftclient
+      - python-magnumclient
+      - python-openstackclient
+    yum_pkgs:
+      - python-keystoneclient
+      - python-glanceclient
+      - python-novaclient
+      - python-neutronclient
+      - python-cinderclient
+      - python-heatclient
+      - python-ceilometerclient
+      - python-ironicclient
+      - python-swiftclient
+      - python-magnumclient
+      - python-openstackclient
