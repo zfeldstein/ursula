@@ -4,7 +4,7 @@
          QR_INTERFACES=($(ip netns exec ${ROUTER_NS} ip a|grep ' qr'|awk '{print $2}'|awk -F "@" '{print $1}'|sed 's/\://g'));
          for i in "${QR_INTERFACES[@]}"; do ip netns exec ${ROUTER_NS} ip link set dev $i down ;done
   args:
-    executable: /bin/bash -x
+    executable: /bin/bash
   register: result
   until: result|success
   retries: 6
