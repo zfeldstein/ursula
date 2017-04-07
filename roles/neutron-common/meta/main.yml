@@ -16,7 +16,6 @@ dependencies:
     system_dependencies: "{{ neutron.source.system_dependencies }}"
     python_dependencies: "{{ neutron.source.python_dependencies }}"
     python_post_dependencies: "{{ neutron.source.python_post_dependencies }}"
-    constrain: "{{ neutron.source.constrain }}"
     upper_constraints: "{{ neutron.source.upper_constraints }}"
     when: openstack_install_method == 'source'
   - role: openstack-package

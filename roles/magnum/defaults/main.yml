@@ -8,8 +8,7 @@ magnum:
       - openstack-magnum
   source:
     rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
+    upper_constraints: '{{ openstack_meta.upper_constraints }}'
     virtualenv: "/opt/openstack/magnum"
     python_dependencies:
       - { name: PyMySQL }

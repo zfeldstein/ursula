@@ -1,5 +1,6 @@
 ---
 dependencies:
+  - role: openstack-meta
   - role: endpoints
   - role: logging-config
     when: logging.enabled|default(True)|bool
@@ -12,7 +13,6 @@ dependencies:
     alternatives: "{{ ironic.alternatives }}"
     system_dependencies: "{{ ironic.source.system_dependencies }}"
     python_dependencies: "{{ ironic.source.python_dependencies }}"
-    constrain: "{{ ironic.source.constrain }}"
     upper_constraints: "{{ ironic.source.upper_constraints }}"
     when: openstack_install_method == 'source'
   - role: openstack-package

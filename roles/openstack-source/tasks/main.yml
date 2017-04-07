@@ -17,8 +17,7 @@
 
 - name: set pip args fact
   set_fact:
-    pip_extra_args: "{{ openstack_source.pip_extra_args|default('') }}"
-  when: openstack.pypi_mirror is defined
+    pip_extra_args: "{{ openstack_source.pip_extra_args }}"
 
 - name: set pip proxy args
   set_fact:
@@ -27,53 +26,45 @@
 
 - name: update pip in virtualenv
   pip:
-    name: "{{ item }}"
+    name: pip
     state: latest
     virtualenv: "{{ openstack_source.virtualenv_base }}/{{ project_name }}"
     extra_args: "{{ pip_extra_args }}"
-  with_items:
-    - pip
   register: result
   until: result|succeeded
   retries: 5
 
-- block:
-  - name: write constraints file
-    copy:
-      src: files/constraints.txt
-      dest: /opt/stack/constraints.txt
-      force: true
-    when: not upper_constraints|bool
+- name: write constraints file
+  copy:
+    src: files/constraints.txt
+    dest: /opt/stack/constraints.txt
+    force: true
+  when: upper_constraints == None
 
-  - name: get constraints file
-    get_url:
-      url: "{{ upper_constraints }}"
-      dest: /opt/stack/constraints.txt
-      force: true
-    when: upper_constraints|bool
+- name: get constraints file
+  get_url:
+    url: "{{ upper_constraints }}"
+    dest: /opt/stack/constraints.txt
+    force: true
+  when: upper_constraints != None
 
-  - name: set pip constraints args
-    set_fact:
-      pip_extra_args: "{{ pip_extra_args }} -c /opt/stack/constraints.txt"
-
-  when: constrain | bool
+- name: set pip constraints args
+  set_fact:
+    pip_extra_args: "{{ pip_extra_args }} -c /opt/stack/constraints.txt"
 
 - name: update setuptools in virtualenv
   pip:
-    name: "{{ item }}"
+    name: setuptools
     state: latest
     virtualenv: "{{ openstack_source.virtualenv_base }}/{{ project_name }}"
     extra_args: "{{ pip_extra_args }}"
-  with_items:
-    - setuptools
   register: result
   until: result|succeeded
   retries: 5
 
 - name: set code has changed fact
   set_fact:
-    code_has_changed: True
-  when: git_result | changed
+    code_has_changed: git_result | changed
 
 - name: python requirements for project
   pip:

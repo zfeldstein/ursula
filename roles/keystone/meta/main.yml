@@ -22,7 +22,6 @@ dependencies:
     system_dependencies: "{{ keystone.source.system_dependencies }}"
     python_dependencies: "{{ keystone.source.python_dependencies }}"
     python_post_dependencies: "{{ keystone.source.python_post_dependencies }}"
-    constrain: "{{ keystone.source.constrain }}"
     upper_constraints: "{{ keystone.source.upper_constraints }}"
     when: openstack_install_method == 'source'
   - role: openstack-package

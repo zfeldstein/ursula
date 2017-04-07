@@ -27,8 +27,7 @@ keystone:
   #     pip_extra_args: '--extra-index-url https://pypi-mirror.openstack.blueboxgrid.com/root/pypi...'
   source:
     rev: 'stable/newton'
-    constrain: True
-    upper_constraints: 'https://raw.githubusercontent.com/openstack/requirements/stable/newton/upper-constraints.txt'
+    upper_constraints: '{{ openstack_meta.upper_constraints }}'
     python_dependencies:
       - { name: PyMySQL }
       - { name: uwsgi }
