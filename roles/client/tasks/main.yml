@@ -7,16 +7,16 @@
   package:
     name: "{{ item }}"
     state: present
-  with_items: "{{ client.apt_packages }}"
+  with_items: "{{ client.dep_pkgs }}"
   register: result
   until: result|succeeded
   retries: 5
-  
+
 - name: install required packages for clients
   package:
     name: "{{ item }}"
     state: present
-  with_items: "{{ client.names }}"
+  with_items: "{{ client.names['yum_pkgs'] }}"
   register: result
   until: result|succeeded
   retries: 5
@@ -24,7 +24,7 @@
 
 - name: install openstack clients
   pip: name={{ item }}
-  with_items: "{{ client.names }}"
+  with_items: "{{ client.names['pip_pkgs'] }}"
   notify:
     - update ca certs
   register: result
