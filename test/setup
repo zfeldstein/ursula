@@ -117,11 +117,12 @@ fi
 
 #workaround security group issue for defect 344951 and security rules can take effect after retouch securitygroup
 
-secgroup=$(nova secgroup-list|grep ${SECURITYGROUP_NAME})
+secgroup=$(openstack security group list|grep ${SECURITYGROUP_NAME})
 secgroup_id=$(echo ${secgroup}|awk '{print $2}')
 
-nova secgroup-add-rule    ${secgroup_id} tcp 23 23 192.168.1.1/32
-nova secgroup-delete-rule ${secgroup_id} tcp 23 23 192.168.1.1/32
+openstack security group rule create  --protocol tcp --ingress --dst-port 23:23 --remote-ip 192.168.1.1/32 ${secgroup_id}
+secgroup_rule_id=$(openstack security group rule list|grep 192.168.1.1/32|awk '{print $2}')
+openstack security group rule delete ${secgroup_rule_id}
 
 ring_bell
 echo "vms are up: ${VMS} !!"
