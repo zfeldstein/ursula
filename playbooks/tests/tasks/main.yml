@@ -26,6 +26,18 @@
     when: item in host_result.stdout
     with_items: "{{ groups['controller'] }}"
 
+  - name: Find host in host backup default router
+    shell: . /root/stackrc; neutron l3-agent-list-hosting-router default | grep " standby "
+    register: backup_host_result
+
+  - set_fact:
+      host_backup_default_router: "{{ item }}"
+    when: item in backup_host_result.stdout
+    with_items: "{{ groups['controller'] }}"
+
+  - include: workaround_network.yml
+    delegate_to: "{{ host_backup_default_router }}"
+
   - include: integration.yml
     delegate_to: "{{ host_hosting_default_router }}"
 
