@@ -34,6 +34,10 @@
     mode: 0640
   when: inventory_hostname in groups['controller']
 
+- name: check if snmpd.conf exists
+  stat: path=/etc/snmp/snmpd.conf
+  register: snmpd_conf
+
 - name: remove v1,v2,etc from snmpd config file
   lineinfile:
     dest: /etc/snmp/snmpd.conf
@@ -43,6 +47,7 @@
     - "com2sec notConfigUser  default       public"
     - "group   notConfigGroup v1           notConfigUser"
     - "group   notConfigGroup v2c           notConfigUser"
+  when: snmpd_conf.stat.exists
 
 - include: logging.yml
   tags:
