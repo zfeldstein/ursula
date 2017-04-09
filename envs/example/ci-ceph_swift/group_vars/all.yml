@@ -5,7 +5,7 @@ ursula_os: 'ubuntu'
 state_path_base: /opt/stack/data
 
 swift_floating_ip: "{{ hostvars[groups['swiftnode'][0]][primary_interface]['ipv4']['address'] }}"
-swift_fqdn: "swift.{{ fqdn }}"
+swift_fqdn: "swift-{{ fqdn }}"
 
 etc_hosts:
   - name: "{{ fqdn }}"
