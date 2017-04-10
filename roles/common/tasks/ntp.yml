@@ -15,6 +15,14 @@
   notify:
     - restart-ntp
 
+#Needed on rhel to start ntpd on boot
+- name: disable chronyd
+  service:
+    name: 'chronyd'
+    state: stopped
+    enabled: false
+  when: ursula_os == 'rhel'
+
 - name: ntp service enabled
   service:
     name: "{{ ntpd_service_name }}"
