@@ -153,14 +153,14 @@
   when: floating_ip.floating_ip.floating_ip_address is defined
 
 - name: test instance can ping 8.8.8.8
-  command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes
+  command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=60
            -i /root/.ssh/id_rsa
            cirros@{{ floating_ip.floating_ip.floating_ip_address }}
            ping -c 5 8.8.8.8
   when: floating_ip.floating_ip.floating_ip_address is defined
 
 - name: test instance can ping Google
-  command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes
+  command: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=60
            -i /root/.ssh/id_rsa
            cirros@{{ floating_ip.floating_ip.floating_ip_address }}
            ping -c 5 www.google.com
@@ -180,7 +180,7 @@
   when: cinder.enabled|bool
 
 - name: write volume in VM
-  shell: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes
+  shell: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=60
          -i /root/.ssh/id_rsa
          cirros@{{ floating_ip.floating_ip.floating_ip_address }}
          sudo dd if=/dev/zero of=/dev/vdb count=100 bs=1M
