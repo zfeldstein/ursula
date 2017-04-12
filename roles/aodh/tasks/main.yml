@@ -18,7 +18,8 @@
     name: "{{ item.name }}"
     user: "{{ item.user }}"
     cmd: "{{ item.cmd }}"
-    config_dirs: "{{ item.config_dirs }}"
+    args: "{{ (item.name == 'aodh-api') | ternary('--port %s' % endpoints.aodh.port.backend_api, '') }}"
+    config_dirs: "{{ (item.name == 'aodh-api') | ternary('', '%s' % item.config_dirs ) }}"
   with_items:
     - "{{ aodh.services.aodh_api }}"
     - "{{ aodh.services.aodh_evaluator }}"
