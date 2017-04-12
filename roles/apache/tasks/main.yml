@@ -55,6 +55,31 @@
 
   - name: remove ports.conf
     file: dest=/etc/apache2/ports.conf state=absent
+
+  - name: update security.conf to mask details of apache version and modules
+    lineinfile: dest=/etc/apache2/conf-available/security.conf
+                regexp="^ServerTokens"
+                line='ServerTokens Prod'
+                state=present
+    notify:
+      - reload apache
+
+  - name: mask the version number and the ServerName of apache
+    lineinfile: dest=/etc/apache2/conf-available/security.conf
+                regexp="^ServerSignature"
+                line='ServerSignature Off'
+                state=present
+    notify:
+      - reload apache
+
+  - name: disable trace method on apache
+    lineinfile: dest=/etc/apache2/conf-available/security.conf
+                regexp="^TraceEnable"
+                line='TraceEnable Off'
+                state=present
+    notify:
+      - reload apache
+
   when: ursula_os == 'ubuntu'
 
 - block:
