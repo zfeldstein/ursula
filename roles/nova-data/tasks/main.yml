@@ -128,11 +128,6 @@
     - common
   when: monitoring.enabled|default('True')|bool
 
-- include: serverspec.yml
-  tags:
-    - serverspec
-  when: serverspec.enabled|default('False')|bool
-
 - name: /dev/kvm permissions should be 0660 for compliance
   file:
     dest: /dev/kvm
