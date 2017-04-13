@@ -4,6 +4,7 @@
     name: "{{ item.name }}"
     user: "{{ item.user }}"
     cmd: "{{ item.cmd }}"
+    args: "{{ (item.name == 'ceilometer-api') | ternary('--port %s' % endpoints.ceilometer.port.backend_api, '') }}"
   with_items:
     - "{{ ceilometer.services.ceilometer_api }}"
     - "{{ ceilometer.services.ceilometer_collector }}"
