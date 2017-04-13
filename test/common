@@ -6,25 +6,33 @@ set +x
 [[ -f ${STACK_RC} ]] && source ${STACK_RC}
 set -x
 
+if [ $JOB_NAME ]; then
+    JOB_SHORT_NAME=$(echo ${JOB_NAME//_/ } | awk '{for(i=1;i<=NF;i++) printf substr($i,0,1)}')
+    JOB_SHORT_NAME=${JOB_SHORT_NAME//UT/}
+fi
+export BUILD_ID=${BUILD_ID:=0}
+export JOB_SHORT_NAME=${JOB_SHORT_NAME:=local}
+if [[ -n ${ghprbPullId} ]]; then
+  export testenv_instance_prefix="CI-${JOB_SHORT_NAME}-${BUILD_ID}-pr${ghprbPullId}"
+elif [[ $(git rev-parse --abbrev-ref HEAD) == 'HEAD' ]]; then
+  export testenv_instance_prefix="CI-${JOB_SHORT_NAME}-${BUILD_ID}-$(git rev-parse --short HEAD)"
+else
+  export testenv_instance_prefix="CI-${JOB_SHORT_NAME}-${BUILD_ID}-$(git rev-parse --abbrev-ref HEAD)"
+fi
+testenv_instance_prefix=${testenv_instance_prefix//./}
+
 export ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
 export ANSIBLE_VAR_DEFAULTS_FILE="${ROOT}/envs/test/defaults-2.0.yml"
 export IMAGE_ID=${IMAGE_ID:=ubuntu-14.04}
 export AVAILABILITY_ZONE=${OS_AVAILABILITY_ZONE:=nova}
 export TEST_ENV=${TEST_ENV:=ci-full}
 export RUN_CLEANUP=${RUN_CLEANUP:=true}
-if [[ -n ${ghprbPullId} ]]; then
-  export testenv_instance_prefix="ursula-${BUILD_ID}-pr${ghprbPullId}"
-elif [[ $(git rev-parse --abbrev-ref HEAD) == 'HEAD' ]]; then
-  export testenv_instance_prefix="ursula-${BUILD_ID}-$(git rev-parse --short HEAD)"
-else
-  export testenv_instance_prefix="ursula-${BUILD_ID}-$(git rev-parse --abbrev-ref HEAD)"
-fi
-
-export testenv_heat_template_file=${ROOT}/envs/test/heat_stack.yml
-export testenv_heat_stack_name="${testenv_instance_prefix}_stack"
+export LOGIN_USER=${LOGIN_USER:=ubuntu}
 export testenv_flavor=${testenv_flavor:=m1.large}
 export testenv_network=${testenv_network:=internal}
 export testenv_floating_ip_pool=${testenv_floating_ip_pool:=external}
+export testenv_heat_template_file=${ROOT}/envs/test/heat_stack.yml
+export testenv_heat_stack_name="${testenv_instance_prefix}_stack"
 export SECURITYGROUP_NAME="${testenv_instance_prefix}_ursula"
 export CONTROLLER_0_NAME="${testenv_instance_prefix}-controller-0"
 export CONTROLLER_1_NAME="${testenv_instance_prefix}-controller-1"
@@ -38,6 +46,16 @@ export SWIFT_2_NAME="${testenv_instance_prefix}-swift-2"
 export CPM_0_NAME="${testenv_instance_prefix}-cpm-0"
 export CPM_1_NAME="${testenv_instance_prefix}-cpm-1"
 export CPM_2_NAME="${testenv_instance_prefix}-cpm-2"
+export KEY_NAME="${testenv_instance_prefix}_key"
+export KEY_PATH=${ROOT}/envs/test/.ssh_key
+
+SSH_ARGS=\
+" ${ANSIBLE_SSH_ARGS}"\
+' -o LogLevel=quiet'\
+' -o StrictHostKeyChecking=no'\
+' -o UserKnownHostsFile=/dev/null'\
+" -i ${KEY_PATH}"
+export ANSIBLE_SSH_ARGS="${SSH_ARGS}"
 
 VMS="${CONTROLLER_0_NAME} ${CONTROLLER_1_NAME} ${COMPUTE_0_NAME}"
 if [[ $TEST_ENV == "ci-allinone" ]]; then
@@ -51,17 +69,6 @@ elif [[ $TEST_ENV == "ci-ceph-swift-rhel" ]]; then
   VMS=${VMS}" ${CEPH_0_NAME} ${CEPH_1_NAME} ${CEPH_2_NAME} ${CPM_0_NAME} ${CPM_1_NAME} ${CPM_2_NAME} ${SWIFT_0_NAME} ${SWIFT_1_NAME} ${SWIFT_2_NAME}"
   export testenv_flavor_ceph_swift=${testenv_flavor_ceph_swift:=ci_ceph_swift}
 fi
-
-export KEY_NAME="${testenv_instance_prefix}_key"
-export KEY_PATH=${ROOT}/envs/test/.ssh_key
-LOGIN_USER=${LOGIN_USER:-"ubuntu"}
-SSH_ARGS=\
-" ${ANSIBLE_SSH_ARGS}"\
-' -o LogLevel=quiet'\
-' -o StrictHostKeyChecking=no'\
-' -o UserKnownHostsFile=/dev/null'\
-" -i ${KEY_PATH}"
-export ANSIBLE_SSH_ARGS="${SSH_ARGS}"
 
 if [[ $TEST_ENV == "ci-full-centos" || $TEST_ENV == "ci-full-rhel" || $TEST_ENV == "ci-ceph-redhat" || $TEST_ENV == "ci-ceph-swift-rhel" ]]; then
     EXTRA_HEAT_PARAMS="image=${IMAGE_ID};key_name=${KEY_NAME};security_group=${SECURITYGROUP_NAME};az=${AVAILABILITY_ZONE};controller-0_name=${CONTROLLER_0_NAME};controller-1_name=${CONTROLLER_1_NAME};compute-0_name=${COMPUTE_0_NAME}"

@@ -61,9 +61,9 @@ ursula ${extra_args} "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/pre-deploy.
 
 if [[ ${TEST_ENV} == "ci-ceph_swift" || ${TEST_ENV} == "ci-ceph-swift-rhel" ]]; then
   echo "generating ring_definition.yml file for swift ..."
-  swift_0_ip="$(private_ip ${testenv_instance_prefix}-swift-0)"
-  swift_1_ip="$(private_ip ${testenv_instance_prefix}-swift-1)"
-  swift_2_ip="$(private_ip ${testenv_instance_prefix}-swift-2)"
+  swift_0_ip="$(private_ip ${SWIFT_0_NAME})"
+  swift_1_ip="$(private_ip ${SWIFT_1_NAME})"
+  swift_2_ip="$(private_ip ${SWIFT_2_NAME})"
   cat > ${ROOT}/envs/test/ring_definition.yml <<eof
 ---
 part_power: 13
