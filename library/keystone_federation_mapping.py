@@ -16,90 +16,154 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+DOCUMENTATION = '''
+---
+author: Elvin Tubillara
+module: keystone_service_provider
+short_description: register mapping
+description:
+  - This module registers a federation mapping on keystone
+options:
+  mapping_id:
+    description:
+        - id of the mapping
+          example -federation_mapping
+    required: true
+  rules:
+    description:
+        - keystone mapping rules
+          example : |
+              [
+                {
+                    "local": [
+                        {
+                            "user": {
+                                "name": "{0}"
+                            }
+                        },
+                        {
+                            "group": {
+                                "domain": {
+                                    "name": "Default"
+                                },
+                                "name": "some_group"
+                            }
+                        }
+                    ],
+                    "remote": [
+                        {
+                            "type": "email"
+                        },
+                        {
+                            "type": "email",
+                            "any_one_of": [
+                                "example@email.com",
+
+                            ]
+                        }
+                    ]
+                }
+            ]
+    required: true
+  state:
+    description:
+       - Indicate desired state of the resource
+    choices: ['present', 'absent']
+    default: present
+'''
 try:
-    from keystoneauth1 import session
-    from keystoneauth1.identity import v3
-    from keystoneclient.v3.client import Client
+    import shade
+    HAS_SHADE = True
 except ImportError:
-    print("failed=True msg='keystoneclient and keystoneauth1 are required'")
+    HAS_SHADE = False
 
 
-def _get_federation_mapping(client, mapping_id):
-    for mapping in client.federation.mappings.list():
-        if mapping.id == mapping_id:
-            return mapping
-    return None
+def _get_cloud(**kwargs):
+    cloud_shade = shade.operator_cloud(**kwargs)
+    cloud_shade.cloud_config.config['identity_api_version'] = '3'
+    cloud = ShadePlaceholder(cloud_shade.keystone_client)
+    return cloud
 
 
-def _federation_mapping_exists(client, mapping_id):
-    return _get_federation_mapping(client, mapping_id) != None
+class ShadePlaceholder(object):
+    def __init__(self, keystone_client):
+        self.client = keystone_client
 
+    def get_mapping(self, mapping_id):
+        for mapping in self.client.federation.mappings.list():
+            if getattr(mapping, 'id') == mapping_id:
+                return mapping
+        return None
 
-def _create_federation_mapping(client, mapping_id, rules):
-    client.federation.mappings.create(mapping_id=mapping_id, rules=rules)
+    def create_mapping(self, mapping_id, rules):
+        mapping = self.client.federation.mappings.create(
+            mapping_id=mapping_id,
+            rules=rules)
+        return mapping
 
+    def update_mapping(self, mapping_id, rules):
+        mapping = self.client.federation.identity_providers.update(
+            mapping_id=mapping_id,
+            rules=rules)
+        return mapping
 
-def _delete_federation_mapping(client, mapping_id):
-    mapping = _get_federation_mapping(client, mapping_id)
-    client.federation.mappings.delete(mapping=mapping)
+    def delete_mapping(self, mapping_id):
+        mapping = self.get_mapping(mapping_id)
+        self.client.federation.mappings.delete(mapping=mapping)
 
 
 def main():
-
-    module = AnsibleModule(
-        argument_spec=dict(
-            auth_url=dict(default=None, required=True),
-            username=dict(default=None, required=True),
-            password=dict(default=None, required=True),
-            project_name_to_auth=dict(default=None, required=True),
-            domain_name_to_auth=dict(default=None, required=True),
-            verify=dict(default=True, type='bool', required=False),
-            name=dict(default=None, required=True),
-            rules=dict(default=None, type='list', required=False),
-            state=dict(default='present', required=False,
-                       choices=['present', 'absent']),
-        )
+    argument_spec = openstack_full_argument_spec(
+        mapping_id=dict(required=True),
+        rules=dict(required=True, type='list'),
+        state=dict(default='present', choices=['absent', 'present']),
     )
+    module_kwargs = openstack_module_kwargs()
+    module = AnsibleModule(argument_spec,
+                           supports_check_mode=True,
+                           **module_kwargs)
 
-    changed = False
-    result = None
-    action = "Creating" if module.params['state'] == 'present' else "Deleting"
+    if not HAS_SHADE:
+        module.fail_json(msg='shade is required for this module')
+
+    mapping_id = module.params['mapping_id']
+    rules = module.params['rules']
+
+    state = module.params['state']
     try:
-        auth = v3.Password(auth_url=module.params['auth_url'],
-                          username=module.params['username'],
-                          user_domain_name=module.params['domain_name_to_auth'],
-                          password=module.params['password'],
-                          project_name=module.params['project_name_to_auth'],
-                          project_domain_name=
-                                          module.params['domain_name_to_auth'])
+        cloud = _get_cloud(**module.params)
+        mapping = cloud.get_mapping(mapping_id)
+        changed = False
 
-        client_session = session.Session(auth=auth,
-                                         verify=module.params['verify'])
-        keystone = Client(session=client_session)
+        if module.check_mode:
+            if state == 'present':
+                changed = mapping is not None
+            elif state == 'absent':
+                changed = mapping is None
+            module.exit_json(changed=changed)
 
-        if module.params['state'] == 'present':
-            if not _federation_mapping_exists(keystone,
-                                              module.params['name']):
-                params = {
-                    'client': keystone,
-                    'mapping_id': module.params['name'],
-                    'rules': module.params['rules']
-                }
-                _create_federation_mapping(**params)
+        if state == 'present':
+            if not mapping:
+                mapping = cloud.create_mapping(mapping_id, rules)
                 changed = True
-                result = 'created'
-        else:
-            if _federation_mapping_exists(keystone, module.params['name']):
-                _delete_federation_mapping(keystone, module.params['name'])
+            else:
+                changed = False
+        module.exit_json(
+            changed=changed,
+            mapping=[mapping_id, rules])
+        if state == 'absent':
+            if mapping:
+                cloud.delete_mapping(mapping_id)
                 changed = True
-                result = 'deleted'
+            module.exit_json(changed=changed)
+
     except Exception as e:
-        module.fail_json(msg="%s federation mapping failed: %s" % (action, e))
-
-    module.exit_json(changed=changed, result=result, id=module.params['name'])
-
+        module.fail_json(msg="Keystone mapping failed: %s" % str(e))
 
 # this is magic, see lib/ansible/module_common.py
 from ansible.module_utils.basic import *
+from ansible.module_utils.openstack import *
 
-main()
+if __name__ == '__main__':
+    main()
