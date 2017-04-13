@@ -163,7 +163,7 @@
   notify:
     - reload apache
 
-# Source horizon config
+# package/source horizon config
 - block:
   - name: add local_settings to venv
     file: src=/etc/openstack-dashboard/local_settings.py
@@ -182,7 +182,7 @@
       - "{{ horizon.horizon_lib_dir }}/bin/django-admin.py collectstatic --noinput"
       - "{{ horizon.horizon_lib_dir }}/bin/django-admin.py compress --force"
 
-  when: openstack_install_method == 'source'
+  when: openstack_install_method != 'distro'
 
 # Use custom policy to allow cloud_admin admin panel access
 - name: set horizon keystone policy fact
