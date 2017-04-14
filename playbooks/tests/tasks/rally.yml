@@ -10,6 +10,8 @@
       when: cinder.enabled|bool
 
     - name: run Rally script
+      environment: 
+        DEBIAN_FRONTEND: noninteractive
       script: ./rally/run.sh -e "{{ cinder.enabled }}" -t "{{ build_tag }}"
       become: yes
       become_user: root
