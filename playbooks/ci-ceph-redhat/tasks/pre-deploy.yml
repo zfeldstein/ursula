@@ -37,3 +37,16 @@
   tasks:
   - name: Generate en_US locale
     command: localedef -c -f UTF-8 -i en_US en_US.UTF-8
+
+- name: update interface eth0 configure
+  hosts: all
+  tasks:
+    - name: prevent networkmanager from controlling device eth0
+      lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }} regexp=^NM_CONTROLLED
+                  line="NM_CONTROLLED="no"" state=present
+
+- name: restart network service
+  hosts: all
+  tasks:
+    - name: restart network service
+      service: name=network state=restarted
