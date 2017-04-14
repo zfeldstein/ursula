@@ -7,7 +7,7 @@
 
 - name: validate ursula_os is a supported operating system and matches host system 
   fail: msg="ursula_os does not match host operating system or {{ ursula_os }} is not a supported operating system (must be rhel or ubuntu)"
-  when: (ursula_os is defined) and ( ursula_os not in ['rhel', 'ubuntu'] or
+  when: (ursula_os is undefined) or ( ursula_os not in ['rhel', 'ubuntu'] or
                                      ursula_os != "{{ ansible_distribution | regex_replace('RedHat|CentOS', 'rhel')|lower }}")
 
 - name: set ssh_service fact for ubuntu
