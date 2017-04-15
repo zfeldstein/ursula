@@ -68,4 +68,3 @@
 - include: ../../ceph-monitor/tasks/restart_flags.yml
 
 - include: system_tuning.yml
-  tags: ceph-osd

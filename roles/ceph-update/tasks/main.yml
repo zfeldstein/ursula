@@ -28,19 +28,14 @@
 
 # tasks of ceph osds
 - block:
-  # Setting noout to prevent cluster from rebalancing after service restart
+  # Setting flags to prevent cluster from rebalancing/scrubing
   - name: set osd noout
-    command: ceph osd set noout
+    command: "{{ item }}"
     delegate_to: "{{ groups['ceph_monitors'][0] }}"
-
-  # Setting osd values to reduce performance degradation of client I/O
-  - name: set osd noscrub
-    command: ceph osd set noscrub
-    delegate_to: "{{ groups['ceph_monitors'][0] }}"
-
-  - name: set osd nodeep scrub
-    command: ceph osd set nodeep-scrub
-    delegate_to: "{{ groups['ceph_monitors'][0] }}"
+    with_items:
+      - ceph osd set noout
+      - ceph osd set noscrub
+      - ceph osd set nodeep-scrub
 
   - name: restart ceph osds
     service: name={{ ceph.osd_service[ursula_os] }} state=restarted enabled=yes
@@ -54,18 +49,14 @@
     retries: 5
     delay: 5
 
-  # Unset the osd values to make heath check pass
+  # Unset the osd flags
   - name: unset osd noout
-    command: ceph osd unset noout
+    command: "{{ item }}"
     delegate_to: "{{ groups['ceph_monitors'][0] }}"
-
-  - name: unset osd noscrub
-    command: ceph osd unset noscrub
-    delegate_to: "{{ groups['ceph_monitors'][0] }}"
-
-  - name: unset osd nodeep scrub
-    command: ceph osd unset nodeep-scrub
-    delegate_to: "{{ groups['ceph_monitors'][0] }}"
+    with_items:
+      - ceph osd unset noout
+      - ceph osd unset noscrub
+      - ceph osd unset nodeep-scrub
   when: "'ceph_osds' in group_names"
 
 - name: remove ceph restart flag
