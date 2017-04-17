@@ -5,10 +5,8 @@ ursula_os: 'ubuntu'
 undercloud_cidr:
   - cidr: 192.168.0.0/22
 
-ceph:
-  monitor_interface: eth0
-  enabled: false
 glance:
+  store_smart: false
   store_file: True
 primary_interface: ansible_eth0
 
@@ -74,5 +72,11 @@ heat:
 ironic:
   enabled: False
 
-cinder:
+ceph:
   enabled: false
+
+lvm:
+  enabled: true
+
+cinder:
+  enabled: true
