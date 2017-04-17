@@ -9,9 +9,9 @@ inspec:
   dependency_path: /etc/inspec/
   profiles:
     openstack_security:
-      name: inspec-openstack-security
+      name: openstack-baseline
       version: master
-      url: https://github.com/chef-partners/inspec-openstack-security/archive/master.tar.gz
+      url: https://github.com/dev-sec/openstack-baseline/archive/master.tar.gz
     stig_rhel:
       name: inspec-stig-rhel7
       version: master
