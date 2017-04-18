@@ -10,14 +10,14 @@
   shell: ceph osd crush add-bucket {{ hybrid_pool }} root
   register: result
   changed_when: result.stdout |search("added bucket")
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_hybrid']))[0]
 
 # Create crush ruleset for the hybrid root bucket
 - name: Create crush ruleset hybrid root bucket
   shell: ceph osd crush rule create-simple {{ hybrid_ruleset }} {{ hybrid_pool }} host firstn
   register: result
   changed_when: not result.stdout |search("already exists")
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_hybrid']))[0]
 
 - name: Create osd host bucket
   shell: ceph osd crush add-bucket {{ ansible_hostname }} host
@@ -154,11 +154,10 @@
     ceph_init_ssd: "{{ hostvars[item].ceph_init_ssd }}"
     journal_guid: "{{ ceph.journal_guid }}"
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['ceph_osds_hybrid']|default([]) }}"
+  with_items: "{{ groups['ceph_osds_hybrid']|default([])|intersect(play_hosts) }}"
   when:
-    - item in play_hosts
+    - inventory_hostname == (play_hosts | intersect(groups['ceph_osds_hybrid']))[0]
     - hostvars[item].ceph_init_ssd or hostvars[item].result_bcache_backs.changed
-  run_once: true
 
 - name: make sure ceph-osd-all started
   service: name=ceph-osd-all state=started
@@ -170,11 +169,11 @@
     pool_name: "{{ hybrid_pool }}"
     osds: "{{ groups['ceph_osds_hybrid']|length * ceph.disks|length }}"
   delegate_to: "{{ groups['ceph_monitors'][0] }}"
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_hybrid']))[0]
 
 # not sure is there a better way to get ruleset id
 - name: set ruleset for pool
   shell: ceph osd pool set {{ hybrid_pool }} crush_ruleset
          $(ceph osd crush rule dump |grep {{ hybrid_ruleset }} -A1 |grep -oP '\d+')
   delegate_to: "{{ groups['ceph_monitors'][0] }}"
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_hybrid']))[0]

@@ -4,7 +4,7 @@
   shell: ceph osd crush add-bucket {{ ssd_pool }} root
   register: result
   changed_when: result.stdout |search("added bucket")
-  when: inventory_hostname == groups['ceph_osds_ssd'][0]
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_ssd']))[0]
 
 # Create crush ruleset for the ssd root bucket
 - name: Create crush ruleset ssd root bucket
@@ -12,7 +12,7 @@
   register: result
   changed_when: not result.stdout |search("already exists")
   delegate_to: "{{ groups['ceph_monitors'][0] }}"
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_ssd']))[0]
 
 # Create osd host bucket
 - name: Create osd host bucket
@@ -37,11 +37,10 @@
 - name: activate new osds(full ssd)
   include: activate_fullssd.yml
   delegate_to: "{{ outer_item }}"
-  with_items: "{{ groups['ceph_osds_ssd']|default([]) }}"
+  with_items: "{{ groups['ceph_osds_ssd']|default([])|intersect(play_hosts) }}"
   loop_control:
     loop_var: outer_item
-  when: outer_item in play_hosts
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_ssd']))[0]
 
 # pool pg number is based on osd amount
 # we should create pool when all osds are up
@@ -50,11 +49,11 @@
     pool_name: "{{ ssd_pool }}"
     osds: "{{ groups['ceph_osds_ssd']|length * ceph.disks|length }}"
   delegate_to: "{{ groups['ceph_monitors'][0] }}"
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_ssd']))[0]
 
 # not sure is there a better way to get ruleset id
 - name: set ruleset for pool
   shell: ceph osd pool set {{ ssd_pool }} crush_ruleset
          $(ceph osd crush rule dump |grep {{ ssd_ruleset }} -A1 |grep -oP '\d+')
   delegate_to: "{{ groups['ceph_monitors'][0] }}"
-  run_once: true
+  when: inventory_hostname == (play_hosts | intersect(groups['ceph_osds_ssd']))[0]
