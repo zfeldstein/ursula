@@ -178,7 +178,7 @@ ceph:
     rbd_user: cinder
     rbd_ceph_conf: /etc/ceph/ceph.conf
     rbd_flatten_volume_from_snapshot: false
-    rbd_max_clone_depth: 5
+    rbd_max_clone_depth: 0
     glance_api_version: 2
 
   # Logging
