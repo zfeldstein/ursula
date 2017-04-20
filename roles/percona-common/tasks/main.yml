@@ -6,15 +6,6 @@
     garbd_service: garb
   when: ursula_os == 'rhel'
 
-
-- name: create mysql user
-  user:
-    name: mysql
-    comment: mysql service user
-    shell: /bin/false
-    system: yes
-    home: /var/lib/mysql
-
 - name: install python-pycurl
   package:
     name: python-pycurl

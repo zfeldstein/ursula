@@ -18,6 +18,16 @@
         openstack_source:
           git_update: yes
 
+    - name: set ursula_os if undefined
+      set_fact:
+        ursula_os: "{{ ansible_distribution | regex_replace('RedHat|CentOS', 'rhel')|lower }}"
+      when: ( ursula_os is undefined ) and
+            ( ansible_distribution in ['CentOS', 'RedHat'] or ansible_distribution == 'Ubuntu')
+
+    - name: set ssh_service fact
+      set_fact:
+        ssh_service: "{{ (ursula_os == 'ubuntu') | ternary('ssh','sshd') }}"
+
 - name: cleanups
   hosts: all:!vyatta-*
   gather_facts: no
@@ -35,6 +45,14 @@
         owner: root
         group: root
         mode: 0755
+
+- name: ensure filebeat installed
+  hosts: all:!vyatta-*
+  max_fail_percentage: 1
+  tags: logging
+  roles:
+    - role: logging
+  environment: "{{ env_vars|default({}) }}"
 
 - name: upgrade common bits first
   hosts: all:!vyatta-*
@@ -104,6 +122,16 @@
       tags: ['infra', 'percona']
   environment: "{{ env_vars|default({}) }}"
 
+# post upgrade mysql will be behind haproxy. Set endpoint
+# so db_sync commands will work until post upgrade
+- name: set mysql connection string port 3306
+  hosts: all:!vyatta-*
+  tasks:
+    - name: set mysql endpoint to standard port
+      set_fact:
+        endpoints:
+          db: "{{ undercloud_floating_ip }}"
+
 ## OpenStack stuff now
 - name: upgrade client bits
   hosts: all:!vyatta-*
@@ -162,6 +190,16 @@
         changed: false
   environment: "{{ env_vars|default({}) }}"
 
+- name: ceph osds
+  hosts: ceph_osds
+  max_fail_percentage: 1
+  any_errors_fatal: true
+  roles:
+    - role: ceph-osd
+      when: ceph.enabled
+      tags: ['ceph', 'ceph-osd']
+  environment: "{{ env_vars|default({}) }}"
+
 - include: playbooks/cinder-upgrade.yml
   when: cinder.enabled|bool
 
@@ -179,7 +217,30 @@
       when: heat.enabled|bool
   environment: "{{ env_vars|default({}) }}"
 
-# Ceilometer block
+# Ceilometer/aodh block
+- name: upgrade aodh
+  hosts: controller
+  max_fail_percentage: 1
+  tags: aodh
+
+  pre_tasks:
+    - name: dump aodh db
+      mysql_db:
+        name: aodh
+        state: dump
+        target: /backup/aodh-preupgrade.sql
+      run_once: True
+      tags: dbdump
+      delegate_to: "{{ groups['db'][0] }}"
+
+  roles:
+    - role: aodh
+      force_sync: true
+      restart: False
+      database_create:
+        changed: false
+  environment: "{{ env_vars|default({}) }}"
+
 - name: stage ceilometer data software
   hosts: compute
   max_fail_percentage: 1
@@ -561,8 +622,8 @@
   hosts: all:!vyatta-*
   tags: always
   tasks:
-    # work around Ansible 2.0 bug where parent roles do not see vars
-    # assigned to child roles
+   # work around Ansible 2.0 bug where parent roles do not see vars
+   # assigned to child roles
     - name: turn restarts on
       set_fact:
         restart: True
@@ -575,5 +636,13 @@
   roles:
     - role: horizon
   environment: "{{ env_vars|default({}) }}"
+# Use haproxy port for post upgrade
+- name: set mysql connection string 3307
+  hosts: all:!vyatta-*
+  tasks:
+    - name: set mysql endpoint port 3307
+      set_fact:
+        endpoints:
+          db: "{{ undercloud_floating_ip }}:3307"
 
 - include: site.yml
