@@ -21,16 +21,6 @@
     until: result|succeeded
     retries: 5
     notify: restart rabbitmq
-
-  - name: upgrade rabbitmq for CVEs on upgrade/update (ubuntu)
-    apt:
-      pkg: "{{ item }}"
-      update_cache: yes
-    with_items:
-      - esl-erlang={{ rabbitmq.version.esl_erlang }}
-      - rabbitmq-server={{ rabbitmq.version.rabbitmq_server }}
-    notify: restart rabbitmq
-    when: upgrade | default('False') | bool
   when: ursula_os == "ubuntu"
 
 - block:
