@@ -217,6 +217,9 @@ ceph:
 lvm:
   enabled: false
 
+v7k:
+  enabled: false
+
 cinder:
   enabled: True
   enabled_backends: [] # rbd_volumes for Ceph

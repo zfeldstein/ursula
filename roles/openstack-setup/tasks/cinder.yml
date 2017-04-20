@@ -48,6 +48,20 @@
   when: lvm.enabled
   run_once: true
 
+- name: create cinder volume types({{item}} backend)
+  environment:
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  cinder_volume_type: volume_type={{item|upper}}
+                      auth_url={{ endpoints.auth_uri }}
+                      login_username=admin
+                      login_password={{ secrets.admin_password }}
+                      login_tenant_name=admin
+                      extra_specs="volume_backend_name={{ item }}"
+                      insecure={{ insecure|default(omit) }}
+  with_items: "{{ v7k.storage_pools }}"
+  when: v7k.enabled
+  run_once: true
+
 - name: create cinder encryption volume types
   environment:
     PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"

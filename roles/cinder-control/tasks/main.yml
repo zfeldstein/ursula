@@ -1,4 +1,7 @@
 ---
+- include: v7k_integration.yml
+  when: v7k.enabled
+
 - name: install cinder controller services (ubuntu)
   upstart_service:
     name: "{{ item.name }}"
