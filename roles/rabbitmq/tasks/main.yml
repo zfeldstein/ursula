@@ -4,62 +4,72 @@
 - name: add rabbitmq config directory
   file: dest=/etc/rabbitmq state=directory owner=root mode=0755
 
-# pin version of esl-erlang for
-# https://github.com/rabbitmq/rabbitmq-management/issues/244
-# lift when rabbitmq-server 3.6.4 is released
-- name: install erlang-solutions erlang
-  apt:
-    pkg: esl-erlang=1:18.3
-    force: True
-  register: result
-  until: result|succeeded
-  retries: 5
-  when: ansible_distribution in ['Ubuntu']
+- block:
+  - name: install erlang-solutions erlang (ubuntu)
+    apt:
+      pkg: esl-erlang={{ rabbitmq.version.esl_erlang }}
+      force: True
+    register: result
+    until: result|succeeded
+    retries: 5
+    notify: restart rabbitmq
 
-- name: install EPEL erlang
-  package:
-    name: erlang
-  register: result
-  until: result|succeeded
-  retries: 5
-  when: ansible_distribution in ['CentOS','RedHat']
+  - name: install rabbitmq-server (ubuntu)
+    package:
+      name: rabbitmq-server={{ rabbitmq.version.rabbitmq_server }}
+    register: result
+    until: result|succeeded
+    retries: 5
+    notify: restart rabbitmq
 
-- name: install rabbitmq-server
-  package:
-    name: rabbitmq-server
-  with_items:
-    - rabbitmq-server
-  register: result
-  until: result|succeeded
-  retries: 5
+  - name: upgrade rabbitmq for CVEs on upgrade/update (ubuntu)
+    apt:
+      pkg: "{{ item }}"
+      update_cache: yes
+    with_items:
+      - esl-erlang={{ rabbitmq.version.esl_erlang }}
+      - rabbitmq-server={{ rabbitmq.version.rabbitmq_server }}
+    notify: restart rabbitmq
+    when: upgrade | default('False') | bool
+  when: ursula_os == "ubuntu"
 
-- name: upgrade rabbitmq for CVEs on upgrade
-  apt:
-    pkg: "{{ item }}"
-    update_cache: yes
-  with_items:
-    - rabbitmq-server={{ rabbitmq.version_for_upgrade }}
-  when: upgrade | default('False') | bool
+- block:
+  - name: install EPEL erlang (rhel)
+    package:
+      name: erlang
+      state: latest
+    register: result
+    until: result|succeeded
+    retries: 5
+    notify: restart rabbitmq
 
-- name: create systemd override dir
-  file:
-    dest: /etc/systemd/system/rabbitmq-server.service.d
-    state: directory
-  when: ursula_os == 'rhel' 
+  - name: install rabbitmq-server (rhel)
+    package:
+      name: rabbitmq-server
+      state: latest
+    register: result
+    until: result|succeeded
+    retries: 5
+    notify: restart rabbitmq
 
-- name: set systemd overrides
-  copy:
-    dest: /etc/systemd/system/rabbitmq-server.service.d/override.conf
-    content: "{{ rabbitmq.systemd.custom }}"
-    force: yes
-  register: override
-  when: ursula_os == 'rhel'
+  - name: create systemd override dir
+    file:
+      dest: /etc/systemd/system/rabbitmq-server.service.d
+      state: directory
 
-- name: restart systemd
-  command: systemctl daemon-reload
-  when: override.changed and ursula_os == 'rhel'
-  notify: 
-    - restart rabbitmq
+  - name: set systemd overrides
+    copy:
+      dest: /etc/systemd/system/rabbitmq-server.service.d/override.conf
+      content: "{{ rabbitmq.systemd.custom }}"
+      force: yes
+    register: override
+
+  - name: restart systemd
+    command: systemctl daemon-reload
+    when: override.changed
+    notify:
+      - restart rabbitmq
+  when: ursula_os == "rhel"
 
 - name: add rabbitmq environment configuration
   template: src=etc/rabbitmq/rabbitmq-env.conf
