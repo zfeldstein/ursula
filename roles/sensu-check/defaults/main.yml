@@ -93,6 +93,7 @@ sensu_checks:
 
   nova:
     check_nova_services:
+      auto_resolve: true
       handler: default
       interval: 120
       standalone: true
