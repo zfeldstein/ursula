@@ -819,3 +819,10 @@ openstack_meta:
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}ceilometer-polling"
           args: "--polling-namespaces compute"
           restart: on-failure
+  barbican:
+    services:
+      barbican_api:
+        ubuntu:
+          name: openstack-barbican-api
+          desc: OpenStack Key Management Service
+          cmd: /usr/local/bin/barbican-api

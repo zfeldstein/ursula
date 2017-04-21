@@ -186,6 +186,9 @@ nova:
       ephemeral: 0
       vcpus: 8
 
+barbican:
+  enabled: True
+  
 ceph:
   enabled: false
   #disks:
@@ -193,9 +196,6 @@ ceph:
   #  - sdc
   #  - sdd
   #bcache_ssd_device: sdg
-
-lvm:
-  enabled: false
 
 cinder:
   enabled: True
@@ -356,6 +356,9 @@ keystone:
     - name: aodh
       password: "{{ secrets.service_password }}"
       tenant: service
+    - name: barbican
+      password: "{{ secrets.service_password }}"
+      tenant: service
   user_roles:
     - user: admin
       tenant: admin
@@ -409,6 +412,9 @@ keystone:
       tenant: demo
       role: heat_stack_owner
     - user: aodh
+      tenant: service
+      role: admin
+    - user: barbican
       tenant: service
       role: admin
   services:
@@ -496,6 +502,12 @@ keystone:
       public_url: "{{ endpoints.aodh.url.public }}"
       internal_url: "{{ endpoints.aodh.url.internal }}"
       admin_url: "{{ endpoints.aodh.url.admin }}"
+    - name: barbican
+      type: barbican
+      description: 'Key Management Service'
+      public_url: "{{ endpoints.barbican.url.public }}/{{ endpoints.barbican.url.path }}"
+      internal_url: "{{ endpoints.barbican.url.internal }}/{{ endpoints.barbican.url.path }}"
+      admin_url: "{{ endpoints.barbican.url.admin }}/{{ endpoints.barbican.url.path }}"
   federation:
     enabled: False
 

@@ -18,6 +18,7 @@ client:
       - python-swiftclient
       - python-magnumclient
       - python-openstackclient
+      - python-barbicanclient
     yum_pkgs:
       - python-keystoneclient
       - python-glanceclient
