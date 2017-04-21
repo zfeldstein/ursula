@@ -1,11 +1,4 @@
 ---
-- name: install cinder-data required packages
-  package: name={{ item }}
-  with_items: "{{ cinder.data_pkgs[ursula_os] }}"
-  register: result
-  until: result|succeeded
-  retries: 5
-
 - name: iscsi target framework conf dir
   file: dest=/etc/tgt/conf.d state=directory
 

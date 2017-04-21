@@ -1,4 +1,11 @@
 ---
+- name: install cinder-data required packages
+  package: name={{ item }}
+  with_items: "{{ cinder.data_pkgs[ursula_os] }}"
+  register: result
+  until: result|succeeded
+  retries: 5
+
 - include: lvm_integration.yml
   when: lvm.enabled
 
