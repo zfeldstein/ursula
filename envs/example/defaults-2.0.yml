@@ -503,7 +503,7 @@ keystone:
       internal_url: "{{ endpoints.aodh.url.internal }}"
       admin_url: "{{ endpoints.aodh.url.admin }}"
     - name: barbican
-      type: barbican
+      type: key-manager
       description: 'Key Management Service'
       public_url: "{{ endpoints.barbican.url.public }}/{{ endpoints.barbican.url.path }}"
       internal_url: "{{ endpoints.barbican.url.internal }}/{{ endpoints.barbican.url.path }}"
