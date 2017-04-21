@@ -12,7 +12,8 @@ barbican:
   source:
     rev: 'stable/newton'
     upper_constraints: '{{ openstack_meta.upper_constraints }}'
-    python_dependencies: []
+    python_dependencies: 
+        - { name: PyMySQL }
     python_post_dependencies: []
     system_dependencies:
         ubuntu:
