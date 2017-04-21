@@ -1,0 +1,48 @@
+---
+project_name: barbican
+barbican_keystone_auth: yes
+barbican:
+  services:
+    barbican_api: "{{ openstack_meta.barbican.services.barbican_api[ursula_os] }}"
+  state_path: "{{ state_path_base }}/barbican"
+  distro:
+    project_packages:
+      - openstack-barbican
+    python_post_dependencies: []
+  source:
+    rev: 'stable/newton'
+    upper_constraints: '{{ openstack_meta.upper_constraints }}'
+    python_dependencies: []
+    python_post_dependencies: []
+    system_dependencies:
+        ubuntu:
+        - apache2
+        - apache2-utils
+        - libapache2-mod-wsgi 
+        - python-dev
+        - libssl-dev
+        - libpq-dev
+        - libffi-dev
+        - build-essential
+        - uwsgi-plugin-python
+        rhel: []
+  alternatives: 
+    - barbican-manage
+  logs:
+    - paths:
+        - /var/log/barbican/barbican-api.log
+      fields:
+        type: openstack
+        tags: barbican,barbican-api
+    - paths:
+        - /var/log/barbican/barbican-manage.log
+      fields:
+        type: openstack
+        tags: barbican,barbican-manage
+  logging:
+    debug: False
+    verbose: True
+  cafile: "{{ ssl.cafile }}"
+  auditing:
+    enabled: False
+    logging: False

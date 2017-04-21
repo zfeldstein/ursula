@@ -1,0 +1,65 @@
+---
+- name: Check if barbican user exists
+  action: shell getent passwd barbican
+  register: barbican_user
+  failed_when: False
+  changed_when: False
+
+- name: barbican user
+  user: name=barbican shell=/bin/false createhome=no
+  when: barbican_user|success
+
+- name: barbican user
+  user: name=barbican comment=barbican shell=/bin/false system=yes home=/nonexistent createhome=no
+  when: barbican_user|failed
+
+- name: /etc/barbican
+  file: dest=/etc/barbican state=directory
+
+- name: barbican log dir
+  file: dest=/var/log/barbican state=directory mode=2750 owner=barbican group=adm
+
+- name: Change barbican log dir acl
+  acl: name=/var/log/barbican state=present default=yes etype={{ item.etype }} permissions={{ item.permission }}
+  with_items:
+    - etype: user
+      permission: rw
+    - etype: group
+      permission: r
+    - etype: other
+      permission: r
+
+- name: install barbican uwsgi service (ubuntu)
+  template: src=etc/init/barbican.conf
+            dest=/etc/init/barbican.conf mode=0644
+  when: ursula_os == 'ubuntu'
+
+- name: Distribute Barbican Config Files
+  template: src={{ item }} dest=/etc/barbican mode=0644
+  with_fileglob: ../templates/etc/barbican/*
+
+- name: Creates barbican uwsgi and httpd directories
+  file: path={{ item }} state=directory mode=0775
+        owner=barbican group=barbican mode=0775
+  with_items:
+    - /etc/barbican/uwsgi
+    - /run/uwsgi
+    
+- name: configure barbican admin wsgi
+  template: src=etc/uwsgi/barbican-vassals-api.ini
+            dest=/etc/barbican/uwsgi/barbican-main.ini mode=0775
+            owner=barbican group=barbican
+  notify: restart barbican services
+       
+- name: sync barbican database
+  command: barbican-manage db upgrade
+  when: database_create.changed or force_sync|default('false')|bool
+  run_once: true
+  changed_when: true
+  notify:
+    - restart barbican services
+  # we want this to always be changed so that it can notify the service restart
+  tags: db-migrate
+
+- name: Flush handlers
+  meta: flush_handlers

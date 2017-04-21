@@ -1,0 +1,8 @@
+---
+- name: restart barbican services
+  service:
+    name: barbican
+    state: restarted
+    must_exist: false
+  run_once: True
+  when: restart|default(True)

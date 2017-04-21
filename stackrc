@@ -1,0 +1,9 @@
+export OS_USERNAME=wupeiran
+export OS_PASSWORD=Sm4rtcl0ud!
+export OS_AUTH_URL=https://tardis-sl.openstack.blueboxgrid.com:5000/v3
+#export OS_PROJECT_ID=cs-ci
+export OS_PROJECT_NAME=cs-ci
+export OS_AVAILABILITY_ZONE=dev_compute_standard
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_IDENTITY_API_VERSION=3
