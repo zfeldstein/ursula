@@ -17,119 +17,168 @@
 # limitations under the License.
 #
 
+DOCUMENTATION = '''
+---
+author: Nithya Narengan
+module: keystone_federation_protocol
+short_description: register keystone protocol
+description:
+  - This module registers a protocol for federation on keystone
+options:
+  protocol_id:
+    description:
+        - name for the protocol
+          example -saml2
+    required: true
+  mapping:
+    description:
+        - name of an existing mapping that the protocol should be tied to
+          example -federation_mapping
+    required: true
+  identity_provider:
+    description:
+        - name of an existing identity provider that the protocol should
+          be tied to
+          example -idp
+    required: true
+  state:
+    description:
+       - Indicate desired state of the resource
+    choices: ['present', 'absent']
+    default: present
+'''
 try:
-    from keystoneauth1 import session
-    from keystoneauth1.identity import v3
-    from keystoneclient.v3.client import Client
+    import shade
+    HAS_SHADE = True
 except ImportError:
-    print("failed=True msg='keystoneclient and keystoneauth1 are required'")
+    HAS_SHADE = False
 
 
-def _get_identity_provider(client, identity_provider_id):
-    for idp in client.federation.identity_providers.list():
-        if idp.id == identity_provider_id:
-            return idp
-    return None
+def _needs_update(module, protocol):
+    """Check for differences in the updatable values.
+    Note: protocol_ids cannot be updated.
+    """
+    mapping = module.params.get('mapping', None)
+    return mapping != getattr(protocol, 'mapping_id', None)
 
 
-def _get_mapping(client, mapping_id):
-    for mapping in client.federation.mappings.list():
-        if mapping.id == mapping_id:
-            return mapping
-    return None
+def _system_state_change(module, protocol):
+    state = module.params['state']
+    if state == 'present':
+        if not protocol:
+            return True
+        return _needs_update(module, protocol)
+    if state == 'absent' and protocol:
+        return True
+    return False
 
 
-def _get_federation_protocol(client, protocol_id, identity_provider):
-    for protocol in client.federation.protocols.list(identity_provider):
-        if protocol.id == protocol_id:
-            return protocol
-    return None
+def _get_cloud(**kwargs):
+    cloud_shade = shade.operator_cloud(**kwargs)
+    cloud_shade.cloud_config.config['identity_api_version'] = '3'
+    cloud = ShadePlaceholder(cloud_shade.keystone_client)
+
+    return cloud
 
 
-def _federation_protocol_exists(client, protocol_id, identity_provider_id):
-    identity_provider = _get_identity_provider(client, identity_provider_id)
-    rc = _get_federation_protocol(client, protocol_id, identity_provider)
-    return rc != None
+class ShadePlaceholder(object):
+    def __init__(self, keystone_client):
+        self.client = keystone_client
 
+    def _get_identity_provider(self, identity_provider_id):
+        for idp in self.client.federation.identity_providers.list():
+            if getattr(idp, 'id') == identity_provider_id:
+                return idp
+        return None
 
-def _create_federation_protocol(client, protocol_id, identity_provider_id,
-                                mapping_id):
-    identity_provider = _get_identity_provider(client, identity_provider_id)
-    mapping = _get_mapping(client, mapping_id)
-    client.federation.protocols.create(protocol_id=protocol_id,
-                                       identity_provider=identity_provider,
-                                       mapping=mapping)
+    def _get_mapping(self, mapping_id):
+        for mapping in self.client.federation.mappings.list():
+            if getattr(mapping, 'id') == mapping_id:
+                return mapping
+        return None
 
+    def get_protocol(self, protocol_id, idp, mapping_id):
+        for protocol in self.client.federation.protocols.list(idp):
+            if getattr(protocol, 'id') == protocol_id:
+                return protocol
+        return None
 
-def _delete_federation_protocol(client, protocol_id, identity_provider_id):
-    identity_provider = _get_identity_provider(client, identity_provider_id)
-    protocol = _get_federation_protocol(client, protocol_id, identity_provider)
-    client.federation.protocols.delete(identity_provider=identity_provider,
-                                       protocol=protocol)
+    def create_protocol(self, protocol_id, idp, mapping_id):
+        identity_provider = self._get_identity_provider(idp)
+        mapping = self._get_mapping(mapping_id)
+        protocol = self.client.federation.protocols.create(
+            protocol_id=protocol_id,
+            identity_provider=identity_provider,
+            mapping=mapping)
+        return protocol
+
+    def update_protocol(self, protocol_id, idp, mapping):
+        protocol = self.client.federation.protocols.update(
+            protocol=protocol_id,
+            mapping=mapping,
+            identity_provider=idp)
+
+        return protocol
+
+    def delete_protocol(self, protocol_id, idp):
+        identity_provider = self._get_identity_provider(idp)
+        protocol = self.get_protocol(self, protocol_id, idp)
+        self.client.federation.protocols.\
+        delete(identity_provider=identity_provider, protocol=protocol)
 
 
 def main():
-
-    module = AnsibleModule(
-        argument_spec=dict(
-            auth_url=dict(default=None, required=True),
-            username=dict(default=None, required=True),
-            password=dict(default=None, required=True),
-            project_name_to_auth=dict(default=None, required=True),
-            domain_name_to_auth=dict(default=None, required=True),
-            verify=dict(default=True, type='bool', required=False),
-            name=dict(default=None, required=True),
-            identity_provider=dict(default=None, required=True),
-            mapping=dict(default=None, required=True),
-            state=dict(default='present', required=False,
-                       choices=['present', 'absent']),
-        )
+    argument_spec = openstack_full_argument_spec(
+        protocol_id=dict(required=True),
+        mapping=dict(default=None, required=True),
+        identity_provider=dict(default=None, required=True),
+        state=dict(default='present', choices=['absent', 'present']),
     )
+    module_kwargs = openstack_module_kwargs()
+    module = AnsibleModule(argument_spec,
+                           supports_check_mode=True,
+                           **module_kwargs)
 
-    changed = False
-    result = None
-    action = "Creating" if module.params['state'] == 'present' else "Deleting"
+    if not HAS_SHADE:
+        module.fail_json(msg='shade is required for this module')
+
+    protocol_id = module.params['protocol_id']
+    mapping = module.params['mapping']
+    idp = module.params['identity_provider']
+
+    state = module.params['state']
     try:
-        auth = v3.Password(auth_url=module.params['auth_url'],
-                          username=module.params['username'],
-                          user_domain_name=module.params['domain_name_to_auth'],
-                          password=module.params['password'],
-                          project_name=module.params['project_name_to_auth'],
-                          project_domain_name=
-                                          module.params['domain_name_to_auth'])
+        cloud = _get_cloud(**module.params)
+        protocol = cloud.get_protocol(protocol_id, idp, mapping)
 
-        client_session = session.Session(auth=auth,
-                                         verify=module.params['verify'])
-        keystone = Client(session=client_session)
+        if module.check_mode:
+            changed = _system_state_change(module, protocol)
+            module.exit_json(changed=changed)
 
-        idp = module.params['identity_provider']
-
-        if module.params['state'] == 'present':
-            if not _federation_protocol_exists(keystone,
-                                               module.params['name'], idp):
-                params = {
-                    'client': keystone,
-                    'protocol_id': module.params['name'],
-                    'identity_provider_id': module.params['identity_provider'],
-                    'mapping_id': module.params['mapping']
-                }
-                _create_federation_protocol(**params)
+        changed = False
+        if state == 'present':
+            if not protocol:
+                protocol = cloud.create_protocol(protocol_id, idp, mapping)
                 changed = True
-                result = 'created'
-        else:
-            if _federation_protocol_exists(keystone, module.params['name'],
-                                           idp):
-                _delete_federation_protocol(keystone, module.params['name'],
-                                            idp)
+            else:
+                if _needs_update(module, protocol):
+                    protocol = cloud.update_protocol(protocol_id, idp, mapping)
+                    changed = True
+        module.exit_json(
+            changed=changed,
+            protocol=[protocol_id, idp, mapping])
+        if state == 'absent':
+            if protocol:
+                cloud.delete_protocol(protocol_id)
                 changed = True
-                result = 'deleted'
+            module.exit_json(changed=changed)
+
     except Exception as e:
-        module.fail_json(msg="%s federation protocol failed: %s" % (action, e))
-
-    module.exit_json(changed=changed, result=result, id=module.params['name'])
-
+        module.fail_json(msg="Keystone protocol failed: %s" % str(e))
 
 # this is magic, see lib/ansible/module_common.py
 from ansible.module_utils.basic import *
+from ansible.module_utils.openstack import *
 
-main()
+if __name__ == '__main__':
+    main()
