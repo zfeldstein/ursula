@@ -26,5 +26,4 @@ controller-0
 controller-1
 
 [cinder_volume]
-controller-0
-controller-1
+compute-0

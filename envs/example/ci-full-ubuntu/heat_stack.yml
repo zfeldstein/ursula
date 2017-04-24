@@ -13,14 +13,6 @@ parameters:
     type: string
     description: Flavor to use for servers
     default: m1.large
-  second_flavor:
-    type: string
-    description: Flavor to use for servers
-    default: m1.medium
-  storage_flavor:
-    type: string
-    description: Flavor to use for servers
-    default: ci_ceph_swift
   network:
     type: string
     description: Name of Neutron network into which servers get deployed
@@ -32,11 +24,11 @@ parameters:
   key_name:
     type: string
     description: Name of the ssh keypair to use for servers
-    default: ceph_ubuntu_key
+    default: ci_full_ubuntu_key
   security_group:
     type: string
     description: Name of the security group to use for servers
-    default: ceph_ubuntu_ursula
+    default: ci_full_ubuntu_ursula
   az:
     type: string
     description: Name of availability-zone to use for servers
@@ -44,15 +36,15 @@ parameters:
   controller-0_name:
     type: string
     description: Name of controller-0 server
-    default: ceph-ubuntu-controller-0
+    default: controller-0
   controller-1_name:
     type: string
     description: Name of controller-1 server
-    default: ceph-ubuntu-controller-1
+    default: controller-1
   compute-0_name:
     type: string
     description: Name of compute-0 server
-    default: ceph-ubuntu-compute-0
+    default: compute-0
 
 resources:
 
@@ -61,6 +53,7 @@ resources:
     properties:
       description: Security group for servers of Ursula Tests
       name: { get_param: security_group }
+      rules:
       rules:
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
@@ -147,6 +140,7 @@ resources:
           protocol: udp
         - ethertype: 'IPv4'
           remote_mode: 'remote_group_id'
+
 
   ssh_keypair:
     type: OS::Nova::KeyPair

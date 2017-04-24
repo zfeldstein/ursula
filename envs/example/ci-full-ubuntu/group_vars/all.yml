@@ -1,22 +1,16 @@
 ---
-stack_env: ci-ceph-ubuntu
-#openstack_install_method: 'package'
+stack_env: ci-full-ubuntu
 ursula_os: 'ubuntu'
 undercloud_cidr:
   - cidr: 192.168.0.0/22
 
+primary_interface: ansible_eth0
+
 glance:
   store_smart: false
   store_file: True
-primary_interface: ansible_eth0
 
 state_path_base: /opt/stack/data
-
-validate_certs: false
-
-etc_hosts:
-  - name: "{{ fqdn }}"
-    ip: "{{ floating_ip }}"
 
 neutron:
   enable_external_interface: True
@@ -28,7 +22,7 @@ neutron:
     password: "{{ secrets.service_password }}"
     interval: 2
   lbaas:
-    enabled: False
+    enabled: True
 
 common:
   hwraid:
@@ -36,40 +30,21 @@ common:
 
 logging:
   enabled: true
-  follow:
-    enabled: true
-    global_fields:
-      customer_id: "unknown"
-      cluster_name: "unknown"
-    logs:
-      - paths:
-          - /var/log/messages
-        fields:
-          type: syslog
-  forward:
-    host: 127.0.0.1
-    port: 4560
-
-serverspec:
-  enabled: True
-
-haproxy:
-  stats_group: root
 
 keystone:
+  ldap_domain:
+    enabled: True
+    domain: users
   uwsgi:
     method: port
 
 nova:
   libvirt_type: kvm
 
-heat:
+serverspec:
   enabled: True
-  plugin_dirs:
-    - '/usr/lib/heat'
-    - '/usr/lib64/heat'
 
-ironic:
+inspec:
   enabled: False
 
 ceph:
