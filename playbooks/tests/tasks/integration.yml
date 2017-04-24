@@ -96,6 +96,16 @@
     size: 2
   when: cinder.enabled|bool
 
+- name: check volume available before attach
+  shell: . /root/stackrc ;cinder list |grep turtle-vol|awk '{print $4}'
+  args:
+    executable: /bin/bash
+  register: result
+  until: result.stdout.find('available')!=-1
+  retries: 6
+  delay: 10
+  when: cinder.enabled|bool
+
 - name: nova can attach cinder volume
   environment:
     PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
@@ -166,18 +176,6 @@
            ping -c 5 www.google.com
   when: floating_ip.floating_ip.floating_ip_address is defined
 
-- name: nova can attach cinder volume
-  environment:
-    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
-  os_server_volume:
-    auth:
-      auth_url: "{{ endpoints.auth_uri }}"
-      project_name: admin
-      username: admin
-      password: "{{ secrets.admin_password }}"
-    server: turtle-stack
-    volume: turtle-vol
-  when: cinder.enabled|bool
 
 - name: write volume in VM
   shell: ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=60
@@ -186,15 +184,32 @@
          sudo dd if=/dev/zero of=/dev/vdb count=100 bs=1M
   when: cinder.enabled|bool
 
-- name: detach volume and delete volume
+- name: detach volume from server
   shell: . /root/stackrc && {{ item }}
   args:
     executable: /bin/bash
   with_items:
     - openstack server remove volume turtle-stack turtle-vol
-    - while [[ $(cinder list |grep turtle-vol|awk '{print $4}') != 'available' ]]; do echo "wait for volume detach";sleep 1 ;done 
+  when: cinder.enabled|bool
+
+- name: check volume available before detach
+  shell: . /root/stackrc ;cinder list |grep turtle-vol|awk '{print $4}'
+  args:
+    executable: /bin/bash
+  register: result
+  until: result.stdout.find('available')!=-1
+  retries: 6
+  delay: 10
+  when: cinder.enabled|bool
+
+- name: delete volume
+  shell: . /root/stackrc && {{ item }}
+  args:
+    executable: /bin/bash
+  with_items:
     - openstack volume delete turtle-vol
   when: cinder.enabled|bool
+
 
 - name: delete resources
   shell: . /root/stackrc && {{ item }}
