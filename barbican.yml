@@ -1,8 +1,0 @@
----
-- name: barbican
-  hosts: controller
-  any_errors_fatal: true
-  roles:
-    - role: barbican
-      tags: ['openstack', 'barbican']
-  environment: "{{ env_vars|default({}) }}"
