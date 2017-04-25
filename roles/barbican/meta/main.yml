@@ -15,13 +15,14 @@ dependencies:
     project_name: barbican
     alternatives: "{{ barbican.alternatives }}"
     when: openstack_install_method == 'package'
-  - role: openstack-database
-    database_name: barbican
   - role: openstack-distro
     project_name: barbican
     project_packages: "{{ barbican.distro.project_packages }}"
     python_post_dependencies: "{{ barbican.distro.python_post_dependencies }}"
     when: openstack_install_method == 'distro'
+  - role: openstack-database
+    database_name: barbican
+  - role: apache
   - role: openstack-firewall
     rule_name: barbican
     rules_type_input:

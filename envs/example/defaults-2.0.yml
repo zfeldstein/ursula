@@ -505,9 +505,9 @@ keystone:
     - name: barbican
       type: key-manager
       description: 'Key Management Service'
-      public_url: "{{ endpoints.barbican.url.public }}/{{ endpoints.barbican.url.path }}"
-      internal_url: "{{ endpoints.barbican.url.internal }}/{{ endpoints.barbican.url.path }}"
-      admin_url: "{{ endpoints.barbican.url.admin }}/{{ endpoints.barbican.url.path }}"
+      public_url: "{{ endpoints.barbican.url.public }}"
+      internal_url: "{{ endpoints.barbican.url.internal }}"
+      admin_url: "{{ endpoints.barbican.url.admin }}"
   federation:
     enabled: False
 

@@ -14,7 +14,7 @@
   when: barbican_user|failed
 
 - name: /etc/barbican
-  file: dest=/etc/barbican state=directory
+  file: dest=/etc/barbican state=directory owner=cinder group=cinder
 
 - name: barbican log dir
   file: dest=/var/log/barbican state=directory mode=2750 owner=barbican group=adm
@@ -29,6 +29,19 @@
     - etype: other
       permission: r
 
+- name: create barbican cache dir
+  file: dest=/var/cache/barbican state=directory mode=0700
+        owner=barbican group=barbican
+        
+- name: set uwsgi path (source install)
+  set_fact: uwsgi_path={{ openstack_source.virtualenv_base }}/barbican/bin/uwsgi
+  when: openstack_install_method == 'source'
+
+- name: set uwsgi path (package install ubuntu)
+  set_fact:
+    uwsgi_path: "{{ openstack_package.virtualenv_base }}/barbican/bin/uwsgi"
+  when: openstack_install_method == 'package' and ursula_os == 'ubuntu'
+  
 - name: install barbican uwsgi service (ubuntu)
   template: src=etc/init/barbican.conf
             dest=/etc/init/barbican.conf mode=0644
@@ -49,8 +62,14 @@
   template: src=etc/uwsgi/barbican-vassals-api.ini
             dest=/etc/barbican/uwsgi/barbican-main.ini mode=0775
             owner=barbican group=barbican
-  notify: restart barbican services
        
+- name: barbican apache vhost (ubuntu)
+  template: src=etc/apache2/sites-available/barbican.conf
+            dest=/etc/apache2/sites-available/barbican.conf
+  when: ursula_os == 'ubuntu'
+  notify:
+    - reload apache
+         
 - name: sync barbican database
   command: barbican-manage db upgrade
   when: database_create.changed or force_sync|default('false')|bool
@@ -61,5 +80,17 @@
   # we want this to always be changed so that it can notify the service restart
   tags: db-migrate
 
+- name: enable barbican apache site
+  apache2_site: name=barbican state=present
+  notify:
+    - reload apache
+  when: ursula_os == 'ubuntu'
+  
 - name: Flush handlers
   meta: flush_handlers
+
+- name: start barbican
+  service:
+    name: "{{ openstack_meta.barbican.services.barbican_api[ursula_os].name }}"
+    state: started
+    enabled: true

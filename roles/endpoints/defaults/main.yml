@@ -255,6 +255,6 @@ endpoints:
       backend_api:  9312
       haproxy_api:  9311
     haproxy:
-      health_check: 'httpchk GET /healthcheck'
+      health_check: 'tcp-check /'
       balance: 'source'
       prefer_primary_backend: True

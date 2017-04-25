@@ -1,8 +1,10 @@
 ---
 - name: restart barbican services
   service:
-    name: barbican
+    name: "{{ openstack_meta.barbican.services.barbican_api[ursula_os].name }}"
     state: restarted
     must_exist: false
   run_once: True
+  delegate_to: "{{ item }}"
   when: restart|default(True)
+  with_items: play_hosts

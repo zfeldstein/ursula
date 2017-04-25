@@ -2,6 +2,19 @@
 project_name: barbican
 barbican_keystone_auth: yes
 barbican:
+  admin_workers: 1
+  public_workers: 1
+  admin_project_name: admin
+  admin_project_domain_name: Default
+  uwsgi:
+    method: port
+    http_port:
+      admin: 9313
+      public: 9314
+    home:
+      distro: /usr/lib/python2.7/site-packages/barbican
+      source: /opt/openstack/current/barbican
+      package: /opt/openstack/current/barbican
   services:
     barbican_api: "{{ openstack_meta.barbican.services.barbican_api[ursula_os] }}"
   state_path: "{{ state_path_base }}/barbican"
@@ -14,8 +27,10 @@ barbican:
     upper_constraints: '{{ openstack_meta.upper_constraints }}'
     python_dependencies: 
         - { name: PyMySQL }
-    python_post_dependencies: []
-    system_dependencies:
+    python_post_dependencies: 
+        - { name: uwsgi }
+        - { name: python-memcached }
+    system_dependencies: 
         ubuntu:
         - apache2
         - apache2-utils
@@ -25,16 +40,10 @@ barbican:
         - libpq-dev
         - libffi-dev
         - build-essential
-        - uwsgi-plugin-python
         rhel: []
   alternatives: 
     - barbican-manage
   logs:
-    - paths:
-        - /var/log/barbican/barbican-api.log
-      fields:
-        type: openstack
-        tags: barbican,barbican-api
     - paths:
         - /var/log/barbican/barbican-manage.log
       fields:
