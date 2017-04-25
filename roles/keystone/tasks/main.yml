@@ -83,11 +83,13 @@
   template: src=etc/keystone/uwsgi/keystone-admin.ini
             dest=/etc/keystone/uwsgi/keystone-admin.ini mode=0775
             owner=keystone group=keystone
+  notify: restart keystone services
 
 - name: configure keystone public wsgi
   template: src=etc/keystone/uwsgi/keystone-main.ini
             dest=/etc/keystone/uwsgi/keystone-main.ini mode=0775
             owner=keystone group=keystone
+  notify: restart keystone services
 
 - name: setup keystone sso template
   template: src=etc/keystone/sso_callback_template.html

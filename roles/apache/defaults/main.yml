@@ -13,6 +13,7 @@ apache:
     ubuntu:
       - libapache2-mod-wsgi
       - libapache2-mod-uwsgi
+      - libapache2-mod-proxy-uwsgi
     rhel:
       - mod_wsgi
       - mod_proxy_uwsgi
