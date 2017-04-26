@@ -47,6 +47,23 @@ rabbitmq:
 
 mongodb:
   port: 27017
+  keyfile_content: |
+    fO3Ngno3oF5BDdbcc1Dm7ENPOhtlnoKnPBBjoRbGJxO9jsMmNXpqZVisyyCMyNAf
+    YA7X24V4PD+xL/es3Qf8xS7oe503aFaF1XW+L88UfZxzPiDH31LE1Hlek6jRMKqV
+    jwfxc+lg4wvDxo+nvxXpMJW/HtcdlIFj6yaRY0L/n57M4DrXx9zUt2oxDotoDQcJ
+    Ua0PWh/hGUlMQd4hvt7/W1mUrBWJ4HfeweI5iZnMvnhRBnTwx2MQr2dXsbtMtQ0x
+    ImSbcZi9zY1374UGaoRWlLYegS3+6geEzhZb6RX3qhEMCID5+omuh9jP0Uxodhs6
+    Cpi+gN2QVbKdEc1HfeGFWNqBi7B4yN/zztoNGzJvcl2wcWoNp5Iu9MNYVNNy+PnU
+    ozEQ7tdOobgjaUiOl4NdT9ww8ysyIrzPoo3ZxDn+RF6zj/mhVx9EpITiqwSIC+gQ
+    2iq8gVRTbqiIceNmwuoMzcR7o1LbZZjuuoGfE4lPzoiJujJ4RbX5hAqFH+5DFTWr
+    Xts5AaZOiWxgGZaaU/6XWasoh75fqSIW2g+ViBN1Y28+6DoORo6rdaUgY0cfo+wg
+    vRBpVeLGygKpOwc9nq7N3kQvjpAmHJCKdivoDSIUiJKCibUl9qmJwUFvmM/xO8cm
+    z58LLXBhtDsGlT/3WN2n0+NbkD3vef7eriEF8rL/MI1q+inIIoxvlmreDZin2EAh
+    ha32zdZ+jRtEFjMkeJJfpt+jGmCLZxWjyxQFudyv9bg8aISpjwWT4bt7wFQiNFJH
+    Q+oUygwbAxqF0Y1n0XYmRZqUo9RveFntFbik8DpUXmZJABfJCB7HMOkrZN4QE/Ap
+    J0vmxpVJkRCypB1Q9Qvg3Ans3+mdgpwD/HXPyE/MYbM/MGFEIJFzC4Ic88UVB/nW
+    GegLWSgMErRQnaoYcaCyKhyXWvmz1VPymCIwdxDUCLN/GMXyVUw5N8zGEX7Dlyak
+    /LiiRGYq/GLcMPPx2+1mQPPDNMpR
 
 memcached:
   memory: 64
