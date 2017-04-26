@@ -134,8 +134,3 @@
     pkg: mlocate
     state: absent
   when: ursula_os == 'rhel'
-
-- include: serverspec.yml
-  tags:
-    - serverspec
-  when: serverspec.enabled|default('False')|bool

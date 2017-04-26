@@ -65,14 +65,10 @@
   - name: re-read facts after adding custom fact
     setup: filter=ansible_local
   when:
-    - "'ceph_monitors' in group_names or 'ceph_osds' in group_names" 
+    - "'ceph_monitors' in group_names or 'ceph_osds' in group_names"
     - stat_ceph_conf.stat.exists
     - result_ceph_conf.changed
 
 - include: logging.yml
   tags: ['logrotate', 'logging']
   when: logging.enabled|default(true)
-
-- include: serverspec.yml
-  tags: ['serverspec']
-  when: serverspec.enabled|default(false)
