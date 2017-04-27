@@ -1,7 +1,8 @@
 ---
-stack_env: example_ci-ceph_swift
+stack_env: example_ci-ceph-swift-ubuntu
 ursula_os: 'ubuntu'
-
+undercloud_cidr:
+  - cidr: 192.168.0.0/22
 state_path_base: /opt/stack/data
 
 swift_floating_ip: "{{ hostvars[groups['swiftnode'][0]][primary_interface]['ipv4']['address'] }}"
