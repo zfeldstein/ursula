@@ -49,6 +49,7 @@ class VarsModule(object):
         if os.path.exists(defaults_path):
             with open(defaults_path) as fh:
                 return yaml.safe_load(fh)
+        print "could not find defaults: %s" % defaults_path
         return None
 
     def run(self, host, vault_password=None):
