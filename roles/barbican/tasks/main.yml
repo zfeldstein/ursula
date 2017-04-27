@@ -14,20 +14,10 @@
   when: barbican_user|failed
 
 - name: /etc/barbican
-  file: dest=/etc/barbican state=directory owner=cinder group=cinder
+  file: dest=/etc/barbican state=directory owner=barbican group=barbican
 
 - name: barbican log dir
-  file: dest=/var/log/barbican state=directory mode=2750 owner=barbican group=adm
-
-- name: Change barbican log dir acl
-  acl: name=/var/log/barbican state=present default=yes etype={{ item.etype }} permissions={{ item.permission }}
-  with_items:
-    - etype: user
-      permission: rw
-    - etype: group
-      permission: r
-    - etype: other
-      permission: r
+  file: dest=/var/log/barbican state=directory mode=0755 owner=barbican
 
 - name: create barbican cache dir
   file: dest=/var/cache/barbican state=directory mode=0700
@@ -49,6 +39,7 @@
 
 - name: Distribute Barbican Config Files
   template: src={{ item }} dest=/etc/barbican mode=0644
+            owner=barbican group=barbican
   with_fileglob: ../templates/etc/barbican/*
 
 - name: Creates barbican uwsgi and httpd directories

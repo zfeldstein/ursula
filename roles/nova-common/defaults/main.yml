@@ -88,6 +88,7 @@ nova:
       - { name: PyMySQL }
       - { name: python-memcached }
       - { name: python-ironicclient }
+      - { name: python-barbicanclient }
     system_dependencies:
       ubuntu:
         - libjs-jquery-tablesorter

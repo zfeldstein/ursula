@@ -66,6 +66,7 @@ cinder:
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }
+      - { name: python-barbicanclient }
     system_dependencies:
       ubuntu: []
       rhel: []
