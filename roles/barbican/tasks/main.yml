@@ -54,13 +54,6 @@
             dest=/etc/barbican/uwsgi/barbican-main.ini mode=0775
             owner=barbican group=barbican
        
-- name: barbican apache vhost (ubuntu)
-  template: src=etc/apache2/sites-available/barbican.conf
-            dest=/etc/apache2/sites-available/barbican.conf
-  when: ursula_os == 'ubuntu'
-  notify:
-    - reload apache
-         
 - name: sync barbican database
   command: barbican-manage db upgrade
   when: database_create.changed or force_sync|default('false')|bool
@@ -71,12 +64,6 @@
   # we want this to always be changed so that it can notify the service restart
   tags: db-migrate
 
-- name: enable barbican apache site
-  apache2_site: name=barbican state=present
-  notify:
-    - reload apache
-  when: ursula_os == 'ubuntu'
-  
 - name: Flush handlers
   meta: flush_handlers
 

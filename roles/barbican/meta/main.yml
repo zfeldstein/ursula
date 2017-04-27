@@ -22,7 +22,6 @@ dependencies:
     when: openstack_install_method == 'distro'
   - role: openstack-database
     database_name: barbican
-  - role: apache
   - role: openstack-firewall
     rule_name: barbican
     rules_type_input:
