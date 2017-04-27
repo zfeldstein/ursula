@@ -1,5 +1,5 @@
 # Play for upgrading from one version of OpenStack to another.
-# Heavily flavored for Kilo to Mitaka for now, but useful as a model for
+# Heavily flavored for Mitaka to Newton for now, but useful as a model for
 # future upgrades. NOT a rolling upgrade optimized for downtime.
 #
 # Assumes ml2 networking
@@ -53,6 +53,9 @@
   roles:
     - role: logging
   environment: "{{ env_vars|default({}) }}"
+  post_tasks:
+    - name: uninstall logstash-forwarder
+      package: name=logstash-forwarder state=absent
 
 - name: upgrade common bits first
   hosts: all:!vyatta-*
