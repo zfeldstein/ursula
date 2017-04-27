@@ -16,15 +16,25 @@ monitoring:
         - name: 'stackdata'
           path: '/opt/stack/data'
           warning: 89
-          critical: 99 
+          critical: 99
         - name: 'root'
           path: '/'
           warning: 80
-          critical: 90 
+          critical: 90
         - name: 'mysql'
           path: '/var/lib/mysql'
           warning: 70
           critical: 80
+    network_interface_traffic:
+      state: present
+      warning: 250
+      critical: 500
+      interface: "{{ hostvars[inventory_hostname][hostvars[inventory_hostname].primary_interface|remove_vlan_tag]|net_physical_devices|join(',') }}"
+      subdue:
+        days:
+          all:
+            - begin: "12:00 PM"
+              end: "12:00 PM"
     gems:
       - sys-filesystem
   ipmi_checks:
