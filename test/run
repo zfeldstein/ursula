@@ -19,32 +19,32 @@ cd ${ROOT}
 extra_args="--ursula-user=${LOGIN_USER} --ursula-debug --ursula-sudo"
 
 if [ "${ACTION}" == "all" -o "${ACTION}" == "deploy" ]; then
-  time ursula ${extra_args} "envs/test" site.yml -u ${LOGIN_USER} "$@"
+  time ursula ${extra_args} "${ENV_DIR}" site.yml -u ${LOGIN_USER} "$@"
   ring_bell
 fi
 
 if [ "${ACTION}" == "all" -o "${ACTION}" == "test" ]; then
-  time ursula ${extra_args} "envs/test" ${ROOT}/playbooks/tests/tasks/main.yml -u ${LOGIN_USER} $@
+  time ursula ${extra_args} "${ENV_DIR}" ${ROOT}/playbooks/tests/tasks/main.yml -u ${LOGIN_USER} $@
   ring_bell
 fi
 
 if [ "${ACTION}" == "all" -o "${ACTION}" == "rally" ]; then
-  time ursula ${extra_args} "envs/test" ${ROOT}/playbooks/tests/tasks/rally.yml -u ${LOGIN_USER} "$@"
+  time ursula ${extra_args} "${ENV_DIR}" ${ROOT}/playbooks/tests/tasks/rally.yml -u ${LOGIN_USER} "$@"
   ring_bell
 fi
 
 if [ "${ACTION}" == "all" -o "${ACTION}" == "cleanup" ]; then
-  time ursula ${extra_args} "envs/test" ${ROOT}/playbooks/tests/tasks/cleanup.yml -u ${LOGIN_USER}
+  time ursula ${extra_args} "${ENV_DIR}" ${ROOT}/playbooks/tests/tasks/cleanup.yml -u ${LOGIN_USER}
   ring_bell
 fi
 
 if [ "${ACTION}" == "upgrade" ]; then
-  time ursula ${extra_args} "envs/test" upgrade.yml -u ${LOGIN_USER} "$@"
+  time ursula ${extra_args} "${ENV_DIR}" upgrade.yml -u ${LOGIN_USER} "$@"
   ring_bell
 fi
 
 if [ "${ACTION}" == "rhn_unsubscribe" ]; then
-  time ursula ${extra_args} "envs/test" ${ROOT}/playbooks/rhn_unsubscribe.yml -u ${LOGIN_USER} "$@"
+  time ursula ${extra_args} "${ENV_DIR}" ${ROOT}/playbooks/rhn_unsubscribe.yml -u ${LOGIN_USER} "$@"
   ring_bell
 fi
 

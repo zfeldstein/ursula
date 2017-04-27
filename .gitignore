@@ -1,4 +1,4 @@
-envs/test
+envs/example/test
 *.pyc
 *.vdi
 *.retry

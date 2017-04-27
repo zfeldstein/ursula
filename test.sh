@@ -57,8 +57,8 @@ test/setup ${EXTRA_VARS}
 pip install pyopenssl ndg-httpsclient pyasn1
 sleep 120
 if [[ "${INSTALL_METHOD}" == "package" ]]; then
-    echo "openstack_install_method: '${INSTALL_METHOD}'" >> envs/test/group_vars/all.yml
-    echo "openstack_package_version: '${PACKAGE_VERSION}'" >> envs/test/group_vars/all.yml
+    echo "openstack_install_method: '${INSTALL_METHOD}'" >> envs/example/test/group_vars/all.yml
+    echo "openstack_package_version: '${PACKAGE_VERSION}'" >> envs/example/test/group_vars/all.yml
 fi
 test/run deploy ${EXTRA_VARS}
 test/run test
