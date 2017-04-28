@@ -67,6 +67,16 @@ endpoints:
       internal: https://{{ fqdn }}:8776
       public: https://{{ fqdn }}:8776
       path: v2/%(project_id)s
+  cinderv3:
+    name: cinderv3
+    type: volume
+    description: 'Volume Service v3'
+    version: v3
+    url:
+      admin: https://{{ fqdn }}:8776
+      internal: https://{{ fqdn }}:8776
+      public: https://{{ fqdn }}:8776
+      path: v3/%(project_id)s
   keystone:
     name: keystone
     type: identity

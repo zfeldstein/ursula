@@ -454,6 +454,12 @@ keystone:
       public_url: "{{ endpoints.cinderv2.url.public }}/{{ endpoints.cinderv2.url.path }}"
       internal_url: "{{ endpoints.cinderv2.url.internal }}/{{ endpoints.cinderv2.url.path }}"
       admin_url: "{{ endpoints.cinderv2.url.admin }}/{{ endpoints.cinderv2.url.path }}"
+    - name: cinderv3
+      type: volumev3
+      description: 'Volume Service v3'
+      public_url: "{{ endpoints.cinderv3.url.public }}/{{ endpoints.cinderv3.url.path }}"
+      internal_url: "{{ endpoints.cinderv3.url.internal }}/{{ endpoints.cinderv3.url.path }}"
+      admin_url: "{{ endpoints.cinderv3.url.admin }}/{{ endpoints.cinderv3.url.path }}"
     - name: heat
       type: orchestration
       description: 'Heat Orchestration API'
@@ -643,6 +649,9 @@ keystonev3:
   enabled: True
 
 cinderv2:
+  enabled: True
+
+cinderv3:
   enabled: True
 
 magnum:
