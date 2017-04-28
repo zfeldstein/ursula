@@ -35,7 +35,7 @@ fi
 
 export STACK_RC=~/jenkins.stackrc
 export CI=jenkins
-export TEST_ENV=ci-full
+export TEST_ENV=${TEST_ENV:-ci-full-ubuntu}
 export PATH=${WORKSPACE}/venv/bin:$PATH
 export INSTALL_METHOD=${INSTALL_METHOD:-source}
 export IMAGE_ID=${IMAGE_ID:-ci-trusty}
