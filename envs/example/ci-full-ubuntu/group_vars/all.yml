@@ -30,6 +30,20 @@ common:
 
 logging:
   enabled: true
+  follow:
+    enabled: true
+    global_fields:
+      customer_id: "unknown"
+      cluster_name: "unknown"
+    logs:
+      - paths:
+          - /var/log/messages
+        fields:
+          type: syslog
+  forward:
+    host: 127.0.0.1
+    port: 4560
+
 
 keystone:
   ldap_domain:
