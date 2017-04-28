@@ -50,6 +50,7 @@
   sensu_metrics_check: name=nova-oversubscribe-metrics plugin=metrics-nova-oversub.sh
                        args='-s {{ monitoring.graphite.cluster_prefix }}.nova.oversubscription'
                        interval=3600
+                       use_sudo=true
                        only_on_ip="{{ undercloud_floating_ip | default(floating_ip) }}"
   notify: restart sensu-client
 
@@ -84,7 +85,7 @@
     plugin: metrics-nova-project-usage.py
     state: absent
   notify: restart sensu-client
-  
+
 - name: nova limit metrics (quota/usage)
   sensu_metrics_check:
     name: compute-limit-metrics

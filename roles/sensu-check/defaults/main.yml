@@ -48,6 +48,15 @@ sensu_checks:
       service_owner: openstack
       tags:
         - ticket
+    network_interface_traffic:
+      auto_resolve: true
+      handler: default
+      interval: 30
+      occurrences: 2
+      standalone: true
+      command: "sudo check-netif.rb -c {{monitoring.checks.network_interface_traffic.critical}} -w {{monitoring.checks.network_interface_traffic.warning}} --interfaces {{monitoring.checks.network_interface_traffic.interface}}"
+      service_owner: openstack
+      subdue: "{{monitoring.checks.network_interface_traffic.subdue }}"
 
   neutron:
     check_neutron_agents:
@@ -84,6 +93,7 @@ sensu_checks:
 
   nova:
     check_nova_services:
+      auto_resolve: true
       handler: default
       interval: 120
       standalone: true
@@ -153,4 +163,3 @@ sensu_checks:
       standalone: true
       command: "sudo check-inspec.rb --control /etc/inspec/controls"
       service_owner: openstack
-

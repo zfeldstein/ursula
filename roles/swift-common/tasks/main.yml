@@ -11,11 +11,11 @@
   file: dest=/home/swiftops/.ssh state=directory owner=swiftops
         group=swiftops mode=0755
 
-- name: drop a swiftops public key
+- name: drop a swiftops private key
   template: src=home/swiftops/.ssh/id_rsa dest=/home/swiftops/.ssh/id_rsa
             owner=swiftops group=swiftops mode=0600
 
-- name: drop a swiftops private key
+- name: drop a swiftops public key
   template: src=home/swiftops/.ssh/id_rsa.pub
             dest=/home/swiftops/.ssh/id_rsa.pub owner=swiftops
             group=swiftops mode=0600
@@ -134,8 +134,3 @@
     pkg: mlocate
     state: absent
   when: ursula_os == 'rhel'
-
-- include: serverspec.yml
-  tags:
-    - serverspec
-  when: serverspec.enabled|default('False')|bool

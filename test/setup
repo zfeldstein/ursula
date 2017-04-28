@@ -59,7 +59,7 @@ extra_args="--ursula-debug --provisioner=heat --heat-stack-name=${testenv_heat_s
 ursula ${extra_args} "envs/test" ${ROOT}/playbooks/${TEST_ENV}/tasks/pre-deploy.yml -u ${LOGIN_USER} "$@" -vvvv
 mv envs/test/.ssh_config  envs/test/ssh_config
 
-if [[ ${TEST_ENV} == "ci-ceph_swift" || ${TEST_ENV} == "ci-ceph-swift-rhel" ]]; then
+if [[ ${TEST_ENV} == "ci-ceph-swift-ubuntu" || ${TEST_ENV} == "ci-ceph-swift-rhel" ]]; then
   echo "generating ring_definition.yml file for swift ..."
   swift_0_ip="$(private_ip ${SWIFT_0_NAME})"
   swift_1_ip="$(private_ip ${SWIFT_1_NAME})"

@@ -43,7 +43,9 @@
       when: manage_disks.enabled|default('False')|bool
     - role: serverspec
       tags: ['common', 'serverspec']
-      when: serverspec.enabled|default("False")|bool
+      when:
+        - serverspec.enabled|default("False")|bool
+        - ursula_os == 'ubuntu'
     - role: inspec
       install_inspec_controls: [rhel7]
       tags: [common,inspec]

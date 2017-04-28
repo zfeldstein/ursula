@@ -174,7 +174,10 @@
   notify: restart sensu-client
 
 - name: network interface traffic check
-  sensu_check: name=network_interface_traffic plugin=check-netif.rb state=absent
+  sensu_check_dict:
+    name: network_interface_traffic
+    check: "{{sensu_checks.common.network_interface_traffic}}"
+    state: "{{monitoring.checks.network_interface_traffic.state}}"
   notify: restart sensu-client
 
 - name: disk check with default threshold

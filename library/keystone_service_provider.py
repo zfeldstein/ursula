@@ -178,7 +178,7 @@ def main():
             module.exit_json(changed=changed)
 
     except Exception as e:
-        module.fail_json(msg="identity provider failed: %s" % str(e))
+        module.fail_json(msg="service provider failed: %s" % str(e))
 
 # this is magic, see lib/ansible/module_common.py
 from ansible.module_utils.basic import *

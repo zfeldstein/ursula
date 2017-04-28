@@ -33,6 +33,16 @@
     - ursula_os == 'rhel'
     - openstack_install_method == 'distro'
 
+- name: Create keyFile
+  copy:
+    dest: "{{ mongodb.keyFile }}"
+    content: "{{ mongodb.keyfile_content }}"
+    owner: mongodb
+    group: mongodb
+    mode: 0600
+  notify: restart mongodb service
+  no_log: true
+
 - name: install mongodb config files
   template: src=etc/mongodb/mongod.conf
             dest=/etc/mongod.conf
@@ -46,6 +56,12 @@
 - name: start mongodb service
   service: name=mongod state=started enabled=True
 
+- name: install pymongo for mongodb_user module
+  pip: name=pymongo state=present
+  register: result
+  until: result|succeeded
+  retries: 5
+
 - include: monitoring.yml
   tags:
     - monitoring
@@ -56,8 +72,3 @@
   tags:
     - logrotate
     - logging
-
-- include: serverspec.yml
-  tags:
-    - serverspec
-  when: serverspec.enabled|default('False')|bool

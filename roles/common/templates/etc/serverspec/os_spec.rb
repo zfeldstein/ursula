@@ -12,15 +12,14 @@ describe file('/etc/pam.d/common-password') do
 end
 
 describe file('/etc/login.defs') do
-  it { should contain '^PASS_MAX_DAYS   90' }
-  it { should contain '^PASS_MIN_DAYS   1' }
+  it { should contain '^PASS_MIN_DAYS\s*1' }
 end
 
 describe file('/etc/ssh/sshd_config') do
   it {should contain '^PermitEmptyPasswords no'}
   it {should contain '^PubkeyAuthentication yes'}
   it {should contain '^PasswordAuthentication no'}
-  it {should contain '^PermitRootLogin without-password'}
+  it {should contain '^PermitRootLogin no'}
   it {should contain '^RSAAuthentication yes'}
   it {should contain '^HostbasedAuthentication no'}
   it {should contain '^IgnoreRhosts yes'}
@@ -66,7 +65,7 @@ files.each do |file|
   end
 end
 
-files = ['bin', 'games', 'include', 'lib', 'local', 'sbin', 'share', 'src']
+files = ['bin', 'include', 'lib', 'local', 'sbin', 'share', 'src']
 files.each do |file|
   describe file("/usr/#{file}/") do
     it {should be_directory }
