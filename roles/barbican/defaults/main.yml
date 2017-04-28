@@ -8,9 +8,6 @@ barbican:
   admin_project_domain_name: Default
   uwsgi:
     method: port
-    http_port:
-      admin: 9313
-      public: 9314
     home:
       distro: /usr/lib/python2.7/site-packages/barbican
       source: /opt/openstack/current/barbican
@@ -25,23 +22,23 @@ barbican:
   source:
     rev: 'stable/newton'
     upper_constraints: '{{ openstack_meta.upper_constraints }}'
-    python_dependencies: 
+    python_dependencies:
         - { name: PyMySQL }
-    python_post_dependencies: 
+    python_post_dependencies:
         - { name: uwsgi }
         - { name: python-memcached }
-    system_dependencies: 
+    system_dependencies:
         ubuntu:
         - apache2
         - apache2-utils
-        - libapache2-mod-wsgi 
+        - libapache2-mod-wsgi
         - python-dev
         - libssl-dev
         - libpq-dev
         - libffi-dev
         - build-essential
         rhel: []
-  alternatives: 
+  alternatives:
     - barbican-manage
   logs:
     - paths:

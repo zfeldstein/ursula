@@ -187,8 +187,8 @@ nova:
       vcpus: 8
 
 barbican:
-  enabled: True
-  
+  enabled: False
+
 ceph:
   enabled: false
   #disks:
@@ -196,6 +196,9 @@ ceph:
   #  - sdc
   #  - sdd
   #bcache_ssd_device: sdg
+
+lvm:
+  enabled: False
 
 cinder:
   enabled: True

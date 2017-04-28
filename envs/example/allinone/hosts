@@ -1,17 +1,17 @@
 [controller]
-allinone-multiple
+allinone
 
 [network]
-allinone-multiple
+allinone
 
 [db]
-allinone-multiple
+allinone
 
 [mongo_db]
-allinone-multiple
+allinone
 
 [compute]
-allinone-multiple
+allinone
 
 [cinder_volume]
-allinone-multiple
+allinone
