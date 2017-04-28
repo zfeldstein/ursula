@@ -22,7 +22,12 @@
             dest=/etc/cinder/cinder.encryption.conf mode=0640
             owner=root group=cinder
   notify: restart cinder services
-  when: barbican.enabled or cinder.fixed_key is defined
+  when: cinder.fixed_key is defined
+
+- name: disable cinder encryption
+  file: dest=/etc/cinder/cinder.encryption.conf state=absent
+  notify: restart cinder services
+  when: cinder.fixed_key is not defined
 
 #When OS is Ubuntu
 - block:
