@@ -60,6 +60,13 @@
     - ceph.log
     - ceph.audit.log
 
+- name: make sure /var/log/ceph has rx permissions for other user
+  file: path=/var/log/ceph
+        state=touch
+        owner=ceph
+        group=ceph
+        mode="o+rx"
+
 - name: activate monitor with upstart
   file: path=/var/lib/ceph/mon/ceph-{{ ansible_hostname }}/{{ item }}
         state=touch
