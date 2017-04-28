@@ -33,13 +33,10 @@ if [[ -z ${PACKAGE_VERSION} && "${INSTALL_METHOD}" == "package" ]]; then
     exit 1
 fi
 
-export WORKSPACE=/home/ubuntu/wpr/ursula
-export BUILD_ID=wpr
-export STACK_RC=$WORKSPACE/stackrc
+export STACK_RC=~/jenkins.stackrc
 export CI=jenkins
 export TEST_ENV=ci-full
 export PATH=${WORKSPACE}/venv/bin:$PATH
-export TEST_ENV=${TEST_ENV:-ci-full-ubuntu}
 export INSTALL_METHOD=${INSTALL_METHOD:-source}
 export IMAGE_ID=${IMAGE_ID:-ci-trusty}
 export LOGIN_USER=${LOGIN_USER:-ubuntu}
@@ -53,7 +50,7 @@ function cleanup {
     ssh-agent -k
 }
 
-#trap cleanup EXIT TERM
+trap cleanup EXIT TERM
 eval $(ssh-agent -s -t 14400)
 ssh-add -D
 test/setup ${EXTRA_VARS}
