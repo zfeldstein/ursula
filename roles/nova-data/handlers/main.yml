@@ -11,3 +11,10 @@
   service: name={{ item.name }} state=restarted must_exist=false
   with_items:
     - "{{ nova.services.nova_compute }}"
+
+- name: restart multipath service
+  service:
+    name: "{{ v7k.multipath[ursula_os].service_name }}"
+    state: restarted
+
+
