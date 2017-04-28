@@ -33,8 +33,9 @@
   file:
     dest: /var/log/barbican
     state: directory
-    mode: 2750
+    mode: 755
     owner: barbican
+    group: adm
 
 - name: Change barbican log dir acl
   acl: name=/var/log/barbican state=present default=yes etype={{ item.etype }} permissions={{ item.permission }}
@@ -119,3 +120,23 @@
     name: "{{ openstack_meta.barbican.services.barbican_api[ursula_os].name }}"
     state: started
     enabled: true
+
+- name: Barbican roles
+  environment:
+    OS_IDENTITY_API_VERSION: 3
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
+  os_keystone_role:
+    name: "{{ item }}"
+    validate_certs: "{{ validate_certs|default(omit) }}"
+    auth:
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      project_name: admin
+      project_domain_name: default
+      user_domain_name: default
+      username: admin
+      password: "{{ secrets.admin_password }}"
+  with_items: "{{ barbican.roles }}"
+  register: result
+  until: result|succeeded
+  retries: 5
+  delay: 10

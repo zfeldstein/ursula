@@ -6,6 +6,10 @@ barbican:
   public_workers: 1
   admin_project_name: admin
   admin_project_domain_name: Default
+  roles:
+    - creator
+    - observer
+    - audit
   uwsgi:
     method: port
     home:
