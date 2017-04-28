@@ -17,6 +17,6 @@ haproxy:
   mysql:
     maxconn: 4096
     timeout_connect: 5000ms
-    timeout_client: 5000ms
-    timeout_server: 5000ms
+    timeout_client: 300s
+    timeout_server: 300s
     retries: 3
