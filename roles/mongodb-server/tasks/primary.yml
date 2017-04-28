@@ -1,18 +1,37 @@
 ---
-- name: initiate replica set
-  command: mongo --host {{ mongodb.endpoint_addr }} --eval 'rs.initiate()'
+- name: check if already initiated
+  command: mongo -u admin -p {{ mongodb.db_password }} admin --host {{ mongodb.endpoint_addr }} --port {{ mongodb.port }} --eval 'rs.initiate()'
+  register: authenticate
+  ignore_errors: yes
+  changed_when: False
+  no_log: true
 
-- name: wait for replica set init to complete
-  pause: seconds=20
+- include: auth_initialization.yml
+  when: authenticate.rc != 0
 
-- name: rename primary replica member
-  command: mongo --host {{ mongodb.endpoint_addr }} --eval 'cfg=rs.conf(); cfg.members[0].host="{{ primary_ip }}:{{ mongodb.port }}"; cfg.members[0].priority = 2; rs.reconfig(cfg)'
+- name: make sure admin user has root role to manage cluster
+  mongodb_user:
+    login_user: admin
+    login_password:  "{{ mongodb.db_password }}"
+    login_port: "{{ mongodb.port }}"
+    database: admin
+    name: admin
+    password: "{{ mongodb.db_password }}"
+    replica_set: "{{ mongodb.replica_name }}"
+    roles: "userAdminAnyDatabase,clusterAdmin"
+    state: present
+  when: authenticate.rc == 0
+  no_log: True
 
-- name: install pymongo for mongodb_user module
-  pip: name=pymongo state=present
-  register: result
-  until: result|succeeded
-  retries: 5
-
-- name: create admin user
-  mongodb_user: database=admin name=admin password={{ mongodb.db_password }} replica_set={{ mongodb.replica_name }} roles='userAdminAnyDatabase' state=present
+- name: make sure it's a member of replica_set(include rs.initate)
+  mongodb_replication:
+    login_host: "{{ mongodb.endpoint_addr }}"
+    login_port: "{{ mongodb.port }}"
+    login_user: "admin"
+    login_password: "{{ mongodb.db_password }}"
+    replica_set: "{{ mongodb.replica_name }}"
+    host_name: "{{ primary_ip }}"
+    host_port: "{{ mongodb.port }}"
+    host_type: "replica"
+    priority: 2.0
+  no_log: true
