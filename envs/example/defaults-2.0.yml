@@ -665,12 +665,6 @@ logging:
 keystonev3:
   enabled: True
 
-cinderv2:
-  enabled: True
-
-cinderv3:
-  enabled: True
-
 magnum:
   enabled: False
   debug: True
