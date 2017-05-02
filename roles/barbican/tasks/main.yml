@@ -33,7 +33,7 @@
   file:
     dest: /var/log/barbican
     state: directory
-    mode: 755
+    mode: 750
     owner: barbican
     group: adm
 
@@ -90,7 +90,7 @@
     mode: 0775
   with_items:
     - /etc/barbican/uwsgi
-    - /run/uwsgi
+    - /run/uwsgi/barbican
 
 - name: configure barbican admin wsgi
   template:

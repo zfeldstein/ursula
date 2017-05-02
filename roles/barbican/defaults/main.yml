@@ -2,6 +2,7 @@
 project_name: barbican
 barbican_keystone_auth: yes
 barbican:
+  enabled: False
   admin_workers: 1
   public_workers: 1
   admin_project_name: admin
@@ -32,7 +33,7 @@ barbican:
         - { name: uwsgi }
         - { name: python-memcached }
     system_dependencies:
-        ubuntu:
+      ubuntu:
         - apache2
         - apache2-utils
         - libapache2-mod-wsgi
@@ -41,7 +42,7 @@ barbican:
         - libpq-dev
         - libffi-dev
         - build-essential
-        rhel: []
+      rhel: []
   alternatives:
     - barbican-manage
   logs:

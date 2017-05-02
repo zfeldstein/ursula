@@ -26,4 +26,3 @@ dependencies:
     rule_name: barbican
     rules_type_input:
       - { protocol: tcp, port: "{{ endpoints.barbican.port.haproxy_api }}" }
-      - { protocol: tcp, port: "{{ endpoints.barbican.port.backend_api }}" }
