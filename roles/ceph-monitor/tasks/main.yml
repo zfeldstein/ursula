@@ -62,7 +62,7 @@
 
 - name: make sure /var/log/ceph has rx permissions for other user
   file: path=/var/log/ceph
-        state=touch
+        state=directory
         owner=ceph
         group=ceph
         mode="o+rx"
