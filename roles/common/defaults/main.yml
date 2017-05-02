@@ -163,6 +163,11 @@ common:
       fields:
         type: syslog
         tags: audit,common
+    - paths:
+        - /var/log/sensu/sensu-client.log
+      fields:
+        type: json
+        tags: sensu
   logging:
     debug: False
     verbose: True
