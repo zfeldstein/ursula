@@ -30,6 +30,14 @@
   until: result|succeeded
   retries: 5
 
+# FIXME: we need to remove this task once all envs are fixed
+- name: correct owner of /var/log/ceph for existing ubuntu envs
+  file: path=/var/log/ceph
+        state=directory
+        owner=ceph
+        group=ceph
+        recurse=yes
+
 - name: register admin.keyring
   slurp: src=/etc/ceph/ceph.client.admin.keyring
   register: admin_keyring
