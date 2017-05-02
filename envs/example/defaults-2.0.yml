@@ -215,7 +215,7 @@ ceph:
   #bcache_ssd_device: sdg
 
 lvm:
-  enabled: False
+  enabled: false
 
 cinder:
   enabled: True

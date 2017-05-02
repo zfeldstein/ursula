@@ -8,3 +8,4 @@
   delegate_to: "{{ item }}"
   when: restart|default(True)
   with_items: play_hosts
+  
