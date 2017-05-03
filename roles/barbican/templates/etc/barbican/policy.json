@@ -1,5 +1,5 @@
 {
-    "admin": "role:admin role:cloud_admin",
+    "admin": "role:admin or role:cloud_admin",
     "observer": "role:observer",
     "creator": "role:creator",
     "audit": "role:audit",
