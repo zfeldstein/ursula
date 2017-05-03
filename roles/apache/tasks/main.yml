@@ -34,6 +34,7 @@
       - uwsgi
       - proxy
       - proxy_http
+      - proxy_uwsgi
     notify: reload apache
 
   - name: disable apache status
@@ -106,6 +107,16 @@
       - userdir.conf
       - welcome.conf
     notify: restart apache
+
+  - name: enable the mod_proxy_uwsgi module
+    template:
+      src: etc/httpd/conf.modules.d/43-mod_proxy_uwsgi.conf
+      dest: /etc/httpd/conf.modules.d/43-mod_proxy_uwsgi.conf
+      mode: 0644
+      owner: root
+      group: root
+    notify: restart apache
+
   when: ursula_os == 'rhel'
 
 - name: enable apache server
@@ -114,9 +125,9 @@
     enabled: true
 
 - name: create horizon config directory
-  file: 
+  file:
     dest: "/etc/openstack-dashboard"
-    state: directory 
+    state: directory
     group: "{{ openstack_meta.apache[ursula_os].group }}"
     mode: 0750
 
