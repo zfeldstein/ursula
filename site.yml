@@ -420,6 +420,15 @@
       when: ironic.enabled|bool and openstack_install_method != 'distro'
   environment: "{{ env_vars|default({}) }}"
 
+- name: barbican
+  hosts: controller
+  any_errors_fatal: true
+  roles:
+    - role: barbican
+      tags: ['openstack', 'barbican']
+      when: barbican.enabled|default(false)
+  environment: "{{ env_vars|default({}) }}"
+  
 - name: openstack base setup
   hosts: controller
   any_errors_fatal: true

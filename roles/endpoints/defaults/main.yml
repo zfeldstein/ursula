@@ -253,3 +253,18 @@ endpoints:
       health_check: 'tcp-check /'
       balance: 'source'
       prefer_primary_backend: False
+  barbican:
+    name: barbican
+    type: key-management
+    description: Key Management Service
+    url:
+      admin: https://{{ fqdn }}:9311
+      internal: https://{{ fqdn }}:9311
+      public: https://{{ fqdn }}:9311
+    port:
+      backend_api:  9312
+      haproxy_api:  9311
+    haproxy:
+      health_check: 'tcp-check /'
+      balance: 'source'
+      prefer_primary_backend: True
