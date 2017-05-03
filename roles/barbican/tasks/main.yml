@@ -112,6 +112,15 @@
   # we want this to always be changed so that it can notify the service restart
   tags: db-migrate
 
+
+- name: trigger restart on upgrades
+  debug:
+    msg: "Triggering service restart for upgrade"
+  changed_when: True
+  notify: restart barbican services
+  when: code_has_changed | default('False') | bool and
+        upgrade | default('False') | bool
+
 - name: Flush handlers
   meta: flush_handlers
 

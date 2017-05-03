@@ -58,3 +58,13 @@ barbican:
   auditing:
     enabled: False
     logging: False
+  backlog: 4096
+  max_allowed_secret_in_bytes: 10000
+  max_allowed_request_size_in_bytes: 1000000
+  sql_idle_timeout: 3600
+  default_limit_paging: 10
+  max_limit_paging: 100
+  asynchronous_workers: 1
+  initial_delay_seconds: 10.0
+  periodic_interval_max_seconds: 10.0
+  thread_pool_size: 10
