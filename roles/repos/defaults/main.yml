@@ -44,8 +44,8 @@ apt_repos:
     repo: ''
     key_url: ''
   elastic:
-    repo: 'https://artifacts.elastic.co/packages/5.x/apt'
-    key_url: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
+    repo: 'http://apt-mirror.openstack.blueboxgrid.com/filebeat'
+    key_url: ' http://apt-mirror.openstack.blueboxgrid.com/keys/filebeat.key'
 
 yum_repos:
   epel:
