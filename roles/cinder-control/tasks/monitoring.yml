@@ -15,6 +15,10 @@
 - include: nimble-monitoring.yml
   when: sensu.nimble_san_ip is defined
 
+- include: v7k-monitoring.yml
+  when: v7k.enabled|default(false)
+
+
 - name: cinder metrics
   template: src=etc/collectd/plugins/cinder.conf dest=/etc/collectd/plugins/cinder.conf
   notify: restart collectd
