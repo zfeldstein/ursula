@@ -151,6 +151,12 @@ apt_repos:
   collectd:
     repo: http://ppa.launchpad.net/raravena80/collectd5/ubuntu
     key_url: "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xE97C3D97792BD34E"
+  mongodb:
+    repo: http://apt-mirror.openstack.blueboxgrid.com/mongodb/apt/ubuntu
+    key_url: http://apt-mirror.openstack.blueboxgrid.com/keys/mongodb.key
+  elastic:
+    repo: http://apt-mirror.openstack.blueboxgrid.com/filebeat
+    key_url: http://apt-mirror.openstack.blueboxgrid.com/keys/filebeat.key
   chef:
     repo: https://packages.chef.io/stable-apt
     key_url: https://downloads.chef.io/packages-chef-io-public.key

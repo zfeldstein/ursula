@@ -19,7 +19,7 @@ neutron:
     password: "{{ secrets.service_password }}"
     interval: 2
   lbaas:
-    enabled: False
+    enabled: True
 
 keystone:
   uwsgi:
@@ -82,4 +82,3 @@ lvm:
 ceph:
   client_version:
     rhel: 0.94.5
-

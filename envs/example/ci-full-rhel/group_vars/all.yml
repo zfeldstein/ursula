@@ -26,7 +26,7 @@ neutron:
     password: "{{ secrets.service_password }}"
     interval: 2
   lbaas:
-    enabled: False
+    enabled: True
 
 common:
   hwraid:
