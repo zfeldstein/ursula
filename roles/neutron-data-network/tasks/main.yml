@@ -139,7 +139,7 @@
 
 - name: symlink other neutron lbaas haproxy templates
   file:
-    src: /opt/openstack/current/neutron/lib/python2.7/site-packages/neutron_lbaas/services/loadbalancer/drivers/haproxy/templates/{{ item }}
+    src: /opt/openstack/current/neutron/lib/python2.7/site-packages/neutron_lbaas/drivers/haproxy/templates/{{ item }}
     dest: /etc/neutron/lbaas_templates/{{ item }}
     owner: root
     group: neutron
