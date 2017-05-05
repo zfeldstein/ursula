@@ -12,7 +12,7 @@ File.open(screenrc, 'w') do |f|
   f.write "hardstatus alwayslastline \"%w\"\n"
 
   cur_group = nil
-  File.read('envs/test/hosts').split("\n").each do |l|
+  File.read('envs/example/test/hosts').split("\n").each do |l|
     next if l.empty?
     if l =~ /\[(.*)\]/
       cur_group = $1

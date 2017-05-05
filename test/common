@@ -22,7 +22,7 @@ fi
 testenv_instance_prefix=${testenv_instance_prefix//./}
 
 export ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/.."
-export ANSIBLE_VAR_DEFAULTS_FILE="${ROOT}/envs/test/defaults-2.0.yml"
+export ENV_DIR=${ROOT}/envs/example/test
 export IMAGE_ID=${IMAGE_ID:=ubuntu-14.04}
 export AVAILABILITY_ZONE=${OS_AVAILABILITY_ZONE:=nova}
 export TEST_ENV=${TEST_ENV:=ci-full-ubuntu}
@@ -31,7 +31,7 @@ export LOGIN_USER=${LOGIN_USER:=ubuntu}
 export testenv_flavor=${testenv_flavor:=m1.large}
 export testenv_network=${testenv_network:=internal}
 export testenv_floating_ip_pool=${testenv_floating_ip_pool:=external}
-export testenv_heat_template_file=${ROOT}/envs/test/heat_stack.yml
+export testenv_heat_template_file=${ENV_DIR}/heat_stack.yml
 export testenv_heat_stack_name="${testenv_instance_prefix}_stack"
 export SECURITYGROUP_NAME="${testenv_instance_prefix}_ursula"
 export CONTROLLER_0_NAME="${testenv_instance_prefix}-controller-0"
@@ -47,8 +47,8 @@ export CPM_0_NAME="${testenv_instance_prefix}-cpm-0"
 export CPM_1_NAME="${testenv_instance_prefix}-cpm-1"
 export CPM_2_NAME="${testenv_instance_prefix}-cpm-2"
 export KEY_NAME="${testenv_instance_prefix}_key"
-export KEY_PATH=${ROOT}/envs/test/.ssh_key
 
+export KEY_PATH=${ENV_DIR}/.ssh_key
 SSH_ARGS=\
 " ${ANSIBLE_SSH_ARGS}"\
 ' -o LogLevel=quiet'\
