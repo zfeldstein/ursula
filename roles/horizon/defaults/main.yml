@@ -25,7 +25,7 @@ horizon:
     python_dependencies:
       - { name: PyMySQL }
       - { name: python-memcached }
-      - { name: neutron-lbaas-dashboard }
+      - { name: neutron-lbaas-dashboard, version: '1.0.0' }
       - { name: django_openstack_auth, version: '2.2.1.dev1' }
     system_dependencies:
       ubuntu:
