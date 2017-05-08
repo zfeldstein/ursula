@@ -65,3 +65,8 @@
     - ceph.enabled
     - "'ceph_monitors' in group_names or 'ceph_osds' in group_names"
   tags: ['precheck_ceph']
+
+- include: v7k.yml
+  when: v7k.enabled
+  tags: ['precheck_v7k']
+  run_once: true
