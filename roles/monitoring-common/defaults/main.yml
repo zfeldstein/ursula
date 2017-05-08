@@ -30,11 +30,7 @@ monitoring:
       warning: 250
       critical: 500
       interface: "{{ hostvars[inventory_hostname][hostvars[inventory_hostname].primary_interface|remove_vlan_tag]|net_physical_devices|join(',') }}"
-      subdue:
-        days:
-          all:
-            - begin: "12:00 PM"
-              end: "12:00 PM"
+
     gems:
       - sys-filesystem
   ipmi_checks:
