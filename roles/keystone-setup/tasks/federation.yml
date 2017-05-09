@@ -1,5 +1,8 @@
 ---
 - name: Register keystone sp info on keystone idp
+  environment:
+    OS_IDENTITY_API_VERSION: 3
+    PYTHONPATH: "{{ basevenv_lib_dir|default(omit) }}"
   keystone_service_provider:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
