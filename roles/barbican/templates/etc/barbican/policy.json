@@ -3,7 +3,7 @@
     "observer": "role:observer",
     "creator": "role:creator",
     "audit": "role:audit",
-    "service_admin": "role:key-manager:service-admin",
+    "service_admin": "role:admin or role:cloud_admin",
     "admin_or_user_does_not_work": "project_id:%(project_id)s",
     "admin_or_user": "rule:admin or project_id:%(project_id)s",
     "admin_or_creator": "rule:admin or rule:creator",
