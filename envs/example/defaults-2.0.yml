@@ -80,7 +80,6 @@ endpoints:
   main:     "{{ fqdn }}"
   db:       "{{ undercloud_floating_ip }}"
   rabbit:   "{{ undercloud_floating_ip }}"
-  magnum: "{{ fqdn }}"
   identity_uri: https://{{ fqdn }}:35357
   auth_uri: https://{{ fqdn }}:5000/v2.0
 
@@ -528,9 +527,9 @@ keystone:
     - name: magnum
       type: container
       description: 'Magnum Container Service'
-      public_url: https://{{ endpoints.main }}:9511
-      internal_url: https://{{ endpoints.main }}:9511
-      admin_url: https://{{ endpoints.main }}:9511
+      public_url: "{{ endpoints.magnum.url.public }}"
+      internal_url: "{{ endpoints.magnum.url.internal }}"
+      admin_url: "{{ endpoints.magnum.url.admin }}"
     - name: aodh
       type: alarming
       description: 'aodh alarming service'
