@@ -30,7 +30,7 @@ common:
     disable_root: False
     disable_dns: True
     client_alive_interval: 1800
-  pip_version: 8.0.2
+  pip_version: 9.0.1
   setuptools_version: system
   ursula_monitoring:
     path: /opt/ursula-monitoring
