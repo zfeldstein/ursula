@@ -178,7 +178,9 @@ ceph:
     rbd_user: cinder
     rbd_ceph_conf: /etc/ceph/ceph.conf
     rbd_flatten_volume_from_snapshot: false
-    rbd_max_clone_depth: 0
+    # FIXME: this variable should be set to 0 once the bug is fixed
+    # https://bugs.launchpad.net/cinder/+bug/1658037
+    rbd_max_clone_depth: 5
     glance_api_version: 2
 
   # Logging
