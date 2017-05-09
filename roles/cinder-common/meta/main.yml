@@ -35,3 +35,5 @@ dependencies:
     project_packages: "{{ cinder.distro.project_packages }}"
     rootwrap: True
     when: openstack_install_method == 'distro'
+  - role: v7k-defaults
+
