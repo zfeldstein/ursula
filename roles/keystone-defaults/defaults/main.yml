@@ -8,6 +8,7 @@ keystone:
   admin_project_domain_name: Default
   uwsgi:
     method: port
+    buffer_size: 114688
     http_port:
       admin: 9091
       public: 9092
