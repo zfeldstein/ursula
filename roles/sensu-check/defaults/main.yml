@@ -56,7 +56,7 @@ sensu_checks:
       standalone: true
       command: "sudo check-netif.rb -c {{monitoring.checks.network_interface_traffic.critical}} -w {{monitoring.checks.network_interface_traffic.warning}} --interfaces {{monitoring.checks.network_interface_traffic.interface}}"
       service_owner: openstack
-      subdue: "{{monitoring.checks.network_interface_traffic.subdue }}"
+
 
   neutron:
     check_neutron_agents:
