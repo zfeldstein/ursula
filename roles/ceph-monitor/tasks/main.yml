@@ -111,6 +111,28 @@
 
 - include: restart_flags.yml
 
+# setup ceph-utils
+- block:
+  - name: create config directory for ceph_utils
+    file: path=/etc/bbg-ceph-utils state=directory
+
+  - name: setup config file for ceph_utils
+    template: src=etc/bbg-ceph-utils/ceph-utils.conf
+              dest=/etc/bbg-ceph-utils/ceph-utils.conf
+
+  - name: install ceph_utils module
+    pip: name={{ ceph.bbg_ceph_utils_pkg.name }}
+         version={{ ceph.bbg_ceph_utils_pkg.version|default(omit) }}
+         virtualenv={{ basevenv|default(omit)  }}
+         extra_args={{ ceph.bbg_ceph_utils_pkg.pip_extra_args|default(omit) }}
+    no_log: true
+
+  - name: add cron to adjust ceph pg number
+    cron: name='ceph-utils' minute='*/{{ ceph.adjust_inveral }}'
+          job='{{ basevenv+"/bin/" if basevenv else "" }}ceph-utils adjust-all'
+          cron_file='ceph_utils' user=root
+  when: ceph.bbg_ceph_utils_pkg
+
 - include: monitoring.yml
   tags:
     - monitoring

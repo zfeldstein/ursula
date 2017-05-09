@@ -35,36 +35,6 @@ EXAMPLES = """
 
 import time
 
-
-def increase_pg_count(module, osds, pool_name,
-                      current_pg_count, desired_pg_count):
-    max_increase_per_pass = osds * 32
-    diff = desired_pg_count - current_pg_count
-
-    while diff > 0:
-        if diff <= max_increase_per_pass:
-            cmd = ['ceph', 'osd', 'pool', 'set', pool_name,
-                   'pg_num', str(desired_pg_count)]
-            rc, out, err = module.run_command(cmd, check_rc=True)
-            # needs at least 10 seconds or the second command will fail
-            time.sleep(10)
-            cmd = ['ceph', 'osd', 'pool', 'set', pool_name,
-                   'pgp_num', str(desired_pg_count)]
-            rc, out, err = module.run_command(cmd, check_rc=True)
-            diff = 0
-        else:
-            current_pg_count = current_pg_count + max_increase_per_pass
-            cmd = ['ceph', 'osd', 'pool', 'set', pool_name,
-                   'pg_num', str(current_pg_count)]
-            rc, out, err = module.run_command(cmd, check_rc=True)
-            # needs at least 10 seconds or the second command will fail
-            time.sleep(10)
-            cmd = ['ceph', 'osd', 'pool', 'set', pool_name,
-                   'pgp_num', str(current_pg_count)]
-            rc, out, err = module.run_command(cmd, check_rc=True)
-            diff = diff - max_increase_per_pass
-
-
 def main():
     module = AnsibleModule(
         argument_spec=dict(
@@ -88,7 +58,7 @@ def main():
 
     # if desired_pg_count is > 32 pgs/osd, ceph throws a warning
     # common protocol is to divide by 2
-    if (desired_pg_count / osds) > 32:
+    while desired_pg_count / osds > 32:
         desired_pg_count = desired_pg_count / 2
 
     # does the pool exist already?
@@ -104,19 +74,7 @@ def main():
         module.exit_json(changed=True, msg="new pool was created")
     # yes
     else:
-        # does the current pg count match the desired pg count?
-        ## Example
-        # out.splitlines()[0] = "pg_num: 256"
-        # current_pg_count = 256
-        current_pg_count = int(out.splitlines()[0].split(":")[1].strip())
-        # no
-        if current_pg_count < desired_pg_count:
-            increase_pg_count(module, osds, pool_name,
-                              current_pg_count, desired_pg_count)
-            module.exit_json(changed=True, msg="pool's pg count was changed")
-        # yes
-        else:
-            module.exit_json(changed=False)
+        module.exit_json(changed=False)
 
 from ansible.module_utils.basic import *
 main()
