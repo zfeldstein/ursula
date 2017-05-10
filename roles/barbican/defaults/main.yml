@@ -29,28 +29,14 @@ barbican:
     upper_constraints: '{{ openstack_meta.upper_constraints }}'
     python_dependencies:
         - { name: PyMySQL }
-    python_post_dependencies:
-        - { name: uwsgi }
         - { name: python-memcached }
+        - { name: uwsgi }
+    python_post_dependencies: []
     system_dependencies:
-      ubuntu:
-        - apache2
-        - apache2-utils
-        - libapache2-mod-wsgi
-        - python-dev
-        - libssl-dev
-        - libpq-dev
-        - libffi-dev
-        - build-essential
+      ubuntu: []
       rhel: []
   alternatives:
     - barbican-manage
-  logs:
-    - paths:
-        - /var/log/barbican/barbican-manage.log
-      fields:
-        type: openstack
-        tags: barbican,barbican-manage
   logging:
     debug: False
     verbose: True
@@ -58,6 +44,16 @@ barbican:
   auditing:
     enabled: False
     logging: False
+  monitoring:
+    sensu_checks:
+      check_barbican_api:
+        criticality: 'critical'
+  logs:
+    - paths:
+      - /var/log/barbican/api.log
+      fields:
+        type: openstack
+        tags: barbican,barbican-api
   backlog: 4096
   max_allowed_secret_in_bytes: 10000
   max_allowed_request_size_in_bytes: 1000000

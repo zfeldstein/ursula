@@ -148,3 +148,14 @@
   until: result|succeeded
   retries: 5
   delay: 10
+
+- include: monitoring.yml
+  tags:
+    - monitoring
+    - common
+  when: monitoring.enabled|default('True')|bool
+
+- include: logging.yml
+  tags:
+    - logrotate
+    - logging

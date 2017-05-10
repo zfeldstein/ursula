@@ -121,6 +121,17 @@
   tasks:
     - include: ../roles/heat/tasks/logging.yml
 
+- name: barbican logging
+  hosts: controller
+  vars_files:
+    - ../roles/barbican/defaults/main.yml
+  roles:
+  - role: ../roles/logging-config
+    service: barbican
+    logdata: "{{ barbican.logs }}"
+  tasks:
+    - include: ../roles/barbican/tasks/logging.yml
+
 - name: start and check logstash-forwarder is running
   hosts: all:!vyatta-*
   tasks:
