@@ -5,7 +5,6 @@ endpoints:
   db: "{{ undercloud_floating_ip }}:3307"
   rabbit: "{{ undercloud_floating_ip }}"
   memcache: "{{ undercloud_floating_ip }}:11211"
-  magnum: "{{ fqdn }}"
   identity_uri: https://{{ fqdn }}:35357
   auth_uri: https://{{ fqdn }}:5000/v2.0
   nova:
@@ -199,6 +198,21 @@ endpoints:
       haproxy_api: 8777
     haproxy:
       health_check: 'tcp-check /'
+      balance: 'source'
+      prefer_primary_backend: False
+  magnum:
+    name: magnum
+    type: container
+    description: 'Magnum Container Service'
+    url:
+      admin: https://{{ fqdn }}:9511
+      internal: https://{{ fqdn }}:9511
+      public: https://{{ fqdn }}:9511
+    port:
+      backend_api: 9512
+      haproxy_api: 9511
+    haproxy:
+      health_check: 'httpchk /'
       balance: 'source'
       prefer_primary_backend: False
   ironic:
