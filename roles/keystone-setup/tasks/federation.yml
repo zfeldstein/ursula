@@ -6,7 +6,7 @@
   keystone_service_provider:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "http://127.0.0.1:{{ endpoints.keystone_admin.port.backend_api }}/v3"
+      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
       domain_id: Default
       username: admin
