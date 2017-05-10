@@ -48,10 +48,10 @@
             helpLocation="/about.html"
             styleSheet="/shibboleth-sp/main.css"/>
 
-{% if keystone.federation.sp.saml.providers[0].metadata_provider_type == 'file' %}
+{% if keystone.federation.sp.saml.providers[0].metadata_provider_type|default('url') == 'file' %}
         <MetadataProvider type="XML" path="{{keystone.federation.sp.saml.providers[0].metadata_file_path}}" />
 {% endif %}
-{% if keystone.federation.sp.saml.providers[0].metadata_provider_type == 'url' %}
+{% if keystone.federation.sp.saml.providers[0].metadata_provider_type|default('url') == 'url' %}
         <MetadataProvider type="XML" uri="{{ keystone.federation.sp.saml.providers[0].idp_metadata_url }}"
           backingFilePath="idp-metadata-provider-backup.xml"
           {% if keystone.federation.sp.saml.providers[0].idp_metadata_min_refresh_delay is defined %}

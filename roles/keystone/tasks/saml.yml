@@ -21,7 +21,7 @@
 - name: Create idp metadata file
   template: src=etc/shibboleth/idp_metadata.xml
             dest=/etc/shibboleth/idp_metadata.xml
-  when: keystone.federation.sp.saml.providers[0].metadata_provider_type == 'file'
+  when: keystone.federation.sp.saml.providers[0].metadata_provider_type|default('url') == 'file'
   notify: restart shibboleth
 
 - name: configure shibboleth settings
