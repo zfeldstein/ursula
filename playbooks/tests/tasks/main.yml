@@ -49,3 +49,6 @@
 
 - include: aodh.yml
   when: aodh.enabled|default('False')|bool
+
+- include: barbican.yml
+  when: barbican.enabled|default('False')|bool
