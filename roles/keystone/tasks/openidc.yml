@@ -50,7 +50,7 @@
     owner: "{{ openstack_meta.apache[ursula_os].user }}"
     group: root
     mode: 0640
-  with_items: "{{ keystone.federation.sp.oidc.providers_info }}"
+  with_items: "{{ keystone.federation.sp.oidc.providers_info|default([]) }}"
 
 - name: create .conf file for the IdPs
   template:
@@ -59,7 +59,7 @@
     owner: "{{ openstack_meta.apache[ursula_os].user }}"
     group: root
     mode: 0640
-  with_items: "{{ keystone.federation.sp.oidc.providers_info }}"
+  with_items: "{{ keystone.federation.sp.oidc.providers_info|default([]) }}"
 
 - name: create .provider file for the IdPs
   template:
@@ -69,9 +69,9 @@
     group: root
     mode: 0640
   when: item.provider_metadata_url is undefined
-  with_items: "{{ keystone.federation.sp.oidc.providers_info }}"
+  with_items: "{{ keystone.federation.sp.oidc.providers_info|default([]) }}"
 
 - name: create .provider file for the IdPs
   shell: "curl --fail {{ item.provider_metadata_url }}  > /etc/{{ openstack_meta.apache[ursula_os].package_name }}/openidc/metadata/{{ item.metadata_file_name }}.provider"
   when: item.provider_metadata_url is defined
-  with_items: "{{ keystone.federation.sp.oidc.providers_info }}"
+  with_items: "{{ keystone.federation.sp.oidc.providers_info|default([]) }}"

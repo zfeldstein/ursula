@@ -87,7 +87,6 @@
     mode: 0775
     owner: barbican
     group: barbican
-    mode: 0775
   with_items:
     - /etc/barbican/uwsgi
     - /run/uwsgi/barbican

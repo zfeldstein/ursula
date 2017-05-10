@@ -46,7 +46,7 @@
       url: '{{ inspec.profiles[item].url }}'
       dest: '/etc/inspec/profiles/archive/{{ inspec.profiles[item].name}}-{{ inspec.profiles[item].version }}.tgz'
       mode: 0644
-    with_items: "{{ install_inspec_profiles }}"
+    with_items: "{{ install_inspec_profiles|default([]) }}"
     when: inspec.dependency_install_method == 'tar'
 
   - name: untar inspec dependencies
@@ -54,7 +54,7 @@
       src: '/etc/inspec/profiles/archive/{{ inspec.profiles[item].name }}-{{ inspec.profiles[item].version }}.tgz'
       dest: '/etc/inspec/profiles/'
       copy: no
-    with_items: "{{ install_inspec_profiles }}"
+    with_items: "{{ install_inspec_profiles|default([]) }}"
     when: inspec.dependency_install_method == 'tar'
 
   - name: create inspec dependency current symlink
@@ -63,7 +63,7 @@
       dest: "/etc/inspec/profiles/{{ inspec.profiles[item].name }}-current"
       state: link
       force: true
-    with_items: "{{ install_inspec_profiles }}"
+    with_items: "{{ install_inspec_profiles|default([]) }}"
     when: inspec.dependency_install_method == 'tar'
 
   - name: create path for inspec control
