@@ -8,7 +8,8 @@
     auth:
       auth_url: "{{ endpoints.keystone.url.internal }}/v3"
       project_name: admin
-      domain_id: Default
+      project_domain_name: default
+      user_domain_name: default
       username: admin
       password: "{{ secrets.admin_password }}"
     service_provider_id: "{{ item.id }}"
