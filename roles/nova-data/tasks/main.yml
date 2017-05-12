@@ -133,3 +133,6 @@
     dest: /dev/kvm
     mode: 0660
   when: ursula_os == 'rhel'
+
+- include: v7k.yml
+  when: v7k.enabled|bool and v7k.multipath.enabled|bool

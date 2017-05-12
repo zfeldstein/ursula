@@ -44,3 +44,4 @@ dependencies:
     when:
       - openstack_install_method == 'distro'
       - inventory_hostname in groups['compute']
+  - role: v7k-defaults
