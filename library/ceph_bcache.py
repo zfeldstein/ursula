@@ -115,7 +115,6 @@ def main():
         cmd = ['sgdisk', '-t', str(partition_index) + ':' + journal_guid, '/dev/' + ssd_device]
         rc, out, err = module.run_command(cmd, check_rc=True)
 
-        cmd = ['ln', '-s', '/dev/' + ssd_device + str(partition_index), '/var/lib/ceph/osd/ceph-' + osd_id + '/journal']
         if 'nvme' in ssd_device:
             cmd = ['ln', '-s', '/dev/' + ssd_device + 'p' + str(partition_index), '/var/lib/ceph/osd/ceph-' + osd_id + '/journal']
         else:
