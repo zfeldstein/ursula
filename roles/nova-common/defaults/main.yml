@@ -7,10 +7,20 @@ nova:
     nova_compute: "{{ openstack_meta.nova.services.nova_compute[ursula_os] }}"
     nova_consoleauth: "{{ openstack_meta.nova.services.nova_consoleauth[ursula_os] }}"
     nova_novncproxy: "{{ openstack_meta.nova.services.nova_novncproxy[ursula_os] }}"
+    nova_placement_api: "{{ openstack_meta.nova.services.nova_placement_api[ursula_os] }}"
     nova_scheduler: "{{ openstack_meta.nova.services.nova_scheduler[ursula_os] }}"
     nova_cert: "{{ openstack_meta.nova.services.nova_cert[ursula_os] }}"
     nova_cells: "{{ openstack_meta.nova.services.nova_cells[ursula_os] }}"
     libvirt: "{{ openstack_meta.nova.services.libvirt[ursula_os] }}"
+  placement:
+    workers: 3
+    uwsgi:
+      method: port
+      http_port: "{{ endpoints.placement.port.backend_api }}"
+      home:
+        distro: /usr/lib/python2.7/site-packages/nova
+        source: /opt/openstack/current/nova
+        package: /opt/openstack/current/nova
   libvirt:
     ubuntu:
       config_file: libvirtd.conf
@@ -76,6 +86,7 @@ nova:
         - openstack-nova-scheduler
         - openstack-nova-novncproxy
         - openstack-nova-console
+        - openstack-nova-placement-api
     compute:
       project_packages:
         - "librbd1-{{ ceph.client_version[ursula_os] }}"
@@ -88,6 +99,7 @@ nova:
       - { name: PyMySQL }
       - { name: python-memcached }
       - { name: python-ironicclient }
+      - { name: uwsgi }
     system_dependencies:
       ubuntu:
         - libjs-jquery-tablesorter
@@ -110,6 +122,7 @@ nova:
     - nova-manage
     - nova-network
     - nova-novncproxy
+    - nova-placement-api
     - nova-rootwrap
     - nova-scheduler
     - nova-serialproxy
@@ -121,6 +134,11 @@ nova:
       fields:
         type: openstack
         tags: nova,nova-api
+    - paths:
+        - /var/log/nova/nova-placement-api.log
+      fields:
+        type: openstack
+        tags: nova,nova-placement-api
     - paths:
         - /var/log/nova/nova-compute.log
       fields:

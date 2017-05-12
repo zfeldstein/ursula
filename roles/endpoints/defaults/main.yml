@@ -24,6 +24,22 @@ endpoints:
       health_check: 'httpchk GET /healthcheck'
       balance: 'roundrobin'
       prefer_primary_backend: False
+  placement:
+    name: placement
+    type: placement
+    description: Placement Service
+    version: v1.0
+    url:
+      admin: https://{{ fqdn }}:8778
+      internal: https://{{ fqdn }}:8778
+      public: https://{{ fqdn }}:8778
+    port:
+      backend_api: 9778
+      haproxy_api: 8778
+    haproxy:
+      health_check: 'tcp-check /'
+      balance: 'roundrobin'
+      prefer_primary_backend: False
   glance:
     name: glance
     type: image
@@ -50,7 +66,7 @@ endpoints:
       public: https://{{ fqdn }}:8776
       path: v1/%(project_id)s
     port:
-      backend_api: 8778
+      backend_api: 9776
       haproxy_api: 8776
     haproxy:
       health_check: 'httpchk GET /healthcheck'

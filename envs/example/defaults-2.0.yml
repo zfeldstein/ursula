@@ -387,6 +387,9 @@ keystone:
     - name: barbican
       password: "{{ secrets.service_password }}"
       tenant: service
+    - name: placement
+      password: "{{ secrets.service_password }}"
+      tenant: service
   user_roles:
     - user: admin
       tenant: admin
@@ -445,6 +448,9 @@ keystone:
     - user: barbican
       tenant: service
       role: admin
+    - user: placement
+      role: admin
+      tenant: service
   services:
     - name: keystone
       type: identity
@@ -464,6 +470,12 @@ keystone:
       public_url: "{{ endpoints.nova.url.public }}/{{ endpoints.nova.url.path }}"
       internal_url: "{{ endpoints.nova.url.internal }}/{{ endpoints.nova.url.path }}"
       admin_url: "{{ endpoints.nova.url.admin }}/{{ endpoints.nova.url.path }}"
+    - name: placement
+      type: placement
+      description: 'Placement Service'
+      public_url: "{{ endpoints.placement.url.public }}"
+      internal_url: "{{ endpoints.placement.url.internal }}"
+      admin_url: "{{ endpoints.placement.url.admin }}"
     - name: glance
       type: image
       description: 'Image Service'

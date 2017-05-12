@@ -34,7 +34,7 @@ dependencies:
     project_name: nova
     project_packages: "{{ nova.distro.controller.project_packages }}"
     rootwrap: True
-    when: 
+    when:
       - openstack_install_method == 'distro'
       - inventory_hostname in groups['controller']
   - role: openstack-distro
