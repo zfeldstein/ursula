@@ -52,6 +52,9 @@ keystone:
   uwsgi:
     method: port
 
+barbican:
+  enabled: True
+
 nova:
   libvirt_type: kvm
 
@@ -59,7 +62,7 @@ serverspec:
   enabled: True
 
 inspec:
-  enabled: False
+  enabled: True
 
 ceph:
   enabled: false
