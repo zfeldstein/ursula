@@ -76,31 +76,63 @@
   notify: restart nova compute
   when: cinder.fixed_key is not defined
 
-- name: install nova-compute service (ubuntu)
-  upstart_service:
-    name: "{{ item.name }}"
-    user: "{{ item.user }}"
-    cmd: "{{ item.cmd }}"
-    config_dirs: "{{ item.config_dirs }}"
-  with_items:
-    - "{{ nova.services.nova_compute }}"
+- block:
+  # Handle update to nova-compute service with env information.
+  - name: check {{ nova.services.nova_compute.name }} has REQUESTS_CA_BUNDLE information (ubuntu)
+    command: grep -q REQUESTS_CA_BUNDLE /etc/init/{{ nova.services.nova_compute.name }}.conf
+    register: srvc_has_env
+    failed_when: false
+    changed_when: false
+
+  - name: remove {{ nova.services.nova_compute.name }} service for update (ubuntu)
+    upstart_service:
+      name: "{{ nova.services.nova_compute.name }}"
+      user: "{{ nova.services.nova_compute.user }}"
+      cmd: "{{ nova.services.nova_compute.cmd }}"
+      state: absent
+    when: srvc_has_env|failed
+
+  - name: install nova-compute service (ubuntu)
+    upstart_service:
+      name: "{{ item.name }}"
+      user: "{{ item.user }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      envs: "{{ item.envs }}"
+    with_items:
+      - "{{ nova.services.nova_compute }}"
   when: ursula_os == 'ubuntu'
 
-- name: install nova-compute service (rhel)
-  systemd_service:
-    name: "{{ item.name }}"
-    description: "{{ item.desc }}"
-    after: "{{ item.after }}"
-    type: "{{ item.type }}"
-    notify_access: "{{ item.notify_access|default(omit) }}"
-    user: "{{ item.user }}"
-    environments: "{{ item.environments }}"
-    cmd: "{{ item.cmd }}"
-    config_dirs: "{{ item.config_dirs }}"
-    config_files: "{{ item.config_files }}"
-    restart: "{{ item.restart }}"
-  with_items:
-    - "{{ nova.services.nova_compute }}"
+- block:
+  # Handle update to nova-compute service with env information.
+  - name: check {{ nova.services.nova_compute.name }} has REQUESTS_CA_BUNDLE information (rhel)
+    command: grep -q REQUESTS_CA_BUNDLE /etc/systemd/system/{{ nova.services.nova_compute.name }}.service
+    register: srvc_has_env
+    failed_when: false
+    changed_when: false
+
+  - name: remove {{ nova.services.nova_compute.name }} service for update (rhel)
+    systemd_service:
+      name: "{{ nova.services.nova_compute.name }}"
+      cmd: "{{ nova.services.nova_compute.cmd }}"
+      state: absent
+    when: srvc_has_env|failed
+
+  - name: install nova-compute service (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      after: "{{ item.after }}"
+      type: "{{ item.type }}"
+      notify_access: "{{ item.notify_access|default(omit) }}"
+      user: "{{ item.user }}"
+      environments: "{{ item.environments }}"
+      cmd: "{{ item.cmd }}"
+      config_dirs: "{{ item.config_dirs }}"
+      config_files: "{{ item.config_files }}"
+      restart: "{{ item.restart }}"
+    with_items:
+      - "{{ nova.services.nova_compute }}"
   when: ursula_os == 'rhel'
 
 - name: trigger restart on upgrades

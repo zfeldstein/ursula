@@ -3,8 +3,41 @@
   when: openstack_install_method != 'distro'
   tags: novnc
 
+- name: set uwsgi path (source install)
+  set_fact: nova_uwsgi_path={{ openstack_source.virtualenv_base }}/nova/bin/uwsgi
+  when: openstack_install_method == 'source'
+
+- name: set uwsgi path (package install ubuntu)
+  set_fact:
+    nova_uwsgi_path: "{{ openstack_package.virtualenv_base }}/nova/bin/uwsgi"
+  when: openstack_install_method == 'package' and ursula_os == 'ubuntu'
+
+- name: set uwsgi path (package install rhel)
+  set_fact:
+    nova_uwsgi_path: "/usr/sbin/uwsgi"
+  when: openstack_install_method == 'distro'
+
+- name: Create nova placement api uwsgi and config directories
+  file: path={{ item }} state=directory
+        owner=nova group=nova mode=0775
+  with_items:
+    - /etc/nova/uwsgi
+    - /run/uwsgi/nova
+
+- name: configure nova placement api wsgi
+  template: src=etc/nova/uwsgi/placement.ini
+            dest=/etc/nova/uwsgi/placement.ini mode=0775
+            owner=nova group=nova
+
+- name: remove nova placement api apache conf (rhel)
+  file:
+    dest: /etc/httpd/conf.d/00-nova-placement-api.conf
+    state: absent
+  failed_when: false
+  when: openstack_install_method == 'distro'
+
 - block:
-  - name: remove retired nova controller services
+  - name: remove retired nova controller services (ubuntu)
     upstart_service:
       name: "{{ item.name }}"
       user: "{{ item.user }}"
@@ -26,10 +59,14 @@
       - "{{ nova.services.nova_consoleauth }}"
       - "{{ nova.services.nova_scheduler }}"
       - "{{ nova.services.nova_novncproxy }}"
+
+  - name: install nova placement api uwsgi service (ubuntu)
+    template: src=etc/init/nova-placement-api.conf
+              dest=/etc/init/nova-placement-api.conf mode=0644
   when: ursula_os == 'ubuntu'
 
 - block:
-  - name: remove retired nova controller services
+  - name: remove retired nova controller services (rhel)
     systemd_service:
       name: "{{ item.name }}"
       cmd: "{{ item.cmd }}"
@@ -55,6 +92,26 @@
       - "{{ nova.services.nova_consoleauth }}"
       - "{{ nova.services.nova_scheduler }}"
       - "{{ nova.services.nova_novncproxy }}"
+
+  - name: install nova placement api uwsgi service (rhel)
+    systemd_service:
+      name: "{{ item.name }}"
+      description: "{{ item.desc }}"
+      cmd: "{{ nova_uwsgi_path }}"
+      args: "{{ item.args }}"
+      user: "{{ item.user }}"
+      type: "{{ item.type }}"
+      notify_access: "{{ item.notify_access }}"
+      restart: "{{ item.restart }}"
+      kill_signal: "SIGINT"
+    with_items:
+      - "{{ openstack_meta.nova.services.nova_placement_api[ursula_os] }}"
+
+  - name: Configure tmpfiles.d for creation of /run/uwsgi/nova on reboot
+    template:
+      src: usr/lib/tmpfiles.d/openstack-nova-placement-api.conf
+      dest: /usr/lib/tmpfiles.d/openstack-nova-placement-api.conf
+      mode: 0644
   when: ursula_os == 'rhel'
 
 #FIXME do we need this on rhosp?
@@ -103,6 +160,7 @@
     - "{{ nova.services.nova_consoleauth }}"
     - "{{ nova.services.nova_scheduler }}"
     - "{{ nova.services.nova_novncproxy }}"
+    - "{{ nova.services.nova_placement_api }}"
 
 - include: monitoring.yml
   tags:

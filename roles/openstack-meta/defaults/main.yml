@@ -153,6 +153,7 @@ openstack_meta:
           user: nova
           cmd: /usr/local/bin/nova-compute
           config_dirs: /etc/nova
+          envs: "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
         rhel:
           name: openstack-nova-compute
           desc: OpenStack Nova Compute Service
@@ -162,6 +163,7 @@ openstack_meta:
           user: nova
           environments:
             - "LIBGUESTFS_ATTACH_METHOD=appliance"
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}nova-compute"
           config_dirs: /etc/nova
           config_files: /etc/nova/nova.conf
@@ -199,6 +201,18 @@ openstack_meta:
           config_dirs: /etc/nova
           config_files: /etc/nova/nova.conf
           restart: always
+      nova_placement_api:
+          ubuntu:
+            name: nova-placement-api
+            desc: OpenStack Nova Placement Service
+          rhel:
+            name: openstack-nova-placement-api
+            desc: OpenStack Nova Placement Service
+            type: notify
+            notify_access: all
+            user: nova
+            args: --uid nova --gid nova --master --emperor /etc/nova/uwsgi
+            restart: always
       nova_scheduler:
         ubuntu:
           name: nova-scheduler

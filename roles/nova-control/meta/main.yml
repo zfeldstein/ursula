@@ -18,3 +18,5 @@ dependencies:
     rules_type_input:
       - { protocol: tcp, port: "{{ endpoints.nova.port.haproxy_api }}" }
       - { protocol: tcp, port: "{{ endpoints.novnc.port.haproxy_api }}" }
+      - { protocol: tcp, port: "{{ endpoints.placement.port.haproxy_api }}" }
+

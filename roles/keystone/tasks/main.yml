@@ -32,17 +32,17 @@
       permission: r
 
 - name: set uwsgi path (source install)
-  set_fact: uwsgi_path={{ openstack_source.virtualenv_base }}/keystone/bin/uwsgi
+  set_fact: keystone_uwsgi_path={{ openstack_source.virtualenv_base }}/keystone/bin/uwsgi
   when: openstack_install_method == 'source'
 
 - name: set uwsgi path (package install ubuntu)
   set_fact:
-    uwsgi_path: "{{ openstack_package.virtualenv_base }}/keystone/bin/uwsgi"
+    keystone_uwsgi_path: "{{ openstack_package.virtualenv_base }}/keystone/bin/uwsgi"
   when: openstack_install_method == 'package' and ursula_os == 'ubuntu'
 
 - name: set uwsgi path (package install rhel)
   set_fact:
-    uwsgi_path: "/usr/sbin/uwsgi"
+    keystone_uwsgi_path: "/usr/sbin/uwsgi"
   when: openstack_install_method == 'distro'
 
 - name: install keystone uwsgi service (ubuntu)
@@ -55,7 +55,7 @@
     systemd_service:
       name: "{{ item.name }}"
       description: "{{ item.desc }}"
-      cmd: "{{ uwsgi_path }}"
+      cmd: "{{ keystone_uwsgi_path }}"
       args: "{{ item.args }}"
       user: "{{ item.user }}"
       type: "{{ item.type }}"
@@ -65,7 +65,7 @@
     with_items:
       - "{{ openstack_meta.keystone.services.keystone_api[ursula_os] }}"
 
-  - name: Configure tmpfiles.d for creation of /run/uwsgi on reboot
+  - name: Configure tmpfiles.d for creation of /run/uwsgi/keystone on reboot
     template:
       src: usr/lib/tmpfiles.d/openstack-keystone.conf
       dest: /usr/lib/tmpfiles.d/openstack-keystone.conf
@@ -77,7 +77,7 @@
         owner=keystone group=keystone mode=0775
   with_items:
     - /etc/keystone/uwsgi
-    - /run/uwsgi
+    - /run/uwsgi/keystone
 
 - name: configure keystone admin wsgi
   template: src=etc/keystone/uwsgi/keystone-admin.ini

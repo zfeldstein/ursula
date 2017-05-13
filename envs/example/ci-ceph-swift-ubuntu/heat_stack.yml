@@ -110,6 +110,14 @@ resources:
           port_range_max: 8774
         - remote_ip_prefix: 0.0.0.0/0
           protocol: tcp
+          port_range_min: 8778
+          port_range_max: 8778
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 9311
+          port_range_max: 9311
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
           port_range_min: 8776
           port_range_max: 8776
         - remote_ip_prefix: 0.0.0.0/0
