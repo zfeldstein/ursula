@@ -34,3 +34,5 @@ sensu ALL= NOPASSWD: /etc/sensu/plugins/check-netif.rb
 sensu ALL= NOPASSWD: /etc/sensu/plugins/check-haproxy.rb
 sensu ALL= NOPASSWD: /etc/sensu/plugins/execute-on-ip.sh
 sensu ALL= NOPASSWD: /etc/sensu/plugins/metrics-nova-oversub.sh
+sensu ALL= NOPASSWD: /etc/sensu/plugins/check-v7k-canister.py
+sensu ALL= NOPASSWD: /etc/sensu/plugins/metrics-v7k.py
