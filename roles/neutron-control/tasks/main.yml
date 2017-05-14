@@ -7,10 +7,10 @@
     upstart_service:
       name: "{{ item.name }}"
       user: "{{ item.user }}"
+      envs: "{{ item.envs }}"
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"
-      envs: "{{ neutron.service.envs }}"
     with_items:
       - "{{ neutron.services.neutron_server }}"
   when: ursula_os == 'ubuntu'
@@ -23,7 +23,7 @@
       type: "{{ item.type }}"
       notify_access: "{{ item.notify_access|default(omit) }}"
       user: "{{ item.user }}"
-      environments: "{{ neutron.service.envs }}"
+      environments: "{{ item.environments }}"
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"

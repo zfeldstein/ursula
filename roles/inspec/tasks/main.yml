@@ -2,6 +2,9 @@
 - name: install inspec
   package:
     name: inspec
+  register: result
+  until: result|succeeded
+  retries: 5
 
 - name: ensure inspec directory exists
   file:

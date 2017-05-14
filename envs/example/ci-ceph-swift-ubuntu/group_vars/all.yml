@@ -14,6 +14,13 @@ etc_hosts:
   - name: "{{ swift_fqdn }}"
     ip: "{{ swift_floating_ip }}"
 
+keystone:
+  uwsgi:
+    method: port
+
+barbican:
+  enabled: True
+
 neutron:
   enable_external_interface: True
   l3ha:
@@ -43,6 +50,9 @@ cinder:
     # Determined automatically by Ceph roles
 
 serverspec:
+  enabled: True
+
+inspec:
   enabled: True
 
 swift:

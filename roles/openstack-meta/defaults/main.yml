@@ -151,9 +151,10 @@ openstack_meta:
           name: nova-compute
           desc: OpenStack Nova Compute Service
           user: nova
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/nova-compute
           config_dirs: /etc/nova
-          envs: "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
         rhel:
           name: openstack-nova-compute
           desc: OpenStack Nova Compute Service
@@ -282,6 +283,8 @@ openstack_meta:
           name: neutron-server
           desc: OpenStack Neutron Server Service
           user: neutron
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/neutron-server
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini
@@ -291,6 +294,8 @@ openstack_meta:
           type: notify
           notify_access: all
           user: neutron
+          environments:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-server"
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini
@@ -301,6 +306,8 @@ openstack_meta:
           name: neutron-dhcp-agent
           desc: OpenStack Neutron DHCP Agent Service
           user: neutron
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/neutron-dhcp-agent
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/dhcp_agent.ini
@@ -311,6 +318,8 @@ openstack_meta:
           desc: OpenStack Neutron DHCP Agent Service
           type: simple
           user: neutron
+          environments:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-dhcp-agent"
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/dhcp_agent.ini
@@ -321,6 +330,8 @@ openstack_meta:
           name: neutron-l3-agent
           desc: OpenStack Neutron L3 Agent Service
           user: neutron
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/neutron-l3-agent
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/l3_agent.ini
@@ -332,6 +343,8 @@ openstack_meta:
           desc: OpenStack Neutron L3 Agent Service
           type: simple
           user: neutron
+          environments:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-l3-agent"
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/l3_agent.ini
@@ -343,12 +356,16 @@ openstack_meta:
           name: neutron-openvswitch-agent
           desc: OpenStack Neutron Open VSwitch Service
           user: neutron
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/neutron-openvswitch-agent
           config_dirs: /etc/neutron
         rhel:
           name: neutron-openvswitch-agent
           desc: OpenStack Neutron Open VSwitch Service
           user: neutron
+          environments:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-openvswitch-agent"
           config_dirs: /etc/neutron
       neutron_linuxbridge_agent:
@@ -356,6 +373,8 @@ openstack_meta:
           name: neutron-linuxbridge-agent
           desc: OpenStack Neutron Linuxbridge Agent Service
           user: neutron
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/neutron-linuxbridge-agent
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/plugins/ml2/ml2_plugin.ini,/etc/neutron/plugins/ml2/ml2_plugin_dataplane.ini
@@ -364,6 +383,8 @@ openstack_meta:
           desc: OpenStack Neutron Linuxbridge Agent Service
           type: simple
           user: neutron
+          environments:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           #prestart_script: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/neutron-enable-bridge-firewall.sh', '') }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-linuxbridge-agent"
           config_dirs: /etc/neutron
@@ -375,6 +396,8 @@ openstack_meta:
           name: neutron-metadata-agent
           desc: OpenStack Neutron Metadata Agent Service
           user: neutron
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/neutron-metadata-agent
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/metadata_agent.ini
@@ -385,6 +408,8 @@ openstack_meta:
           desc: OpenStack Neutron Metadata Agent Service
           type: simple
           user: neutron
+          environments:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-metadata-agent"
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/metadata_agent.ini
@@ -395,6 +420,8 @@ openstack_meta:
           name: neutron-lbaasv2-agent
           desc: OpenStack Neutron LBaasv2 Service
           user: neutron
+          envs:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: /usr/local/bin/neutron-lbaasv2-agent
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini,/etc/neutron/neutron_lbaas.conf
@@ -405,6 +432,8 @@ openstack_meta:
           desc: OpenStack Neutron LBaasv2 Service
           type: simple
           user: neutron
+          environments:
+            - "REQUESTS_CA_BUNDLE={{ ssl.cafile }}"
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}neutron-lbaasv2-agent"
           config_dirs: /etc/neutron
           config_files: /etc/neutron/neutron.conf,/etc/neutron/services/loadbalancer/haproxy/lbaas_agent.ini,/etc/neutron/neutron_lbaas.conf
@@ -833,9 +862,9 @@ openstack_meta:
           cmd: "{{ (ansible_distribution == 'RedHat') | ternary('/usr/bin/', '/usr/local/bin/') }}ceilometer-polling"
           args: "--polling-namespaces compute"
           restart: on-failure
-  barbican: 
+  barbican:
     services:
-      barbican_api: 
+      barbican_api:
         ubuntu:
           name: barbican
           desc: OpenStack Key Management Service

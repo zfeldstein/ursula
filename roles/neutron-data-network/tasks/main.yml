@@ -50,11 +50,11 @@
       start_on: "{{ item.start_on|default(omit) }}"
       stop_on: "{{ item.stop_on|default(omit) }}"
       user: "{{ item.user }}"
+      envs: "{{ item.envs }}"
       pidfile: "{{ item.pidfile|default(omit) }}"
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files|default(omit) }}"
-      envs: "{{ neutron.service.envs }}"
     with_items:
       - "{{ neutron.services.neutron_dhcp_agent }}"
       - "{{ neutron.services.neutron_l3_agent }}"
@@ -70,7 +70,7 @@
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files|default(omit) }}"
-      envs: "{{ neutron.service.envs }}"
+      envs: "{{ item.envs }}"
     when: ((neutron.lbaas.enabled == "smart" and
            groups['controller'][0] not in groups['compute']) or
            neutron.lbaas.enabled|bool)
@@ -85,7 +85,7 @@
       description: "{{ item.desc }}"
       type: "{{ item.type }}"
       user: "{{ item.user }}"
-      environments: "{{ neutron.service.envs }}"
+      environments: "{{ item.environments }}"
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"
@@ -103,7 +103,7 @@
       description: "{{ item.desc }}"
       type: "{{ item.type }}"
       user: "{{ item.user }}"
-      environments: "{{ neutron.service.envs }}"
+      environments: "{{ item.environments }}"
       cmd: "{{ item.cmd }}"
       config_dirs: "{{ item.config_dirs }}"
       config_files: "{{ item.config_files }}"

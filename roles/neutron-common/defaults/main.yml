@@ -79,8 +79,6 @@ neutron:
     service_plugin:
       - neutron_lbaas.services.loadbalancer.plugin.LoadBalancerPluginv2
     service_provider: LOADBALANCERV2:Haproxy:neutron_lbaas.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default
-  service:
-    envs: []
   distro:
     project_packages:
       - openstack-neutron
@@ -157,7 +155,7 @@ neutron:
         - /var/log/neutron/neutron-linuxbridge-agent.log
       fields:
         type: openstack
-        tags: neutron,neutron-linuxbridge-agent        
+        tags: neutron,neutron-linuxbridge-agent
   logging:
     debug: False
     verbose: True
