@@ -66,7 +66,7 @@
     - name: clean all serverspec definition
       file: dest=/etc/serverspec/spec/localhost
             state=absent
-            
+
   roles:
     - role: common
   environment: "{{ env_vars|default({}) }}"
@@ -157,7 +157,14 @@
         - python-neutronclient
         - python-heatclient
         - python-novaclient
+        - python-glanceclient
+        - python-cinderclient
+        - python-ceilometerclient
+        - python-swiftclient
         - python-keystoneclient
+        - python-magnumclient
+        - python-ironicclient
+
       register: result
       until: result|succeeded
       retries: 5
