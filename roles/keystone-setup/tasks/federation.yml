@@ -6,7 +6,7 @@
   keystone_service_provider:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      auth_url: "{{ endpoints.keystone.url.internal }}/{{ endpoints.keystonev3.version }}"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -25,7 +25,7 @@
   keystone_identity_provider:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      auth_url: "{{ endpoints.keystone.url.internal }}/{{ endpoints.keystonev3.version }}"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -44,7 +44,7 @@
   os_group:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      auth_url: "{{ endpoints.keystone.url.internal }}/{{ endpoints.keystonev3.version }}"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -61,7 +61,7 @@
   os_user_role:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      auth_url: "{{ endpoints.keystone.url.internal }}/{{ endpoints.keystonev3.version }}"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -79,7 +79,7 @@
   keystone_federation_mapping:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      auth_url: "{{ endpoints.keystone.url.internal }}/{{ endpoints.keystonev3.version }}"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
@@ -96,7 +96,7 @@
   keystone_federation_protocol:
     validate_certs: "{{ validate_certs|default(omit) }}"
     auth:
-      auth_url: "{{ endpoints.keystone.url.internal }}/v3"
+      auth_url: "{{ endpoints.keystone.url.internal }}/{{ endpoints.keystonev3.version }}"
       project_name: admin
       project_domain_name: default
       user_domain_name: default
