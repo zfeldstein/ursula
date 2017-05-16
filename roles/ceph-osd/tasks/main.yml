@@ -6,7 +6,9 @@
   # https://github.com/ansible/ansible/issues/15365
   # delegate_facts does not work with run_once
   # so we use inventory_hostname == play_hosts[0] instead of run_once
-  when: inventory_hostname == play_hosts[0]
+  when:
+    - inventory_hostname == play_hosts[0]
+    - ssd_pool is undefined
   tags: ['monitoring', 'openstack', 'control', 'glance', 'cinder',
          'cinder-data', 'nova', 'nova-data', 'data', 'openstack-setup']
 
