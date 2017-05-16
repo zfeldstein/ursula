@@ -53,7 +53,7 @@
 # if default pool exists, ssd/hybrid pool exists too
 - name: set pool names if default pool and ssd pool exist
   set_fact:
-    ssd_pool:  "rbd_ssd"
+    ssd_pool: "rbd_ssd"
     hybrid_pool: "default"
   when:
     - existing_pools.stdout | search("default")
@@ -61,7 +61,7 @@
 
 - name: set pool names if default pool and hybrid pool exist
   set_fact:
-    hybrid_pool:  "rbd_hybrid"
+    hybrid_pool: "rbd_hybrid"
     ssd_pool: "default"
   when:
     - existing_pools.stdout | search("default")
@@ -77,7 +77,7 @@
 
 - name: populate pool names to all osd nodes
   set_fact:
-    hybrid_pool:  "{{ hybrid_pool }}"
+    hybrid_pool: "{{ hybrid_pool }}"
     ssd_pool: "{{ ssd_pool }}"
   delegate_to: "{{ item }}"
   delegate_facts: yes

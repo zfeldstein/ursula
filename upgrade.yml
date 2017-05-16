@@ -206,12 +206,12 @@
         changed: false
   environment: "{{ env_vars|default({}) }}"
 
-- name: ceph osds
-  hosts: ceph_osds
+- name: populate ceph related vars
+  hosts: ceph_monitors[0]
   max_fail_percentage: 1
   any_errors_fatal: true
-  roles:
-    - role: ceph-osd
+  tasks:
+    - include: roles/ceph-osd/tasks/pool_names.yml
       when: ceph.enabled
       tags: ['ceph', 'ceph-osd']
   environment: "{{ env_vars|default({}) }}"
