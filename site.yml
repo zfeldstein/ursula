@@ -204,6 +204,7 @@
     - role: ceph-client
       when: ceph.enabled
       tags: ['ceph','ceph-client']
+  environment: "{{ env_vars|default({}) }}"
 
 # OPENSTACK SERVICES
 # # this next play can go away after 2.1.0+ is everywhere
@@ -216,6 +217,7 @@
       tags:
         - openstack
         - symlink
+  environment: "{{ env_vars|default({}) }}"
 
 - name: openstack client tools
   hosts: all:!vyatta-*:!ceph_monitors:!ceph_osds
@@ -237,6 +239,7 @@
   hosts: controller[0]
   any_errors_fatal: true
   tags: ['openstack', 'setup', 'keystone-setup']
+  environment: "{{ env_vars|default({}) }}"
 
   roles:
     - role: keystone-setup
@@ -401,6 +404,7 @@
     - role: magnum
       tags: ['openstack', 'magnum', 'control']
       when: magnum.enabled|bool and openstack_install_method != 'distro'
+  environment: "{{ env_vars|default({}) }}"
 
 - name: ironic control plane
   hosts: controller
