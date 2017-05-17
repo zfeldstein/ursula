@@ -1,6 +1,6 @@
 ---
 - name: restart ironic services
-  service: name={{ item }} state=restarted must_exist=false
+  service: name={{ item }} state=restarted
   when: restart|default(True)
   with_items:
     - ironic-api
