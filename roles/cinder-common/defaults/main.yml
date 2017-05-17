@@ -1,6 +1,6 @@
 ---
 project_name: cinder
-cinder:
+cinder: 
   services:
     cinder_api: "{{ openstack_meta.cinder.services.cinder_api[ursula_os] }}"
     cinder_scheduler: "{{ openstack_meta.cinder.services.cinder_scheduler[ursula_os] }}"

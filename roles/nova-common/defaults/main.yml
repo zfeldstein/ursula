@@ -13,6 +13,7 @@ nova:
     nova_cells: "{{ openstack_meta.nova.services.nova_cells[ursula_os] }}"
     libvirt: "{{ openstack_meta.nova.services.libvirt[ursula_os] }}"
   placement:
+    enabled: True # Added to keep keystone.services.endpoints.cinderv3 in default-2.0.yml backward compatible with 3.1.x
     workers: 3
     uwsgi:
       method: port
