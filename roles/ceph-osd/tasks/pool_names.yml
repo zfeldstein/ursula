@@ -182,3 +182,10 @@
   with_items:
     - "{{ groups['controller'] }}"
     - "{{ groups['cinder_volume'] }}"
+
+# this flag has to be defined at the end of this yml file
+# because main.yml passes condition 'pool_names_completed is defined' to
+# every task in this yml file
+- name: set pool_names_completed to indicate pool_names.yml has been run
+  set_fact:
+    pool_names_completed: true

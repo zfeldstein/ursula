@@ -8,7 +8,7 @@
   # so we use inventory_hostname == play_hosts[0] instead of run_once
   when:
     - inventory_hostname == play_hosts[0]
-    - ssd_pool is undefined
+    - pool_names_completed is undefined
   tags: ['monitoring', 'openstack', 'control', 'glance', 'cinder',
          'cinder-data', 'nova', 'nova-data', 'data', 'openstack-setup']
 
