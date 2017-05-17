@@ -26,15 +26,17 @@
 
 - block:
   - name: enable apache modules
-    apache2_module: name={{ item }}
+    apache2_module:
+      name: "{{ item }}"
+      ignore_configcheck: True
     with_items:
+      - proxy
+      - proxy_http
+      - uwsgi
+      - proxy_uwsgi
       - headers
       - ssl
       - rewrite
-      - uwsgi
-      - proxy
-      - proxy_http
-      - proxy_uwsgi
     notify: reload apache
 
   - name: disable apache status

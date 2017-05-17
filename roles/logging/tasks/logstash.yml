@@ -45,7 +45,7 @@
   retries: 5
 
 - name: stop logstash-forwarder service
-  service: name=logstash-forwarder state=stopped enabled=yes must_exist=false
+  service: name=logstash-forwarder state=stopped enabled=yes
   when: ursula_os == 'ubuntu' and install_lsf|changed
 
 - name: install logstash-forwarder service
