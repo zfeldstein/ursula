@@ -126,6 +126,9 @@
          virtualenv={{ basevenv|default(omit)  }}
          extra_args={{ ceph.bbg_ceph_utils_pkg.pip_extra_args|default(omit) }}
     no_log: true
+    register: result
+    until: result|succeeded
+    retries: 5
 
   - name: add cron to adjust ceph pg number
     cron: name='ceph-utils' minute='*/{{ ceph.adjust_inveral }}'
