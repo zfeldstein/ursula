@@ -238,11 +238,9 @@
 - name: keystone setup
   hosts: controller[0]
   any_errors_fatal: true
-  tags: ['openstack', 'setup', 'keystone-setup']
-  environment: "{{ env_vars|default({}) }}"
-
   roles:
     - role: keystone-setup
+      tags: ['openstack', 'setup', 'keystone-setup']
   environment: "{{ env_vars|default({}) }}"
 
 - name: glance code and config
@@ -432,7 +430,7 @@
       tags: ['openstack', 'barbican']
       when: barbican.enabled|default(false)
   environment: "{{ env_vars|default({}) }}"
-  
+
 - name: openstack base setup
   hosts: controller
   any_errors_fatal: true
